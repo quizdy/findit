@@ -19,7 +19,7 @@
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
-              @click.stop="delUser(user)"
+              @click.stop="confirmUser(user)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -37,7 +37,14 @@ const emitsUserList = defineEmits<{
     color: string,
     msg: string
   ): void;
-  (e: "setUser", user: any): void;
+  (
+    e: "showConfirmDialog",
+    show: boolean,
+    title: string,
+    msg: string,
+    func: typeof deleteUser,
+    params: any
+  ): void;
   (e: "changeComponent", componentName: string): void;
 }>();
 
@@ -58,6 +65,17 @@ const selectedUser = (user: any) => {
   emitsUserList("changeComponent", "userEdit");
 };
 
+const confirmUser = (user: any) => {
+  emitsUserList(
+    "showConfirmDialog",
+    true,
+    "削除",
+    "削除します。よろしいですか？",
+    deleteUser,
+    user
+  );
+};
+
 const addUser = () => {
   const user = {
     userId:
@@ -75,13 +93,14 @@ const addUser = () => {
   emitsUserList("changeComponent", "userEdit");
 };
 
-const delUser = async (user: any) => {
-  const { data: resDelUser } = await useFetch("/api/DeleteUser", {
+const deleteUser = async (user: any) => {
+  console.log(user);
+  const { data: resDeleteUser } = await useFetch("/api/DeleteUser", {
     method: "POST",
     body: { userId: user.userId },
   });
 
-  if ((resDelUser.value as any).msg === "") {
+  if ((resDeleteUser.value as any).msg === "") {
     users.value = users.value.filter(
       (user_: any) => user_.userId !== user.userId
     );

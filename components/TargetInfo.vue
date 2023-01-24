@@ -2,6 +2,7 @@
   <div>
     <Swiper
       :slides-per-view="1"
+      :initial-slide="venue.pos"
       :loop="false"
       :effect="'creative'"
       :creative-effect="{
@@ -17,38 +18,28 @@
       <SwiperSlide v-for="(target, i) in targets" :key="i">
         <v-card max-width="600" class="mx-auto mt-2">
           <v-sheet class="d-flex flex-column">
-            <v-container mt-0 pt-0>
-              <v-row no-gutters>
-                <v-col cols="12">
-                  <div class="layout">
-                    <v-icon
-                      v-show="target.status === 2"
-                      size="10rem"
-                      color="success"
-                      style="position: absolute; top: 25vh; left: 25vw"
-                      >mdi-check-circle</v-icon
-                    >
-                    <v-img
-                      :class="[
-                        i > 0 && target.status === 0 ? 'passive' : '',
-                        target.status === 2 ? 'clear' : '',
-                      ]"
-                      :src="target.image"
-                      :style="{
-                        height: imageHeight,
-                        width: imageWidth,
-                      }"
-                    ></v-img>
-                  </div>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="12" width="400">
-                  <h3>{{ target.title }}</h3>
-                  <small>{{ target.comments }}</small>
-                </v-col>
-              </v-row>
-            </v-container>
+            <div class="layout">
+              <v-icon
+                v-show="target.status === 2"
+                size="10rem"
+                color="success"
+                class="check"
+                >mdi-check-circle</v-icon
+              >
+              <v-img
+                :class="[
+                  i > 0 && target.status === 0 ? 'passive' : '',
+                  target.status === 2 ? 'clear' : '',
+                ]"
+                :src="target.image"
+                :style="{
+                  height: imageHeight,
+                  width: imageWidth,
+                }"
+              ></v-img>
+            </div>
+            <h3 class="mx-8 mt-4">{{ target.title }}</h3>
+            <small class="mx-8 mt-2">{{ target.comments }}</small>
           </v-sheet>
         </v-card>
       </SwiperSlide>
@@ -81,5 +72,14 @@ const targets = ref(propsTargetInfo.venue.targets);
 .layout .clear {
   filter: sepia(60%);
   filter: opacity(50%);
+}
+
+.layout .check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
 }
 </style>

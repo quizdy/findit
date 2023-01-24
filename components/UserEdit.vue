@@ -3,7 +3,7 @@
     <v-card max-width="600" class="mx-auto">
       <v-toolbar color="light-blue" dark>
         <v-spacer></v-spacer>
-        <v-btn @click="cancelUser()"
+        <v-btn @click="cancelUser"
           ><v-icon>mdi-arrow-left-circle</v-icon></v-btn
         >
       </v-toolbar>
@@ -50,7 +50,7 @@
           </v-row>
           <v-row no-gutters justify-space-between>
             <v-col cols="6">
-              <v-btn @click="updateUser">登録</v-btn>
+              <v-btn @click="confirmUser">登録</v-btn>
             </v-col>
             <v-col cols="6" style="text-align: right">
               <v-btn @click="cancelUser">キャンセル</v-btn>
@@ -71,6 +71,14 @@ const emitsUserEdit = defineEmits<{
     color: string,
     msg: string
   ): void;
+  (
+    e: "showConfirmDialog",
+    show: boolean,
+    title: string,
+    msg: string,
+    func: typeof updateUser,
+    params: any
+  ): void;
   (e: "changeComponent", componentName: string): void;
 }>();
 
@@ -86,7 +94,7 @@ const user = reactive({
 });
 
 const venues = ref([]);
-const selectedVenue = ref("");
+const selectedVenue = ref(propsUserList.user.venue.venueName);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",
@@ -105,7 +113,7 @@ const getVenue = async () => {
   user.venue = (resGetVenue.value as any).venue;
 };
 
-const updateUser = async () => {
+const confirmUser = () => {
   if (!user.userName) {
     emitsUserEdit(
       "setSnackbar",
@@ -117,6 +125,17 @@ const updateUser = async () => {
     return;
   }
 
+  emitsUserEdit(
+    "showConfirmDialog",
+    true,
+    "登録",
+    "登録します。よろしいですか？",
+    updateUser,
+    ""
+  );
+};
+
+const updateUser = async (params: any) => {
   const { data: resUpdateUser } = await useFetch("/api/UpdateUser", {
     method: "POST",
     body: {

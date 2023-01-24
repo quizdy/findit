@@ -3,7 +3,7 @@
     <v-card max-width="600" class="mx-auto">
       <v-toolbar color="light-blue" dark>
         <v-spacer></v-spacer>
-        <v-btn @click="cancelVenue()"
+        <v-btn @click="cancelVenue"
           ><v-icon>mdi-arrow-left-circle</v-icon></v-btn
         >
       </v-toolbar>
@@ -31,7 +31,7 @@
           </v-row>
           <v-row no-gutters justify-space-between>
             <v-col cols="6">
-              <v-btn @click="updateVenue">登録</v-btn>
+              <v-btn @click="confirmVenue">登録</v-btn>
             </v-col>
             <v-col cols="6" style="text-align: right">
               <v-btn @click="cancelVenue">キャンセル</v-btn>
@@ -52,6 +52,14 @@ const emitsVenueEdit = defineEmits<{
     color: string,
     msg: string
   ): void;
+  (
+    e: "showConfirmDialog",
+    show: boolean,
+    title: string,
+    msg: string,
+    func: typeof updateVenue,
+    params: any
+  ): void;
   (e: "changeComponent", componentName: string): void;
 }>();
 
@@ -64,6 +72,28 @@ const venue = reactive({
   comments: propsVenueList.venue.comments,
   pos: propsVenueList.venue.pos,
 });
+
+const confirmVenue = () => {
+  if (!venue.venueName) {
+    emitsVenueEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "会場名を入力して下さい"
+    );
+    return;
+  }
+
+  emitsVenueEdit(
+    "showConfirmDialog",
+    true,
+    "登録",
+    "登録します。よろしいですか？",
+    updateVenue,
+    ""
+  );
+};
 
 const updateVenue = async () => {
   const { data: resUpdateVenue } = await useFetch("/api/UpdateVenue", {

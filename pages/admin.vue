@@ -4,6 +4,7 @@
       <UserList
         v-if="currentComponent === 'userList'"
         @setSnackbar="setSnackbar"
+        @showConfirmDialog="showConfirmDialog"
         @setUser="setUser"
         @changeComponent="changeComponent"
       />
@@ -11,11 +12,13 @@
         v-if="currentComponent === 'userEdit'"
         :user="user"
         @setSnackbar="setSnackbar"
+        @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
       />
       <VenueList
         v-if="currentComponent === 'venueList'"
         @setSnackbar="setSnackbar"
+        @showConfirmDialog="showConfirmDialog"
         @setVenue="setVenue"
         @changeComponent="changeComponent"
       />
@@ -23,12 +26,14 @@
         v-if="currentComponent === 'venueEdit'"
         :venue="venue"
         @setSnackbar="setSnackbar"
+        @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
       />
       <TargetList
         v-if="currentComponent === 'targetList'"
         :venue="venue"
         @setSnackbar="setSnackbar"
+        @showConfirmDialog="showConfirmDialog"
         @setTarget="setTarget"
         @changeComponent="changeComponent"
       />
@@ -37,6 +42,7 @@
         :venueName="venue.venueName"
         :target="target"
         @setSnackbar="setSnackbar"
+        @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
       />
     </v-main>
@@ -48,6 +54,34 @@
       >
         {{ snackbar.msg }}
       </v-snackbar>
+      <v-dialog v-model="confirmDialog.show" persistent>
+        <v-card max-width="600" class="mx-auto">
+          <v-card-title class="text-h5">
+            {{ confirmDialog.title }}
+          </v-card-title>
+          <v-card-text>{{ confirmDialog.msg }}</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green-darken-1"
+              variant="text"
+              @click="
+                closeConfirmDialog();
+                confirmDialog.func(confirmDialog.params);
+              "
+            >
+              はい
+            </v-btn>
+            <v-btn
+              color="green-darken-1"
+              variant="text"
+              @click="closeConfirmDialog"
+            >
+              いいえ
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </client-only>
   </v-app>
 </template>
@@ -82,6 +116,13 @@ const snackbar = reactive({
   color: "",
   msg: "",
 });
+const confirmDialog = reactive({
+  show: false,
+  title: "",
+  msg: "",
+  func: null,
+  params: null,
+});
 
 const changeComponent = (componentName: string) => {
   currentComponent.value = componentName;
@@ -97,6 +138,24 @@ const setSnackbar = (
   snackbar.timeout = timeout;
   snackbar.color = color;
   snackbar.msg = msg;
+};
+
+const showConfirmDialog = (
+  show: boolean,
+  title: string,
+  msg: string,
+  func: any,
+  params: any
+) => {
+  confirmDialog.show = show;
+  confirmDialog.title = title;
+  confirmDialog.msg = msg;
+  confirmDialog.func = func;
+  confirmDialog.params = params;
+};
+
+const closeConfirmDialog = () => {
+  confirmDialog.show = false;
 };
 
 const setUser = (paramUser: any) => {
