@@ -93,6 +93,10 @@
         </v-card>
       </v-dialog>
     </client-only>
+    <!-- admin link -->
+    <div class="admin-icon" @click="openAdmin">
+      <v-icon>mdi-star-shooting</v-icon>
+    </div>
   </v-app>
 </template>
 
@@ -177,6 +181,18 @@ const nextTarget = () => {
     changeComponent("targetInfo");
   }
 };
+
+const openAdmin = () => {
+  window.open("/admin", "_blank");
+};
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.admin-icon {
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  opacity: 0.5;
+  font-size: 0.9rem;
+}
+</style>

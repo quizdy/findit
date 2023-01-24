@@ -362,6 +362,9 @@ const saveImage = () => {
   ) as HTMLCanvasElement;
   const base64 = webcamCanvas.toDataURL("image/png");
   target.image = base64;
+
+  const mp3 = new Audio("/sounds/shutter.mp3");
+  mp3.play();
 };
 
 const scanImage = () => {
@@ -379,6 +382,8 @@ const scanImage = () => {
 };
 
 const showProgress = () => {
+  const webcam = document.getElementById("webcam") as HTMLVideoElement;
+  webcam.pause();
   overlay.value = true;
   matchPercentageValue.value = 0;
   interval.value = setInterval(async () => {
