@@ -47,7 +47,7 @@
                     required
                   ></v-text-field
                 ></v-col>
-                <v-col cols="6">
+                <v-col cols="6" style="text-align: center">
                   <v-chip
                     v-if="target.image"
                     class="ma-2"
@@ -81,7 +81,7 @@
               </v-row>
               <v-row no-gutters justify-space-between>
                 <v-col cols="6">
-                  <v-btn @click="updateTarget">登録</v-btn>
+                  <v-btn @click="confirmTarget">登録</v-btn>
                 </v-col>
                 <v-col cols="6" style="text-align: right">
                   <v-btn @click="cancelTarget">キャンセル</v-btn>
@@ -190,6 +190,14 @@ const emitsTargetEdit = defineEmits<{
     color: string,
     msg: string
   ): void;
+  (
+    e: "showConfirmDialog",
+    show: boolean,
+    title: string,
+    msg: string,
+    func: typeof updateTarget,
+    params: any
+  ): void;
   (e: "changeComponent", componentName: string): void;
 }>();
 
@@ -224,7 +232,7 @@ const interval = ref();
 const imageHeight = 800;
 const imageWidth = 600;
 
-const updateTarget = async () => {
+const confirmTarget = () => {
   if (!target.title) {
     emitsTargetEdit(
       "setSnackbar",
@@ -247,6 +255,17 @@ const updateTarget = async () => {
     return;
   }
 
+  emitsTargetEdit(
+    "showConfirmDialog",
+    true,
+    "登録",
+    "登録します。よろしいですか？",
+    updateTarget,
+    ""
+  );
+};
+
+const updateTarget = async () => {
   const { data: resUpdateTarget } = await useFetch("/api/UpdateTarget", {
     method: "POST",
     body: { venueName: venueName.value, target: target },
@@ -263,6 +282,7 @@ const cancelTarget = () => {
 
 onMounted(async () => {
   if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
+    emitsTargetEdit("setSnackbar", true, 2000, "warning", "位置情報が無効です");
     return;
   }
 
@@ -278,7 +298,16 @@ onMounted(async () => {
 
 const startVideo = async () => {
   if (typeof window !== "object") return;
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    emitsTargetEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "カメラデバイスが無効です"
+    );
+    return;
+  }
 
   let constraints = {
     audio: false,

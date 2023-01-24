@@ -118,7 +118,16 @@ onMounted(async () => {
 
 const startVideo = async () => {
   if (typeof window !== "object") return;
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    emitsTargetScan(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "カメラデバイスが無効です"
+    );
+    return;
+  }
 
   let constraints = {
     audio: false,

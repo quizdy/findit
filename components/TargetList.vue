@@ -23,7 +23,7 @@
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
-              @click.stop="delTarget(target)"
+              @click.stop="confirmTarget(target)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -41,8 +41,16 @@ const emitsTargetList = defineEmits<{
     color: string,
     msg: string
   ): void;
-  (e: "setTarget", target: any): void;
+  (
+    e: "showConfirmDialog",
+    show: boolean,
+    title: string,
+    msg: string,
+    func: typeof deleteTarget,
+    params: any
+  ): void;
   (e: "changeComponent", componentName: string): void;
+  (e: "setTarget", target: any): void;
 }>();
 
 const propsTargetList = defineProps<{
@@ -75,6 +83,17 @@ const selectedTarget = (target: any) => {
   emitsTargetList("changeComponent", "targetEdit");
 };
 
+const confirmTarget = (target: any) => {
+  emitsTargetList(
+    "showConfirmDialog",
+    true,
+    "削除",
+    "削除します。よろしいですか？",
+    deleteTarget,
+    target
+  );
+};
+
 const addTarget = () => {
   const target = {
     no:
@@ -99,7 +118,7 @@ const addTarget = () => {
   emitsTargetList("changeComponent", "targetEdit");
 };
 
-const delTarget = async (target: any) => {
+const deleteTarget = async (target: any) => {
   const { data: resDeleteTarget } = await useFetch("/api/DeleteTarget", {
     method: "POST",
     body: { venueName: venue.venueName, targetNo: target.no },

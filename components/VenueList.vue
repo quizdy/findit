@@ -17,7 +17,7 @@
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
-              @click.stop="delVenue(venue)"
+              @click.stop="confirmVenue(venue)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -35,8 +35,16 @@ const emitsVenueList = defineEmits<{
     color: string,
     msg: string
   ): void;
-  (e: "setVenue", venue: any): void;
+  (
+    e: "showConfirmDialog",
+    show: boolean,
+    title: string,
+    msg: string,
+    func: typeof deleteVenue,
+    params: any
+  ): void;
   (e: "changeComponent", componentName: string): void;
+  (e: "setVenue", venue: any): void;
 }>();
 
 const venues = ref();
@@ -56,6 +64,17 @@ const selectedVenue = (venue: any) => {
   emitsVenueList("changeComponent", "targetList");
 };
 
+const confirmVenue = (venue: any) => {
+  emitsVenueList(
+    "showConfirmDialog",
+    true,
+    "削除",
+    "削除します。よろしいですか？",
+    deleteVenue,
+    venue
+  );
+};
+
 const addVenue = () => {
   const venue = {
     venueName: "venueName" + Date.now(),
@@ -66,7 +85,7 @@ const addVenue = () => {
   emitsVenueList("changeComponent", "venueEdit");
 };
 
-const delVenue = async (venue: any) => {
+const deleteVenue = async (venue: any) => {
   const { data: resDeleteVenue } = await useFetch("/api/DeleteVenue", {
     method: "POST",
     body: { venueName: venue.venueName },
