@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+const { $socket } = useNuxtApp();
 const currentComponent = ref("login");
 const user = reactive({
   userId: "",
@@ -126,6 +127,7 @@ const confirmDialog = reactive({
   func: null,
   params: null,
 });
+const other = ref([]);
 
 const changeComponent = (componentName: string) => {
   currentComponent.value = componentName;
@@ -185,6 +187,39 @@ const nextTarget = () => {
 const openAdmin = () => {
   window.open("/admin", "_blank");
 };
+
+onMounted(async () => {
+  if (
+    !navigator.geolocation ||
+    !navigator.geolocation.getCurrentPosition ||
+    !navigator.geolocation.watchPosition
+  )
+    return;
+
+  const position: any = await new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+
+  const gps = {
+    lat: position.coords.latitude,
+    lng: position.coords.longitude,
+    accuracy: position.coords.accuracy,
+  };
+
+  $socket.emit("gps", gps);
+
+  $socket.on("gps", (recieve: any) => {
+    console.info(recieve);
+    other.push(recieve);
+  });
+});
+
+onBeforeUnmount(() => {
+  if ($socket) {
+    console.log("disconnest");
+    $socket.close();
+  }
+});
 </script>
 
 <style scoped lang="scss">
