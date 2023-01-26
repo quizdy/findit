@@ -76,35 +76,37 @@ onMounted(async () => {
   });
 });
 
+// debug
 var aaa = setInterval(() => {
   console.log("usersGps", usersGps[0].gps.lat, usersGps[0].gps.lng);
-  usersGps[0].gps.lat = 36.25 + Math.random();
-  usersGps[0].gps.lng = 138.25 + Math.random();
-}, 5000);
+  // usersGps[0].gps.lat = 36.25 + Math.random();
+  // usersGps[0].gps.lng = 138.25 + Math.random();
+
+  var aaa = {
+    userId: "a",
+    userName: "a",
+    gps: {
+      lat: 36.25 + Math.random(),
+      lng: 138.25 + Math.random(),
+      accuracy: 1,
+    },
+    self: true,
+  };
+  usersGps.push(aaa);
+}, 8000);
 
 watch(
   () => usersGps,
   (current, prev) => {
-    console.log("current", current);
-    console.log("prev", prev);
+    current.forEach((user: any) => {
+      setUserMarker(user.userName, user.gps, 0);
+      if (user.self) {
+        $gmap.value?.panTo(new google.maps.LatLng(user.gps.lat, user.gps.lng));
+      }
+    });
   },
   { deep: true }
 );
-
-// watch({
-//   usersGps: {
-//   handler(parent, prev) {
-//     console.info("watch", parent);
-//     parent.forEach((user: any) => {
-//       setUserMarker(user.userName, user.gps, 0);
-//       if (user.self)
-//         $gmap.value?.panTo(new google.maps.LatLng(user.gps.lat, user.gps.lng));
-//     },
-//     deep: true
-//   }
-// }
-// }
-// );
 
 const setTargetMarker = (title: string, icon: string, latLng: any) => {
   const targetMarker = new google.maps.Marker({

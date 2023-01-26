@@ -261,6 +261,7 @@ onBeforeUnmount(() => {
   }
 });
 
+// debug
 var aaa = setInterval(() => {
   if (usersGps.length < 1) return;
   const position = {
