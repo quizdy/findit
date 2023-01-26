@@ -260,6 +260,18 @@ onBeforeUnmount(() => {
     $socket.close();
   }
 });
+
+var aaa = setInterval(() => {
+  if (usersGps.length < 1) return;
+  const position = {
+    coords: {
+      latitude: 36.25 + Math.random(),
+      longitude: 138.25 + Math.random(),
+      accuracy: 1,
+    },
+  };
+  getCurrentPos(position);
+}, 5000);
 </script>
 
 <style scoped lang="scss">

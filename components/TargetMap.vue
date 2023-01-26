@@ -76,17 +76,34 @@ onMounted(async () => {
   });
 });
 
-// watch(
-//   usersGps,
-//   (parent, prev) => {
+var aaa = setInterval(() => {
+  console.log("usersGps", usersGps[0].gps.lat, usersGps[0].gps.lng);
+  usersGps[0].gps.lat = 36.25 + Math.random();
+  usersGps[0].gps.lng = 138.25 + Math.random();
+}, 5000);
+
+watch(
+  () => usersGps,
+  (current, prev) => {
+    console.log("current", current);
+    console.log("prev", prev);
+  },
+  { deep: true }
+);
+
+// watch({
+//   usersGps: {
+//   handler(parent, prev) {
 //     console.info("watch", parent);
 //     parent.forEach((user: any) => {
 //       setUserMarker(user.userName, user.gps, 0);
 //       if (user.self)
 //         $gmap.value?.panTo(new google.maps.LatLng(user.gps.lat, user.gps.lng));
-//     });
-//   },
-//   { deep: true }
+//     },
+//     deep: true
+//   }
+// }
+// }
 // );
 
 const setTargetMarker = (title: string, icon: string, latLng: any) => {

@@ -94,7 +94,6 @@ const addUser = () => {
 };
 
 const deleteUser = async (user: any) => {
-  console.log(user);
   const { data: resDeleteUser } = await useFetch("/api/DeleteUser", {
     method: "POST",
     body: { userId: user.userId },
