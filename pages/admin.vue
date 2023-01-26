@@ -5,7 +5,7 @@
         v-if="currentComponent === 'userList'"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
-        @setUser="setUser"
+        @setUserInfo="setUserInfo"
         @changeComponent="changeComponent"
       />
       <UserEdit
@@ -158,7 +158,7 @@ const closeConfirmDialog = () => {
   confirmDialog.show = false;
 };
 
-const setUser = (paramUser: any) => {
+const setUserInfo = (paramUser: any) => {
   user.userId = paramUser.userId;
   user.userName = paramUser.userName;
   user.comments = paramUser.comments;

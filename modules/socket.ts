@@ -13,9 +13,9 @@ export default (_: any, nuxt: any) => {
               console.info("disconnect:", socket.id);
             });
 
-            socket.on("gps", (params) => {
-              console.info("gps:", params);
-              socket.broadcast.emit("gps", params);
+            socket.on("userGps", (params) => {
+              console.info("userGps:", params);
+              socket.broadcast.emit("userGps", params);
             });
         })
     })

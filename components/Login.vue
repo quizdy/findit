@@ -33,9 +33,8 @@ const emitsLogin = defineEmits<{
     color: string,
     msg: string
   ): void;
-  (e: "setUser", user: any): void;
+  (e: "setUserInfo", user: any): void;
   (e: "setVenue", venue: any): void;
-  (e: "changeComponent", componentName: string): void;
 }>();
 
 const userId = ref("");
@@ -76,8 +75,6 @@ const login = async () => {
 
   const user = resGetUser.value;
 
-  emitsLogin("setUser", user);
-
   if (user.venue.targets.length === 0) {
     emitsLogin(
       "setSnackbar",
@@ -89,7 +86,7 @@ const login = async () => {
     return;
   }
 
-  emitsLogin("changeComponent", "targetInfo");
+  emitsLogin("setUserInfo", user);
 };
 </script>
 

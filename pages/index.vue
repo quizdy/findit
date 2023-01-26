@@ -3,19 +3,23 @@
     <v-main>
       <TargetInfo
         v-if="currentComponent === 'targetInfo'"
-        :venue="user.venue"
+        :venue="userInfo.venue"
       />
-      <TargetMap v-if="currentComponent === 'targetMap'" :venue="user.venue" />
+      <TargetMap
+        v-if="currentComponent === 'targetMap'"
+        :venue="userInfo.venue"
+        :userInfo="userInfo"
+        :usersGps="usersGps"
+      />
       <TargetScan
         v-if="currentComponent === 'targetScan'"
-        :venue="user.venue"
+        :venue="userInfo.venue"
         @nextTarget="nextTarget"
       />
       <Login
         v-if="currentComponent === 'login'"
         @setSnackbar="setSnackbar"
-        @setUser="setUser"
-        @changeComponent="changeComponent"
+        @setUserInfo="setUserInfo"
       />
     </v-main>
     <v-bottom-navigation
@@ -103,7 +107,7 @@
 <script setup lang="ts">
 const { $socket } = useNuxtApp();
 const currentComponent = ref("login");
-const user = reactive({
+const userInfo = reactive({
   userId: "",
   userName: "",
   comments: "",
@@ -127,9 +131,13 @@ const confirmDialog = reactive({
   func: null,
   params: null,
 });
-const other = ref([]);
 
-const changeComponent = (componentName: string) => {
+const usersGps: any[] = [];
+
+const changeComponent = async (componentName: string) => {
+  if (currentComponent.value === "login" && componentName === "targetInfo") {
+    await initGeolocation();
+  }
   currentComponent.value = componentName;
 };
 
@@ -163,23 +171,24 @@ const closeConfirmDialog = () => {
   confirmDialog.show = false;
 };
 
-const setUser = async (paramUser: any) => {
-  user.userId = paramUser.userId;
-  user.userName = paramUser.userName;
-  user.comments = paramUser.comments;
-  user.venue = paramUser.venue;
+const setUserInfo = async (user: any) => {
+  userInfo.userId = user.userId;
+  userInfo.userName = user.userName;
+  userInfo.comments = user.comments;
+  userInfo.venue = user.venue;
+  changeComponent("targetInfo");
 };
 
 const nextTarget = () => {
-  if (user.venue.pos < user.venue.targets.length - 1) {
-    user.venue.targets[user.venue.pos].status = 2;
-    user.venue.pos++;
-    user.venue.targets[user.venue.pos].status = 1;
+  if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
+    userInfo.venue.targets[userInfo.venue.pos].status = 2;
+    userInfo.venue.pos++;
+    userInfo.venue.targets[userInfo.venue.pos].status = 1;
     changeComponent("targetInfo");
   } else {
     alert("おめでとう");
-    user.venue.targets[user.venue.pos].status = 2;
-    user.venue.pos = 0;
+    userInfo.venue.targets[userInfo.venue.pos].status = 2;
+    userInfo.venue.pos = 0;
     changeComponent("targetInfo");
   }
 };
@@ -188,29 +197,60 @@ const openAdmin = () => {
   window.open("/admin", "_blank");
 };
 
-onMounted(async () => {
+const initGeolocation = async () => {
   if (
     !navigator.geolocation ||
     !navigator.geolocation.getCurrentPosition ||
     !navigator.geolocation.watchPosition
-  )
+  ) {
+    setSnackbar(true, 2000, "warning", "geolocation is invalid");
     return;
+  }
 
   const position: any = await new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 
-  const gps = {
-    lat: position.coords.latitude,
-    lng: position.coords.longitude,
-    accuracy: position.coords.accuracy,
-  };
+  getCurrentPos(position);
 
-  $socket.emit("gps", gps);
+  navigator.geolocation.watchPosition(getCurrentPos, (e: any) => {
+    setSnackbar(true, 2000, "warning", e);
+    return;
+  });
+};
 
-  $socket.on("gps", (recieve: any) => {
-    console.info(recieve);
-    other.push(recieve);
+const getCurrentPos = (position: any) => {
+  let userGps = usersGps.filter((user) => user.userId === userInfo.userId);
+
+  if (userGps.length === 0) {
+    usersGps.push({
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      gps: {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+      },
+      self: true,
+    });
+  } else if (userGps.length === 1) {
+    userGps[0].gps.lat = position.coords.latitude;
+    userGps[0].gps.lng = position.coords.longitude;
+    userGps[0].gps.accuracy = position.coords.accuracy;
+  } else {
+    setSnackbar(true, 2000, "warning", "userGps has many");
+    return;
+  }
+
+  $socket.emit("userGps", userGps);
+};
+
+onMounted(() => {
+  $socket.on("userGps", (userGps: any) => {
+    if (!usersGps.some((user) => user.userId === userInfo.userId)) {
+      userGps.self = false;
+      usersGps.push(userGps);
+    }
   });
 });
 

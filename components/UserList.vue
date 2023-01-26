@@ -61,7 +61,7 @@ const venueList = () => {
 };
 
 const selectedUser = (user: any) => {
-  emitsUserList("setUser", user);
+  emitsUserList("setUserInfo", user);
   emitsUserList("changeComponent", "userEdit");
 };
 
@@ -89,7 +89,7 @@ const addUser = () => {
       targets: [],
     },
   };
-  emitsUserList("setUser", user);
+  emitsUserList("setUserInfo", user);
   emitsUserList("changeComponent", "userEdit");
 };
 
