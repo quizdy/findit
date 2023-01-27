@@ -14,8 +14,7 @@ export default (_: any, nuxt: any) => {
             });
 
             socket.on("userGps", (params) => {
-              console.info("userGps:", params);
-              socket.broadcast.emit("userGps", params);
+              io.emit("userGps", params);
             });
         })
     })

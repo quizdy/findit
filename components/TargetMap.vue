@@ -15,26 +15,16 @@ const emitsTargetMap = defineEmits<{
   ): void;
 }>();
 
-// const propsTargetMap = defineProps<{
-//   venue: any;
-//   usersGps: any;
-// }>();
-
-type PropsTargetMap = {
+const propsTargetMap = defineProps<{
   venue: any;
   usersGps: any;
-};
-
-const propsTargetMap = withDefaults(defineProps<PropsTargetMap>(), {
-  venue: () => {},
-  usersGps: () => {},
-});
-
-const { venue, usersGps } = toRefs(propsTargetMap);
+}>();
 
 const $config = useRuntimeConfig();
 const $gmap = ref<google.maps.Map>();
-const zoom = ref(10);
+const zoom = ref(20);
+
+const { venue, usersGps } = toRefs(propsTargetMap);
 
 onMounted(async () => {
   const loader = new Loader({
@@ -84,36 +74,12 @@ onMounted(async () => {
   });
 });
 
-// debug ------------------------
-const user = useLoginUser();
-// var debug = setInterval(() => {
-//   const sw = ~~(Math.random() * 2);
-//   console.log("sw", sw);
-//   if (sw == 1) {
-//     usersGps[0].gps.lat = 36.25 + Math.random();
-//     usersGps[0].gps.lng = 138.25 + Math.random();
-//   } else {
-//     var aaa = {
-//       userId: "a",
-//       userName: "a",
-//       gps: {
-//         lat: 36.25 + Math.random(),
-//         lng: 138.25 + Math.random(),
-//         accuracy: 1,
-//       },
-//       self: true,
-//       marker: false,
-//     };
-//     usersGps.value.push(aaa);
-//   }
-// }, 2000);
-// debug ------------------------
-
 watch(
-  () => usersGps.value,
+  () => usersGps,
   (current, prev) => {
-    console.log("b");
-    current.forEach((user: any, index: number) => {
+    console.log("ccc");
+    if (typeof google === "undefined") return;
+    current.value.forEach((user: any, index: number) => {
       const userLatLng = new google.maps.LatLng(user.gps.lat, user.gps.lng);
       setUserMarker(index, user);
       if (user.self) {
@@ -124,11 +90,12 @@ watch(
         const targetLatLng = new google.maps.LatLng(target.lat, target.lng);
         target.icon = "/images/treasure1.png";
         setTargetMarker(target.title, target.icon, targetLatLng);
+        if (typeof google.maps.geometry === "undefined") return;
         const distance = google.maps.geometry.spherical.computeDistanceBetween(
           userLatLng,
           targetLatLng
         );
-        console.log("distance:", distance);
+        // console.log("distance:", distance);
       });
     });
   },
@@ -148,11 +115,15 @@ const setTargetMarker = (title: string, icon: string, latLng: any) => {
   targetMarker.setMap($gmap.value);
 };
 
+const markers: any[] = [];
 const setUserMarker = (no: number, user: any) => {
   const latLng = new google.maps.LatLng(user.gps.lat, user.gps.lng);
 
-  if (user.marker) {
-    $gmap.value?.panTo(new google.maps.LatLng(user.gps.lat, user.gps.lng));
+  const marker = markers.filter((m) => m.userId === user.userId);
+  if (0 < marker.length) {
+    marker[0].marker.setPosition(
+      new google.maps.LatLng(user.gps.lat, user.gps.lng)
+    );
     return;
   }
 
@@ -172,7 +143,10 @@ const setUserMarker = (no: number, user: any) => {
 
   userMarker.setMap($gmap.value);
 
-  user.marker = true;
+  markers.push({
+    userId: user.userId,
+    marker: userMarker,
+  });
 };
 
 // const beep = (tempo: number, volume: number) => {

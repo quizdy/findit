@@ -132,7 +132,7 @@ const confirmDialog = reactive({
   params: null,
 });
 
-const usersGps: any[] = [];
+let usersGps = ref([]);
 
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
@@ -198,11 +198,7 @@ const openAdmin = () => {
 };
 
 const initGeolocation = async () => {
-  if (
-    !navigator.geolocation ||
-    !navigator.geolocation.getCurrentPosition ||
-    !navigator.geolocation.watchPosition
-  ) {
+  if (!navigator.geolocation || !navigator.geolocation.watchPosition) {
     setSnackbar(true, 2000, "warning", "geolocation is invalid");
     return;
   }
@@ -211,46 +207,98 @@ const initGeolocation = async () => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 
-  getCurrentPos(position);
+  const userGps = usersGps.value.filter(
+    (user: any) => user.userId === userInfo.userId
+  );
+  getCurrentPos(userGps, position);
 
-  navigator.geolocation.watchPosition(getCurrentPos, (e: any) => {
-    setSnackbar(true, 2000, "warning", e);
-    return;
-  });
+  navigator.geolocation.watchPosition(
+    (position) => {
+      const userGps = usersGps.value.filter(
+        (user: any) => user.userId === userInfo.userId
+      );
+      getCurrentPos(userGps, position);
+      $socket.emit("userGps", userGps);
+    },
+    (e: any) => {
+      setSnackbar(true, 2000, "warning", e);
+      return;
+    }
+  );
 };
 
-const getCurrentPos = (position: any) => {
-  let userGps = usersGps.filter((user) => user.userId === userInfo.userId);
-
+const getCurrentPos = (userGps: any, position: any) => {
+  console.log("getCurrentPos");
   if (userGps.length === 0) {
-    usersGps.push({
-      userId: userInfo.userId,
-      userName: userInfo.userName,
-      gps: {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        accuracy: position.coords.accuracy,
+    usersGps.value = [
+      ...usersGps.value,
+      {
+        userId: userInfo.userId,
+        userName: userInfo.userName,
+        gps: {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        },
+        self: true,
+        marker: null,
       },
-      self: true,
-      marker: false,
-    });
+    ];
   } else if (userGps.length === 1) {
-    userGps[0].gps.lat = position.coords.latitude;
-    userGps[0].gps.lng = position.coords.longitude;
-    userGps[0].gps.accuracy = position.coords.accuracy;
+    usersGps.value = usersGps.value.map((user) =>
+      user.userId === userInfo.userId
+        ? {
+            userId: user.userId,
+            userName: user.userName,
+            gps: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+            },
+            self: user.self,
+            marker: user.marker,
+          }
+        : user
+    );
   } else {
     setSnackbar(true, 2000, "warning", "userGps has many");
     return;
   }
-
-  $socket.emit("userGps", userGps);
 };
 
 onMounted(() => {
   $socket.on("userGps", (userGps: any) => {
-    if (!usersGps.some((user) => user.userId === userInfo.userId)) {
-      userGps.self = false;
-      usersGps.push(userGps);
+    if (usersGps.value.some((user: any) => user.userId === userGps.userId)) {
+      usersGps.value = usersGps.value.map((user) =>
+        user.userId === userGps.userId
+          ? {
+              userId: user.userId,
+              userName: user.userName,
+              gps: {
+                lat: userGps.latitude,
+                lng: userGps.longitude,
+                accuracy: userGps.accuracy,
+              },
+              self: false,
+              marker: user.marker,
+            }
+          : user
+      );
+    } else {
+      usersGps.value = [
+        ...usersGps.value,
+        {
+          userId: userGps.userId,
+          userName: userGps.userName,
+          gps: {
+            lat: userGps.latitude,
+            lng: userGps.longitude,
+            accuracy: userGps.accuracy,
+          },
+          self: false,
+          marker: null,
+        },
+      ];
     }
   });
 });
@@ -264,16 +312,19 @@ onBeforeUnmount(() => {
 
 // debug ------------------------
 var aaa = setInterval(() => {
-  if (usersGps.length < 1) return;
+  if (usersGps.value.length < 1) return;
   const position = {
     coords: {
-      latitude: 36.25 + Math.random(),
-      longitude: 138.25 + Math.random(),
+      latitude: 36.25 + Math.random() / 100,
+      longitude: 138.25 + Math.random() / 100,
       accuracy: 1,
     },
   };
-  console.log("a");
-  getCurrentPos(position);
+
+  const userGps = usersGps.value.filter(
+    (user: any) => user.userId === userInfo.userId
+  );
+  getCurrentPos(userGps, position);
 }, 2000);
 // debug ------------------------
 </script>
