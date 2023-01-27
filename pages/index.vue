@@ -311,21 +311,21 @@ onBeforeUnmount(() => {
 });
 
 // debug ------------------------
-var aaa = setInterval(() => {
-  if (usersGps.value.length < 1) return;
-  const position = {
-    coords: {
-      latitude: 36.25 + Math.random() / 100,
-      longitude: 138.25 + Math.random() / 100,
-      accuracy: 1,
-    },
-  };
+// var aaa = setInterval(() => {
+//   if (usersGps.value.length < 1) return;
+//   const position = {
+//     coords: {
+//       latitude: 36.25 + Math.random() / 100,
+//       longitude: 138.25 + Math.random() / 100,
+//       accuracy: 1,
+//     },
+//   };
 
-  const userGps = usersGps.value.filter(
-    (user: any) => user.userId === userInfo.userId
-  );
-  getCurrentPos(userGps, position);
-}, 2000);
+//   const userGps = usersGps.value.filter(
+//     (user: any) => user.userId === userInfo.userId
+//   );
+//   getCurrentPos(userGps, position);
+// }, 2000);
 // debug ------------------------
 </script>
 
