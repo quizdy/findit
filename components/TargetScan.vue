@@ -185,7 +185,11 @@ const scanImage = () => {
     .compareTo(webcamCanvas.toDataURL())
     .ignoreColors()
     .onComplete((data) => {
-      scan.matchPercentage = 100 - data.misMatchPercentage;
+      // scan.matchPercentage = 100 - data.misMatchPercentage;
+      scan.matchPercentage =
+        (100 - data.misMatchPercentage) * 2 > 100
+          ? 100
+          : (100 - data.misMatchPercentage) * 1.5;
       showProgress();
     });
 };
