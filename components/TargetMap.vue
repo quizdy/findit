@@ -15,16 +15,26 @@ const emitsTargetMap = defineEmits<{
   ): void;
 }>();
 
-const propsTargetMap = defineProps<{
+// const propsTargetMap = defineProps<{
+//   venue: any;
+//   usersGps: any;
+// }>();
+
+type PropsTargetMap = {
   venue: any;
   usersGps: any;
-}>();
+};
+
+const propsTargetMap = withDefaults(defineProps<PropsTargetMap>(), {
+  venue: () => {},
+  usersGps: () => {},
+});
+
+const { venue, usersGps } = toRefs(propsTargetMap);
 
 const $config = useRuntimeConfig();
 const $gmap = ref<google.maps.Map>();
 const zoom = ref(10);
-
-const usersGps = reactive(propsTargetMap.usersGps);
 
 onMounted(async () => {
   const loader = new Loader({
@@ -36,9 +46,7 @@ onMounted(async () => {
   const google = await loader.load();
   const mapId = document.getElementById("map") as HTMLElement;
 
-  const userGps = propsTargetMap.usersGps.filter(
-    (user: any) => user.self === true
-  )[0];
+  const userGps = usersGps.value.filter((user: any) => user.self === true)[0];
 
   $gmap.value = new google.maps.Map(mapId, {
     center: new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng),
@@ -47,15 +55,15 @@ onMounted(async () => {
     zoomControl: true,
   });
 
-  propsTargetMap.venue.targets.forEach((target: any) => {
+  venue.value.targets.forEach((target: any) => {
     const latLng = new google.maps.LatLng(target.lat, target.lng);
     target.icon = "/images/treasure1.png";
     setTargetMarker(target.title, target.icon, latLng);
   });
 
-  usersGps.forEach((user: any) => {
+  usersGps.value.forEach((user: any, index: number) => {
     const latLng = new google.maps.LatLng(user.gps.lat, user.gps.lng);
-    setUserMarker(user.userName, latLng, user.gps.accuracy);
+    setUserMarker(index, user);
     if (user.self) {
       $gmap.value?.panTo(latLng);
       new google.maps.Circle({
@@ -76,33 +84,52 @@ onMounted(async () => {
   });
 });
 
-// debug
-var aaa = setInterval(() => {
-  console.log("usersGps", usersGps[0].gps.lat, usersGps[0].gps.lng);
-  // usersGps[0].gps.lat = 36.25 + Math.random();
-  // usersGps[0].gps.lng = 138.25 + Math.random();
-
-  var aaa = {
-    userId: "a",
-    userName: "a",
-    gps: {
-      lat: 36.25 + Math.random(),
-      lng: 138.25 + Math.random(),
-      accuracy: 1,
-    },
-    self: true,
-  };
-  usersGps.push(aaa);
-}, 8000);
+// debug ------------------------
+const user = useLoginUser();
+// var debug = setInterval(() => {
+//   const sw = ~~(Math.random() * 2);
+//   console.log("sw", sw);
+//   if (sw == 1) {
+//     usersGps[0].gps.lat = 36.25 + Math.random();
+//     usersGps[0].gps.lng = 138.25 + Math.random();
+//   } else {
+//     var aaa = {
+//       userId: "a",
+//       userName: "a",
+//       gps: {
+//         lat: 36.25 + Math.random(),
+//         lng: 138.25 + Math.random(),
+//         accuracy: 1,
+//       },
+//       self: true,
+//       marker: false,
+//     };
+//     usersGps.value.push(aaa);
+//   }
+// }, 2000);
+// debug ------------------------
 
 watch(
-  () => usersGps,
+  () => usersGps.value,
   (current, prev) => {
-    current.forEach((user: any) => {
-      setUserMarker(user.userName, user.gps, 0);
+    console.log("b");
+    current.forEach((user: any, index: number) => {
+      const userLatLng = new google.maps.LatLng(user.gps.lat, user.gps.lng);
+      setUserMarker(index, user);
       if (user.self) {
-        $gmap.value?.panTo(new google.maps.LatLng(user.gps.lat, user.gps.lng));
+        $gmap.value?.panTo(userLatLng);
       }
+
+      venue.value.targets.forEach((target: any) => {
+        const targetLatLng = new google.maps.LatLng(target.lat, target.lng);
+        target.icon = "/images/treasure1.png";
+        setTargetMarker(target.title, target.icon, targetLatLng);
+        const distance = google.maps.geometry.spherical.computeDistanceBetween(
+          userLatLng,
+          targetLatLng
+        );
+        console.log("distance:", distance);
+      });
     });
   },
   { deep: true }
@@ -121,19 +148,31 @@ const setTargetMarker = (title: string, icon: string, latLng: any) => {
   targetMarker.setMap($gmap.value);
 };
 
-const setUserMarker = (userName: string, latLng: any, accuracy: number) => {
-  const userMarker = new google.maps.Marker({ position: latLng });
+const setUserMarker = (no: number, user: any) => {
+  const latLng = new google.maps.LatLng(user.gps.lat, user.gps.lng);
+
+  if (user.marker) {
+    $gmap.value?.panTo(new google.maps.LatLng(user.gps.lat, user.gps.lng));
+    return;
+  }
+
+  const userMarker = new google.maps.Marker({
+    position: latLng,
+    label: (no + 1).toString(),
+    title: user.userName,
+  });
+
+  const infoWindow = new google.maps.InfoWindow();
+
+  userMarker.addListener("click", () => {
+    infoWindow.close();
+    infoWindow.setContent(userMarker.getTitle());
+    infoWindow.open(userMarker.getMap(), userMarker);
+  });
+
   userMarker.setMap($gmap.value);
 
-  // if (typeof google.maps.geometry !== "undefined") {
-  //   distance.value = google.maps.geometry.spherical.computeDistanceBetween(
-  //     new google.maps.LatLng(
-  //       propsTargetMap.venue.targets[propsTargetMap.venue.pos].lat,
-  //       propsTargetMap.venue.targets[propsTargetMap.venue.pos].lng
-  //     ),
-  //     currentPos
-  //   );
-  // }
+  user.marker = true;
 };
 
 // const beep = (tempo: number, volume: number) => {

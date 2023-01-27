@@ -232,6 +232,7 @@ const getCurrentPos = (position: any) => {
         accuracy: position.coords.accuracy,
       },
       self: true,
+      marker: false,
     });
   } else if (userGps.length === 1) {
     userGps[0].gps.lat = position.coords.latitude;
@@ -261,7 +262,7 @@ onBeforeUnmount(() => {
   }
 });
 
-// debug
+// debug ------------------------
 var aaa = setInterval(() => {
   if (usersGps.length < 1) return;
   const position = {
@@ -271,8 +272,10 @@ var aaa = setInterval(() => {
       accuracy: 1,
     },
   };
+  console.log("a");
   getCurrentPos(position);
-}, 5000);
+}, 2000);
+// debug ------------------------
 </script>
 
 <style scoped lang="scss">
