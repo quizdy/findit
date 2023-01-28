@@ -77,7 +77,6 @@ onMounted(async () => {
 watch(
   () => usersGps,
   (current, prev) => {
-    console.log("ccc");
     if (typeof google === "undefined") return;
     current.value.forEach((user: any, index: number) => {
       const userLatLng = new google.maps.LatLng(user.gps.lat, user.gps.lng);

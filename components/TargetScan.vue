@@ -146,6 +146,10 @@ const startVideo = async () => {
     (constraints.video as any) = true;
   }
 
+  if (typeof requestPermission === "function") {
+    (constraints.video as any) = { facingMode: { exact: "environment" } };
+  }
+
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
   const webcam = document.getElementById("webcam") as HTMLVideoElement;
@@ -204,7 +208,7 @@ const showProgress = () => {
   overlay.value = true;
   matchPercentageValue.value = 0;
   interval.value = setInterval(async () => {
-    if (matchPercentageValue.value > scan.matchPercentage) {
+    if (matchPercentageValue.value >= scan.matchPercentage) {
       clearInterval(interval.value);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       overlay.value = false;

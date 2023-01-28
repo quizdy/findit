@@ -31,7 +31,7 @@ export default defineEventHandler(async (e) => {
       gap: body.target.gap,
       image: body.target.image,
       comments: body.target.comments,
-      status: 0,
+      targetStatus: 0,
     }
     venueJson.targets.push(t)
   }
@@ -42,7 +42,7 @@ export default defineEventHandler(async (e) => {
     venueJson.targets[pos].gap = body.target.gap
     venueJson.targets[pos].image = body.target.image
     venueJson.targets[pos].comments = body.target.comments
-    venueJson.targets[pos].status = 0
+    venueJson.targets[pos].targetStatus = 0
   }
 
   try {

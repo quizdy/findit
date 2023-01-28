@@ -320,14 +320,22 @@ const startVideo = async () => {
     return;
   }
 
-  let constraints = {
+  const constraints = {
     audio: false,
-    video: true,
+    video: { facingMode: { exact: "environment" } },
   };
 
   const requestPermission = (
     DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
   ).requestPermission;
+
+  const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
+    (device) => device.kind === "videoinput" && device.label.includes("USB")
+  );
+
+  if (0 < devices.length) {
+    (constraints.video as any) = true;
+  }
 
   if (typeof requestPermission === "function") {
     (constraints.video as any) = { facingMode: { exact: "environment" } };
@@ -398,7 +406,7 @@ const showProgress = () => {
   overlay.value = true;
   matchPercentageValue.value = 0;
   interval.value = setInterval(async () => {
-    if (matchPercentageValue.value > scan.matchPercentage) {
+    if (matchPercentageValue.value >= scan.matchPercentage) {
       clearInterval(interval.value);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       overlay.value = false;

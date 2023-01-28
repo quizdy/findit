@@ -47,16 +47,8 @@
         <span>Scan</span>
       </v-btn>
       <v-btn
-        currentComponent="logout"
-        @click="
-          showConfirmDialog(
-            true,
-            'ログアウト',
-            'ログアウトします。よろしいですか？',
-            logout,
-            ''
-          )
-        "
+        currentComponent="confirmLogout"
+        @click="confirmDialog.show = true"
       >
         <v-icon>mdi-door</v-icon>
         <span>Logout</span>
@@ -72,10 +64,8 @@
       </v-snackbar>
       <v-dialog v-model="confirmDialog.show" persistent>
         <v-card max-width="600" class="mx-auto">
-          <v-card-title class="text-h5">
-            {{ confirmDialog.title }}
-          </v-card-title>
-          <v-card-text>{{ confirmDialog.msg }}</v-card-text>
+          <v-card-title class="text-h5"> ログアウト </v-card-title>
+          <v-card-text>ログアウトします。よろしいですか？</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
@@ -83,7 +73,7 @@
               variant="text"
               @click="
                 closeConfirmDialog();
-                confirmDialog.func(confirmDialog.params);
+                reload();
               "
             >
               はい
@@ -91,7 +81,10 @@
             <v-btn
               color="green-darken-1"
               variant="text"
-              @click="closeConfirmDialog"
+              @click="
+                closeConfirmDialog();
+                changeComponent('targetInfo');
+              "
             >
               いいえ
             </v-btn>
@@ -134,7 +127,7 @@ const confirmDialog = reactive({
   params: null,
 });
 
-let usersGps = ref([]);
+let usersGps = ref<any[]>([]);
 
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
@@ -173,6 +166,10 @@ const closeConfirmDialog = () => {
   confirmDialog.show = false;
 };
 
+const reload = () => {
+  location.reload();
+};
+
 const setUserInfo = async (user: any) => {
   userInfo.userId = user.userId;
   userInfo.userName = user.userName;
@@ -183,20 +180,16 @@ const setUserInfo = async (user: any) => {
 
 const nextTarget = () => {
   if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
-    userInfo.venue.targets[userInfo.venue.pos].status = 2;
+    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos++;
-    userInfo.venue.targets[userInfo.venue.pos].status = 1;
+    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
     changeComponent("targetInfo");
   } else {
     alert("おめでとう");
-    userInfo.venue.targets[userInfo.venue.pos].status = 2;
+    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos = 0;
     changeComponent("targetInfo");
   }
-};
-
-const logout = () => {
-  location.reload();
 };
 
 const openAdmin = () => {
@@ -213,12 +206,19 @@ const initGeolocation = async () => {
     (user: any) => user.userId === userInfo.userId
   );
 
-  const position = await new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 2000,
+  let position;
+
+  try {
+    position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 2000,
+      });
     });
-  });
+  } catch (e: any) {
+    setSnackbar(true, 2000, "warning", e.message);
+    return;
+  }
 
   getCurrentPos(userGps, position);
 
@@ -231,7 +231,7 @@ const initGeolocation = async () => {
       $socket.emit("userGps", userGps);
     },
     (e: any) => {
-      setSnackbar(true, 2000, "warning", e);
+      // setSnackbar(true, 2000, "warning", e.message);
       return;
     },
     {
@@ -313,6 +313,10 @@ onMounted(() => {
         },
       ];
     }
+  });
+
+  $socket.io.on("reconnect_failed", () => {
+    console.log("reconnect_failed");
   });
 });
 

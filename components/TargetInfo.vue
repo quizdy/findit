@@ -20,7 +20,7 @@
           <v-sheet class="d-flex flex-column">
             <div class="layout">
               <v-icon
-                v-show="target.status === 2"
+                v-show="target.targetStatus === 2"
                 size="10rem"
                 color="success"
                 class="check"
@@ -28,8 +28,8 @@
               >
               <v-img
                 :class="[
-                  i > 0 && target.status === 0 ? 'passive' : '',
-                  target.status === 2 ? 'clear' : '',
+                  i > 0 && target.targetStatus === 0 ? 'passive' : '',
+                  target.targetStatus === 2 ? 'clear' : '',
                 ]"
                 :src="target.image"
                 :style="{

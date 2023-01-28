@@ -40,18 +40,6 @@ const emitsLogin = defineEmits<{
 const userId = ref("");
 
 const validateCheck = () => {
-  if (!userId.value) {
-    emitsLogin(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "ユーザＩＤを入力して下さい"
-    );
-    return;
-    return;
-  }
-
   if (userId.value.length > 8) {
     emitsLogin("setSnackbar", true, 2000, "warning", "8文字以下にしてください");
     userId.value = userId.value.slice(0, -1);
@@ -61,7 +49,13 @@ const validateCheck = () => {
 
 const login = async () => {
   if (!userId.value) {
-    emitsLogin("setSnackbar", true, 2000, "warning", "文字を入力して下さい");
+    emitsLogin(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "ユーザＩＤを入力して下さい"
+    );
     return;
   }
 
