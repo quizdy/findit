@@ -12,7 +12,7 @@
           <v-row no-gutters>
             <v-col cols="12">
               <v-text-field
-                v-model="user.userId"
+                v-model="userInfo.userId"
                 readonly
                 label="ユーザＩＤ"
               ></v-text-field>
@@ -21,7 +21,7 @@
           <v-row no-gutters>
             <v-col cols="12">
               <v-text-field
-                v-model="user.userName"
+                v-model="userInfo.userName"
                 label="ユーザ名"
                 required
                 @focus="$event.target.select()"
@@ -33,7 +33,7 @@
               <v-select
                 v-model="selectedVenue"
                 label="会場"
-                :items="venues"
+                :items="venuesInfo"
                 @update:modelValue="getVenue"
               ></v-select>
             </v-col>
@@ -42,7 +42,7 @@
             <v-col cols="12">
               <v-textarea
                 solo
-                v-model="user.comments"
+                v-model="userInfo.comments"
                 label="コメント"
                 @focus="$event.target.select()"
               ></v-textarea>
@@ -50,7 +50,7 @@
           </v-row>
           <v-row no-gutters justify-space-between>
             <v-col cols="6">
-              <v-btn @click="confirmUser">登録</v-btn>
+              <v-btn @click="confirmUpdateUser">登録</v-btn>
             </v-col>
             <v-col cols="6" style="text-align: right">
               <v-btn @click="cancelUser">キャンセル</v-btn>
@@ -83,38 +83,40 @@ const emitsUserEdit = defineEmits<{
 }>();
 
 const propsUserList = defineProps<{
-  user: any;
+  userInfo: any;
 }>();
 
-const user = reactive({
-  userId: propsUserList.user.userId,
-  userName: propsUserList.user.userName,
-  comments: propsUserList.user.comments,
-  venue: propsUserList.user.venue,
+const userInfo = reactive({
+  userId: propsUserList.userInfo.userId,
+  userName: propsUserList.userInfo.userName,
+  comments: propsUserList.userInfo.comments,
+  venue: propsUserList.userInfo.venue,
 });
 
-const venues = ref([]);
-const selectedVenue = ref(propsUserList.user.venue.venueName);
+const venuesInfo = ref([]);
+const selectedVenue = ref(propsUserList.userInfo.venue.venueName);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",
 });
 
 resGetVenues.value?.venues.forEach((venue: any) => {
-  venues.value.push(venue.venueName);
+  venuesInfo.value.push(venue.venueName);
 });
 
 const getVenue = async () => {
-  const { data: resGetVenue } = await useFetch("/api/GetVenue", {
-    method: "GET",
-    params: { venueName: selectedVenue.value },
-  });
+  // const { data: resGetVenue } = await useFetch("/api/GetVenue", {
+  //   method: "GET",
+  //   params: { venueName: selectedVenue.value },
+  // });
 
-  user.venue = (resGetVenue.value as any).venue;
+  // user.venue = (resGetVenue.value as any).venue;
+
+  userInfo.venue.venueName = selectedVenue;
 };
 
-const confirmUser = () => {
-  if (!user.userName) {
+const confirmUpdateUser = () => {
+  if (!userInfo.userName) {
     emitsUserEdit(
       "setSnackbar",
       true,
@@ -139,10 +141,12 @@ const updateUser = async (params: any) => {
   const { data: resUpdateUser } = await useFetch("/api/UpdateUser", {
     method: "POST",
     body: {
-      userId: user.userId,
-      userName: user.userName,
-      comments: user.comments,
-      venue: user.venue,
+      userId: userInfo.userId,
+      userName: userInfo.userName,
+      comments: userInfo.comments,
+      venue: {
+        venueName: userInfo.venue.venueName,
+      },
     },
   });
 

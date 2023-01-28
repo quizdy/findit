@@ -12,7 +12,7 @@
           <v-row no-gutters>
             <v-col cols="12">
               <v-text-field
-                v-model="venue.venueName"
+                v-model="venueInfo.venueName"
                 label="会場名"
                 required
                 @focus="$event.target.select()"
@@ -23,7 +23,7 @@
             <v-col cols="12">
               <v-textarea
                 solo
-                v-model="venue.comments"
+                v-model="venueInfo.comments"
                 label="コメント"
                 @focus="$event.target.select()"
               ></v-textarea>
@@ -64,17 +64,17 @@ const emitsVenueEdit = defineEmits<{
 }>();
 
 const propsVenueList = defineProps<{
-  venue: any;
+  venueInfo: any;
 }>();
 
-const venue = reactive({
-  venueName: propsVenueList.venue.venueName,
-  comments: propsVenueList.venue.comments,
-  pos: propsVenueList.venue.pos,
+const venueInfo = reactive({
+  venueName: propsVenueList.venueInfo.venueName,
+  comments: propsVenueList.venueInfo.comments,
+  pos: propsVenueList.venueInfo.pos,
 });
 
 const confirmVenue = () => {
-  if (!venue.venueName) {
+  if (!venueInfo.venueName) {
     emitsVenueEdit(
       "setSnackbar",
       true,
@@ -98,7 +98,7 @@ const confirmVenue = () => {
 const updateVenue = async () => {
   const { data: resUpdateVenue } = await useFetch("/api/UpdateVenue", {
     method: "POST",
-    body: { venueName: venue.venueName, comments: venue.comments },
+    body: { venueName: venueInfo.venueName, comments: venueInfo.comments },
   });
 
   if ((resUpdateVenue.value as any).msg === "") {

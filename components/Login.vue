@@ -41,6 +41,14 @@ const userId = ref("");
 
 const validateCheck = () => {
   if (!userId.value) {
+    emitsLogin(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "ユーザＩＤを入力して下さい"
+    );
+    return;
     return;
   }
 

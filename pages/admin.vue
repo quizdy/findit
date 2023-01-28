@@ -10,7 +10,7 @@
       />
       <UserEdit
         v-if="currentComponent === 'userEdit'"
-        :user="user"
+        :userInfo="userInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
@@ -19,28 +19,28 @@
         v-if="currentComponent === 'venueList'"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
-        @setVenue="setVenue"
+        @setVenueInfo="setVenueInfo"
         @changeComponent="changeComponent"
       />
       <VenueEdit
         v-if="currentComponent === 'venueEdit'"
-        :venue="venue"
+        :venueInfo="venueInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
       />
       <TargetList
         v-if="currentComponent === 'targetList'"
-        :venue="venue"
+        :venueInfo="venueInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
-        @setTarget="setTarget"
+        @setTargetInfo="setTargetInfo"
         @changeComponent="changeComponent"
       />
       <TargetEdit
         v-if="currentComponent === 'targetEdit'"
-        :venueName="venue.venueName"
-        :target="target"
+        :venueName="venueInfo.venueName"
+        :targetInfo="targetInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
@@ -88,19 +88,19 @@
 
 <script setup lang="ts">
 const currentComponent = ref("venueList");
-const user = reactive({
+const userInfo = reactive({
   userId: "",
   userName: "",
   comments: "",
-  venue: "",
+  venue: {},
 });
-const venue = reactive({
+const venueInfo = reactive({
   venueName: "",
   comments: "",
   pos: 0,
   targets: [],
 });
-const target = reactive({
+const targetInfo = reactive({
   no: 0,
   title: "",
   lat: 0.0,
@@ -108,7 +108,7 @@ const target = reactive({
   gap: 0,
   image: "",
   comments: "",
-  statis: 0,
+  targetStatus: 0,
 });
 const snackbar = reactive({
   show: false,
@@ -158,28 +158,28 @@ const closeConfirmDialog = () => {
   confirmDialog.show = false;
 };
 
-const setUserInfo = (paramUser: any) => {
-  user.userId = paramUser.userId;
-  user.userName = paramUser.userName;
-  user.comments = paramUser.comments;
-  user.venue = paramUser.venue;
+const setUserInfo = (user: any) => {
+  userInfo.userId = user.userId;
+  userInfo.userName = user.userName;
+  userInfo.comments = user.comments;
+  userInfo.venue = user.venue;
 };
 
-const setVenue = (paramVenue: any) => {
-  venue.venueName = paramVenue.venueName;
-  venue.comments = paramVenue.comments;
-  venue.pos = paramVenue.pos;
+const setVenueInfo = (venue: any) => {
+  venueInfo.venueName = venue.venueName;
+  venueInfo.comments = venue.comments;
+  venueInfo.pos = venue.pos;
 };
 
-const setTarget = (paramTarget: any) => {
-  target.no = paramTarget.no;
-  target.title = paramTarget.title;
-  target.lat = paramTarget.lat;
-  target.lng = paramTarget.lng;
-  target.gap = paramTarget.gap;
-  target.image = paramTarget.image;
-  target.comments = paramTarget.comments;
-  target.status = paramTarget.status;
+const setTargetInfo = (target: any) => {
+  targetInfo.no = target.no;
+  targetInfo.title = target.title;
+  targetInfo.lat = target.lat;
+  targetInfo.lng = target.lng;
+  targetInfo.gap = target.gap;
+  targetInfo.image = target.image;
+  targetInfo.comments = target.comments;
+  targetInfo.targetStatus = target.targetStatus;
 };
 </script>
 

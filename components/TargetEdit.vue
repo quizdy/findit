@@ -1,7 +1,12 @@
 <template>
   <div>
-    <v-card max-width="600" class="mx-auto mt-2">
-      <v-tabs v-model="tab" color="deep-purple-accent-4" align-tabs="center">
+    <v-card max-width="600" class="mx-auto">
+      <v-tabs
+        v-model="tab"
+        bg-color="light-blue"
+        align-tabs="center"
+        height="62"
+      >
         <v-tab value="tabInfo" @click="stopVideo">
           <v-icon>mdi-information</v-icon>
         </v-tab>
@@ -16,7 +21,7 @@
               <v-row no-gutters>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="target.title"
+                    v-model="targetInfo.title"
                     label="ターゲット名"
                     required
                     @focus="$event.target.select()"
@@ -26,14 +31,14 @@
               <v-row dense>
                 <v-col cols="6">
                   <v-text-field
-                    v-model="target.lat"
+                    v-model="targetInfo.lat"
                     label="緯度"
                     required
                   ></v-text-field
                 ></v-col>
                 <v-col cols="6">
                   <v-text-field
-                    v-model="target.lng"
+                    v-model="targetInfo.lng"
                     label="経度"
                     required
                   ></v-text-field
@@ -42,38 +47,44 @@
               <v-row dense>
                 <v-col cols="6" style="text-align: center">
                   <v-text-field
-                    v-model="target.gap"
+                    v-model="targetInfo.gap"
                     label="誤差"
                     required
                   ></v-text-field
                 ></v-col>
                 <v-col cols="6" style="text-align: center">
-                  <v-chip
-                    v-if="target.image"
-                    class="ma-2"
-                    color="success"
-                    label
-                    text-color="white"
+                  <div
+                    v-if="targetInfo.image"
+                    class="d-flex align-center justify-center"
                   >
-                    <v-icon start icon="mdi-check-bold"></v-icon>
-                    写真の登録済み
-                  </v-chip>
-                  <v-chip
-                    v-else
-                    class="ma-2"
-                    color="gray"
-                    label
-                    text-color="white"
-                  >
-                    写真が未登録です
-                  </v-chip>
+                    <v-chip
+                      class="ma-2"
+                      color="success"
+                      label
+                      text-color="white"
+                    >
+                      <v-icon start icon="mdi-check-bold"></v-icon>
+                      写真の登録済み
+                    </v-chip>
+                    <img
+                      class="rounded-circle"
+                      :src="targetInfo.image"
+                      height="50"
+                      width="50"
+                    />
+                  </div>
+                  <div v-else>
+                    <v-chip class="ma-2" color="gray" label text-color="white">
+                      写真が未登録です
+                    </v-chip>
+                  </div>
                 </v-col>
               </v-row>
               <v-row no-gutters>
                 <v-col cols="12">
                   <v-textarea
                     solo
-                    v-model="target.comments"
+                    v-model="targetInfo.comments"
                     label="コメント"
                     @focus="$event.target.select()"
                   ></v-textarea>
@@ -81,7 +92,7 @@
               </v-row>
               <v-row no-gutters justify-space-between>
                 <v-col cols="6">
-                  <v-btn @click="confirmTarget">登録</v-btn>
+                  <v-btn @click="confirmUpdateTarget">登録</v-btn>
                 </v-col>
                 <v-col cols="6" style="text-align: right">
                   <v-btn @click="cancelTarget">キャンセル</v-btn>
@@ -112,7 +123,7 @@
                       ></canvas>
                       <img
                         class="targetImage"
-                        :src="target.image"
+                        :src="targetInfo.image"
                         :style="{
                           opacity: scan.opacity / 100,
                           height: imageHeight,
@@ -125,7 +136,7 @@
                 <v-row dense>
                   <v-col cols="12">
                     <v-slider
-                      v-if="target.image"
+                      v-if="targetInfo.image"
                       class="mx-4"
                       max="100"
                       min="0"
@@ -138,7 +149,7 @@
                 <v-row dense>
                   <v-col cols="6">
                     <v-btn
-                      v-if="target.image"
+                      v-if="targetInfo.image"
                       class="mx-4 mb-4"
                       @click="scanImage"
                       ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
@@ -203,19 +214,19 @@ const emitsTargetEdit = defineEmits<{
 
 const propsTargetEdit = defineProps<{
   venueName: string;
-  target: any;
+  targetInfo: any;
 }>();
 
 const tab = ref("tabInfo");
 const venueName = ref(propsTargetEdit.venueName);
-const target = reactive({
-  no: propsTargetEdit.target.no,
-  title: propsTargetEdit.target.title,
-  lat: propsTargetEdit.target.lat,
-  lng: propsTargetEdit.target.lng,
-  gap: propsTargetEdit.target.gap,
-  image: propsTargetEdit.target.image,
-  comments: propsTargetEdit.target.comments,
+const targetInfo = reactive({
+  no: propsTargetEdit.targetInfo.no,
+  title: propsTargetEdit.targetInfo.title,
+  lat: propsTargetEdit.targetInfo.lat,
+  lng: propsTargetEdit.targetInfo.lng,
+  gap: propsTargetEdit.targetInfo.gap,
+  image: propsTargetEdit.targetInfo.image,
+  comments: propsTargetEdit.targetInfo.comments,
   status: 0,
 });
 
@@ -232,8 +243,8 @@ const interval = ref();
 const imageHeight = 800;
 const imageWidth = 600;
 
-const confirmTarget = () => {
-  if (!target.title) {
+const confirmUpdateTarget = () => {
+  if (!targetInfo.title) {
     emitsTargetEdit(
       "setSnackbar",
       true,
@@ -244,7 +255,7 @@ const confirmTarget = () => {
     return;
   }
 
-  if (!target.image) {
+  if (!targetInfo.image) {
     emitsTargetEdit(
       "setSnackbar",
       true,
@@ -268,7 +279,7 @@ const confirmTarget = () => {
 const updateTarget = async () => {
   const { data: resUpdateTarget } = await useFetch("/api/UpdateTarget", {
     method: "POST",
-    body: { venueName: venueName.value, target: target },
+    body: { venueName: venueName.value, target: targetInfo },
   });
 
   if ((resUpdateTarget.value as any).msg === "") {
@@ -290,9 +301,9 @@ onMounted(async () => {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 
-  if (target.lat === 0 && target.lng === 0) {
-    target.lat = position.coords.latitude;
-    target.lng = position.coords.longitude;
+  if (targetInfo.lat === 0 && targetInfo.lng === 0) {
+    targetInfo.lat = position.coords.latitude;
+    targetInfo.lng = position.coords.longitude;
   }
 });
 
@@ -361,7 +372,7 @@ const saveImage = () => {
     "webcamCanvas"
   ) as HTMLCanvasElement;
   const base64 = webcamCanvas.toDataURL("image/png");
-  target.image = base64;
+  targetInfo.image = base64;
 
   const mp3 = new Audio("/sounds/shutter.mp3");
   mp3.play();
@@ -371,7 +382,7 @@ const scanImage = () => {
   const webcamCanvas = document.getElementById(
     "webcamCanvas"
   ) as HTMLCanvasElement;
-  const image = target.image;
+  const image = targetInfo.image;
   const diff = resemble(image)
     .compareTo(webcamCanvas.toDataURL())
     .ignoreColors()
@@ -389,8 +400,9 @@ const showProgress = () => {
   interval.value = setInterval(async () => {
     if (matchPercentageValue.value > scan.matchPercentage) {
       clearInterval(interval.value);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       overlay.value = false;
+      webcam.play();
       return;
     }
     matchPercentageValue.value += 1;

@@ -19,7 +19,7 @@
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
-              @click.stop="confirmUser(user)"
+              @click.stop="confirmDeleteUser(user)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -46,6 +46,7 @@ const emitsUserList = defineEmits<{
     params: any
   ): void;
   (e: "changeComponent", componentName: string): void;
+  (e: "setUserInfo", userInfo: any): void;
 }>();
 
 const users = ref();
@@ -65,7 +66,7 @@ const selectedUser = (user: any) => {
   emitsUserList("changeComponent", "userEdit");
 };
 
-const confirmUser = (user: any) => {
+const confirmDeleteUser = (user: any) => {
   emitsUserList(
     "showConfirmDialog",
     true,
@@ -78,8 +79,7 @@ const confirmUser = (user: any) => {
 
 const addUser = () => {
   const user = {
-    userId:
-      users.value.length === 0 ? "user1" : "user" + (users.value.length + 1),
+    userId: users.value.length === 0 ? "1" : "" + (users.value.length + 1),
     userName: "userName" + Date.now(),
     comments: "comments" + Date.now(),
     venue: {

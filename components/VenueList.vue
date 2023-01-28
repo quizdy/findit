@@ -17,7 +17,7 @@
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
-              @click.stop="confirmVenue(venue)"
+              @click.stop="confirmDeleteVenue(venue)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -44,7 +44,7 @@ const emitsVenueList = defineEmits<{
     params: any
   ): void;
   (e: "changeComponent", componentName: string): void;
-  (e: "setVenue", venue: any): void;
+  (e: "setVenueInfo", venueInfo: any): void;
 }>();
 
 const venues = ref();
@@ -60,11 +60,11 @@ const userList = () => {
 };
 
 const selectedVenue = (venue: any) => {
-  emitsVenueList("setVenue", venue);
+  emitsVenueList("setVenueInfo", venue);
   emitsVenueList("changeComponent", "targetList");
 };
 
-const confirmVenue = (venue: any) => {
+const confirmDeleteVenue = (venue: any) => {
   emitsVenueList(
     "showConfirmDialog",
     true,
@@ -81,7 +81,7 @@ const addVenue = () => {
     comments: "comments" + Date.now(),
     pos: 0,
   };
-  emitsVenueList("setVenue", venue);
+  emitsVenueList("setVenueInfo", venue);
   emitsVenueList("changeComponent", "venueEdit");
 };
 

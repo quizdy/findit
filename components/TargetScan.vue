@@ -191,9 +191,9 @@ const scanImage = () => {
     .onComplete((data) => {
       // scan.matchPercentage = 100 - data.misMatchPercentage;
       scan.matchPercentage =
-        (100 - data.misMatchPercentage) * 2 > 100
+        (100 - data.misMatchPercentage) * 1.75 > 100
           ? 100
-          : (100 - data.misMatchPercentage) * 1.5;
+          : (100 - data.misMatchPercentage) * 1.75;
       showProgress();
     });
 };

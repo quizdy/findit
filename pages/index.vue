@@ -10,10 +10,12 @@
         :venue="userInfo.venue"
         :userInfo="userInfo"
         :usersGps="usersGps"
+        @setSnackbar="setSnackbar"
       />
       <TargetScan
         v-if="currentComponent === 'targetScan'"
         :venue="userInfo.venue"
+        @setSnackbar="setSnackbar"
         @nextTarget="nextTarget"
       />
       <Login
@@ -51,8 +53,8 @@
             true,
             'ログアウト',
             'ログアウトします。よろしいですか？',
-            changeComponent,
-            'login'
+            logout,
+            ''
           )
         "
       >
@@ -193,6 +195,10 @@ const nextTarget = () => {
   }
 };
 
+const logout = () => {
+  location.reload();
+};
+
 const openAdmin = () => {
   window.open("/admin", "_blank");
 };
@@ -203,13 +209,17 @@ const initGeolocation = async () => {
     return;
   }
 
-  const position: any = await new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-
   const userGps = usersGps.value.filter(
     (user: any) => user.userId === userInfo.userId
   );
+
+  const position = await new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 2000,
+    });
+  });
+
   getCurrentPos(userGps, position);
 
   navigator.geolocation.watchPosition(
@@ -223,12 +233,15 @@ const initGeolocation = async () => {
     (e: any) => {
       setSnackbar(true, 2000, "warning", e);
       return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 2000,
     }
   );
 };
 
 const getCurrentPos = (userGps: any, position: any) => {
-  console.log("getCurrentPos");
   if (userGps.length === 0) {
     usersGps.value = [
       ...usersGps.value,

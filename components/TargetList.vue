@@ -9,9 +9,11 @@
         <v-btn @click="addTarget()"><v-icon>mdi-plus-circle</v-icon></v-btn>
       </v-toolbar>
       <v-list>
-        <v-list-item v-if="venue.targets.length === 0">No Target</v-list-item>
+        <v-list-item v-if="venueInfo.targets.length === 0"
+          >No Target</v-list-item
+        >
         <v-list-item
-          v-for="(target, i) in venue.targets"
+          v-for="(target, i) in venueInfo.targets"
           :key="i"
           :value="target"
           :title="target.title"
@@ -23,7 +25,7 @@
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
-              @click.stop="confirmTarget(target)"
+              @click.stop="confirmDeleteTarget(target)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -50,40 +52,40 @@ const emitsTargetList = defineEmits<{
     params: any
   ): void;
   (e: "changeComponent", componentName: string): void;
-  (e: "setTarget", target: any): void;
+  (e: "setTargetInfo", targetInfo: any): void;
 }>();
 
 const propsTargetList = defineProps<{
-  venue: any;
+  venueInfo: any;
 }>();
 
-const venue = reactive({
-  venueName: propsTargetList.venue.venueName,
-  comments: propsTargetList.venue.comments,
-  pos: propsTargetList.venue.pos,
+const venueInfo = reactive({
+  venueName: propsTargetList.venueInfo.venueName,
+  comments: propsTargetList.venueInfo.comments,
+  pos: propsTargetList.venueInfo.pos,
   targets: [],
 });
 
 const { data: resGetVenue } = await useFetch("/api/GetVenue", {
   method: "GET",
-  params: { venueName: venue.venueName },
+  params: { venueName: venueInfo.venueName },
 });
 
-venue.venueName = (resGetVenue.value as any).venue.venueName;
-venue.comments = (resGetVenue.value as any).venue.comments;
-venue.pos = (resGetVenue.value as any).venue.pos;
-venue.targets = (resGetVenue.value as any).venue.targets;
+venueInfo.venueName = (resGetVenue.value as any).venue.venueName;
+venueInfo.comments = (resGetVenue.value as any).venue.comments;
+venueInfo.pos = (resGetVenue.value as any).venue.pos;
+venueInfo.targets = (resGetVenue.value as any).venue.targets;
 
 const venueList = () => {
   emitsTargetList("changeComponent", "venueList");
 };
 
 const selectedTarget = (target: any) => {
-  emitsTargetList("setTarget", target);
+  emitsTargetList("setTargetInfo", target);
   emitsTargetList("changeComponent", "targetEdit");
 };
 
-const confirmTarget = (target: any) => {
+const confirmDeleteTarget = (target: any) => {
   emitsTargetList(
     "showConfirmDialog",
     true,
@@ -95,11 +97,11 @@ const confirmTarget = (target: any) => {
 };
 
 const addTarget = () => {
-  const target = {
+  const targetInfo = {
     no:
-      venue.targets.length === 0
+      venueInfo.targets.length === 0
         ? 1
-        : venue.targets[venue.targets.length - 1].no + 1,
+        : venueInfo.targets[venueInfo.targets.length - 1].no + 1,
     title: "test" + Date.now(),
     lat: 0.0,
     lng: 0.0,
@@ -114,18 +116,18 @@ const addTarget = () => {
       Date.now(),
     status: 0,
   };
-  emitsTargetList("setTarget", target);
+  emitsTargetList("setTargetInfo", targetInfo);
   emitsTargetList("changeComponent", "targetEdit");
 };
 
 const deleteTarget = async (target: any) => {
   const { data: resDeleteTarget } = await useFetch("/api/DeleteTarget", {
     method: "POST",
-    body: { venueName: venue.venueName, targetNo: target.no },
+    body: { venueName: venueInfo.venueName, targetNo: target.no },
   });
 
   if ((resDeleteTarget.value as any).msg === "") {
-    venue.targets = venue.targets.filter(
+    venueInfo.targets = venueInfo.targets.filter(
       (target_: any) => target_.no !== target.no
     );
   }
