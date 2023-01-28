@@ -129,17 +129,21 @@ const startVideo = async () => {
     return;
   }
 
-  let constraints = {
+  const constraints = {
     audio: false,
-    video: true,
+    video: { facingMode: { exact: "environment" } },
   };
 
   const requestPermission = (
     DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
   ).requestPermission;
 
-  if (typeof requestPermission === "function") {
-    (constraints.video as any) = { facingMode: { exact: "environment" } };
+  const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
+    (device) => device.kind === "videoinput" && device.label.includes("USB")
+  );
+
+  if (0 < devices.length) {
+    (constraints.video as any) = true;
   }
 
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -222,7 +226,7 @@ const showProgress = () => {
 <style scoped lang="scss">
 .layout {
   position: relative;
-  height: calc(100dvh - 14.2rem);
+  height: calc(100vh - 14.2rem);
   width: 100%;
 }
 
