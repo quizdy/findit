@@ -19,6 +19,12 @@
               variant="text"
               @click.stop="confirmDeleteVenue(venue)"
             ></v-btn>
+            <v-btn
+              color="grey-lighten-1"
+              icon="mdi-map"
+              variant="text"
+              @click.stop="showAdminMap(venue)"
+            ></v-btn>
           </template>
         </v-list-item>
       </v-list>
@@ -73,6 +79,11 @@ const confirmDeleteVenue = (venue: any) => {
     deleteVenue,
     venue
   );
+};
+
+const showAdminMap = (venue: any) => {
+  emitsVenueList("setVenueInfo", venue);
+  emitsVenueList("changeComponent", "adminMap");
 };
 
 const addVenue = () => {

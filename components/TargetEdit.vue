@@ -31,14 +31,14 @@
               <v-row dense>
                 <v-col cols="6">
                   <v-text-field
-                    v-model="targetInfo.lat"
+                    v-model="lat"
                     label="緯度"
                     required
                   ></v-text-field
                 ></v-col>
                 <v-col cols="6">
                   <v-text-field
-                    v-model="targetInfo.lng"
+                    v-model="lng"
                     label="経度"
                     required
                   ></v-text-field
@@ -230,6 +230,9 @@ const targetInfo = reactive({
   status: 0,
 });
 
+const lat = ref(targetInfo.lat);
+const lng = ref(targetInfo.lng);
+
 const scan = reactive({
   frameId: 0,
   matchPercentage: 0.0,
@@ -302,8 +305,8 @@ onMounted(async () => {
   });
 
   if (targetInfo.lat === 0 && targetInfo.lng === 0) {
-    targetInfo.lat = position.coords.latitude;
-    targetInfo.lng = position.coords.longitude;
+    lat.value = position.coords.latitude;
+    lng.value = position.coords.longitude;
   }
 });
 

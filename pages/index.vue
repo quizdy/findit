@@ -8,7 +8,6 @@
       <TargetMap
         v-if="currentComponent === 'targetMap'"
         :venue="userInfo.venue"
-        :userInfo="userInfo"
         :usersGps="usersGps"
         @setSnackbar="setSnackbar"
       />
@@ -148,20 +147,6 @@ const setSnackbar = (
   snackbar.msg = msg;
 };
 
-const showConfirmDialog = (
-  show: boolean,
-  title: string,
-  msg: string,
-  func: any,
-  params: any
-) => {
-  confirmDialog.show = show;
-  confirmDialog.title = title;
-  confirmDialog.msg = msg;
-  confirmDialog.func = func;
-  confirmDialog.params = params;
-};
-
 const closeConfirmDialog = () => {
   confirmDialog.show = false;
 };
@@ -170,7 +155,7 @@ const reload = () => {
   location.reload();
 };
 
-const setUserInfo = async (user: any) => {
+const setUserInfo = (user: any) => {
   userInfo.userId = user.userId;
   userInfo.userName = user.userName;
   userInfo.comments = user.comments;
@@ -185,7 +170,7 @@ const nextTarget = () => {
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
     changeComponent("targetInfo");
   } else {
-    alert("おめでとう");
+    setSnackbar(true, 5000, "success", "おめでとう");
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos = 0;
     changeComponent("targetInfo");
@@ -202,10 +187,6 @@ const initGeolocation = async () => {
     return;
   }
 
-  const userGps = usersGps.value.filter(
-    (user: any) => user.userId === userInfo.userId
-  );
-
   let position;
 
   try {
@@ -220,14 +201,13 @@ const initGeolocation = async () => {
     return;
   }
 
-  getCurrentPos(userGps, position);
+  const userGps = setUserGps(position);
+
+  $socket.emit("userGps", userGps);
 
   navigator.geolocation.watchPosition(
     (position) => {
-      const userGps = usersGps.value.filter(
-        (user: any) => user.userId === userInfo.userId
-      );
-      getCurrentPos(userGps, position);
+      const userGps = setUserGps(position);
       $socket.emit("userGps", userGps);
     },
     (e: any) => {
@@ -241,78 +221,65 @@ const initGeolocation = async () => {
   );
 };
 
-const getCurrentPos = (userGps: any, position: any) => {
-  if (userGps.length === 0) {
-    usersGps.value = [
-      ...usersGps.value,
-      {
-        userId: userInfo.userId,
-        userName: userInfo.userName,
-        gps: {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-        },
-        self: true,
-        marker: null,
-      },
-    ];
-  } else if (userGps.length === 1) {
+const setUserGps = (position: any) => {
+  const userGps = {
+    userId: userInfo.userId,
+    userName: userInfo.userName,
+    gps: {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+    },
+    self: true,
+  };
+
+  if (!usersGps.value.some((user: any) => user.userId === userInfo.userId)) {
+    usersGps.value = [...usersGps.value, userGps];
+  } else {
     usersGps.value = usersGps.value.map((user) =>
-      user.userId === userInfo.userId
+      user.userId === userInfo.userId ? userGps : user
+    );
+  }
+
+  return userGps;
+};
+
+const setUsersGps = (userGps: any) => {
+  if (usersGps.value.some((user: any) => user.userId === userGps.userId)) {
+    usersGps.value = usersGps.value.map((user) =>
+      user.userId === userGps.userId
         ? {
             userId: user.userId,
             userName: user.userName,
             gps: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              accuracy: position.coords.accuracy,
+              lat: userGps.gps.lat,
+              lng: userGps.gps.lng,
+              accuracy: userGps.gps.accuracy,
             },
             self: user.self,
-            marker: user.marker,
           }
         : user
     );
   } else {
-    setSnackbar(true, 2000, "warning", "userGps has many");
-    return;
+    usersGps.value = [
+      ...usersGps.value,
+      {
+        userId: userGps.userId,
+        userName: userGps.userName,
+        gps: {
+          lat: userGps.gps.lat,
+          lng: userGps.gps.lng,
+          accuracy: userGps.gps.accuracy,
+        },
+        self: false,
+      },
+    ];
   }
 };
 
 onMounted(() => {
   $socket.on("userGps", (userGps: any) => {
-    if (usersGps.value.some((user: any) => user.userId === userGps.userId)) {
-      usersGps.value = usersGps.value.map((user) =>
-        user.userId === userGps.userId
-          ? {
-              userId: user.userId,
-              userName: user.userName,
-              gps: {
-                lat: userGps.latitude,
-                lng: userGps.longitude,
-                accuracy: userGps.accuracy,
-              },
-              self: false,
-              marker: user.marker,
-            }
-          : user
-      );
-    } else {
-      usersGps.value = [
-        ...usersGps.value,
-        {
-          userId: userGps.userId,
-          userName: userGps.userName,
-          gps: {
-            lat: userGps.latitude,
-            lng: userGps.longitude,
-            accuracy: userGps.accuracy,
-          },
-          self: false,
-          marker: null,
-        },
-      ];
-    }
+    setUsersGps(userGps);
   });
 
   $socket.io.on("reconnect_failed", () => {
@@ -341,7 +308,7 @@ onBeforeUnmount(() => {
 //   const userGps = usersGps.value.filter(
 //     (user: any) => user.userId === userInfo.userId
 //   );
-//   getCurrentPos(userGps, position);
+// UsersGpsntPos(userGps, position);
 // }, 2000);
 // debug ------------------------
 </script>

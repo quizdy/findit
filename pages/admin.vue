@@ -22,6 +22,12 @@
         @setVenueInfo="setVenueInfo"
         @changeComponent="changeComponent"
       />
+      <AdminMap
+        v-if="currentComponent === 'adminMap'"
+        :venueInfo="venueInfo"
+        @setSnackbar="setSnackbar"
+        @changeComponent="changeComponent"
+      />
       <VenueEdit
         v-if="currentComponent === 'venueEdit'"
         :venueInfo="venueInfo"
