@@ -71,14 +71,14 @@ onMounted(async () => {
     zoomControl: true,
   });
 
+  google.maps.event.addListener($gmap.value, "zoom_changed", () => {
+    zoom.value = $gmap.value?.getZoom();
+  });
+
   venueInfo.targets.forEach((target: any) => {
     const latLng = new google.maps.LatLng(target.lat, target.lng);
     target.icon = "/images/treasure1.png";
     setTargetMarker(target.title, target.icon, latLng);
-  });
-
-  google.maps.event.addListener($gmap.value, "zoom_changed", () => {
-    zoom.value = $gmap.value?.getZoom();
   });
 
   $socket.on("userGps", (userGps: any) => {

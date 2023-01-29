@@ -29,17 +29,10 @@
                 </v-col>
               </v-row>
               <v-row dense>
-                <v-col cols="6">
+                <v-col cols="12">
                   <v-text-field
-                    v-model="lat"
-                    label="緯度"
-                    required
-                  ></v-text-field
-                ></v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="lng"
-                    label="経度"
+                    v-model="latLng"
+                    label="緯度,経度"
                     required
                   ></v-text-field
                 ></v-col>
@@ -106,6 +99,14 @@
                 <v-row no-gutters>
                   <v-col cols="12">
                     <div class="layout">
+                      <v-progress-circular
+                        v-show="loading"
+                        indeterminate
+                        color="light-blue"
+                        :size="70"
+                        :width="7"
+                        style="margin: 50%"
+                      ></v-progress-circular>
                       <video
                         id="webcam"
                         class="d-none"
@@ -116,6 +117,7 @@
                         :width="imageWidth"
                       ></video>
                       <canvas
+                        v-show="!loading"
                         id="webcamCanvas"
                         class="webcamCanvas"
                         :height="imageHeight"
@@ -230,8 +232,7 @@ const targetInfo = reactive({
   status: 0,
 });
 
-const lat = ref(targetInfo.lat);
-const lng = ref(targetInfo.lng);
+const latLng = ref(targetInfo.lat + "," + targetInfo.lng);
 
 const scan = reactive({
   frameId: 0,
@@ -242,6 +243,7 @@ const scan = reactive({
 const overlay = ref(false);
 const matchPercentageValue = ref(0);
 const interval = ref();
+const loading = ref(false);
 
 const imageHeight = 800;
 const imageWidth = 600;
@@ -267,6 +269,20 @@ const confirmUpdateTarget = () => {
       "写真を登録してください"
     );
     return;
+  }
+
+  if (!latLng.value || (latLng.value.match(/,/g) || []).length !== 1) {
+    emitsTargetEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "緯度,経度をカンマ区切りで登録してください"
+    );
+    return;
+  } else {
+    targetInfo.lat = latLng.value.split(",")[0];
+    targetInfo.lng = latLng.value.split(",")[1];
   }
 
   emitsTargetEdit(
@@ -305,13 +321,17 @@ onMounted(async () => {
   });
 
   if (targetInfo.lat === 0 && targetInfo.lng === 0) {
-    lat.value = position.coords.latitude;
-    lng.value = position.coords.longitude;
+    latLng.value = position.coords.latitude + "," + position.coords.longitude;
   }
 });
 
 const startVideo = async () => {
-  if (typeof window !== "object") return;
+  loading.value = true;
+  if (typeof window !== "object") {
+    loading.value = false;
+    return;
+  }
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     emitsTargetEdit(
       "setSnackbar",
@@ -320,6 +340,7 @@ const startVideo = async () => {
       "warning",
       "カメラデバイスが無効です"
     );
+    loading.value = false;
     return;
   }
 
@@ -351,12 +372,16 @@ const startVideo = async () => {
     "webcamCanvas"
   ) as HTMLCanvasElement;
 
-  if (webcam === null || webcamCanvas === null) return;
+  if (webcam === null || webcamCanvas === null) {
+    loading.value = false;
+    return;
+  }
 
   webcam.srcObject = stream;
   webcam.play();
 
   refresh(webcam, webcamCanvas);
+  loading.value = false;
 };
 
 const stopVideo = () => {
