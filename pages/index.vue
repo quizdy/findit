@@ -203,12 +203,12 @@ const initGeolocation = async () => {
 
   const userGps = setUserGps(position);
 
-  $socket.emit("userGps", userGps);
+  if ($socket) $socket.emit("userGps", userGps);
 
   navigator.geolocation.watchPosition(
     (position) => {
       const userGps = setUserGps(position);
-      $socket.emit("userGps", userGps);
+      if ($socket) $socket.emit("userGps", userGps);
     },
     (e: any) => {
       // setSnackbar(true, 2000, "warning", e.message);
@@ -278,6 +278,7 @@ const setUsersGps = (userGps: any) => {
 };
 
 onMounted(() => {
+  if (!$socket) return;
   $socket.on("userGps", (userGps: any) => {
     setUsersGps(userGps);
   });
@@ -293,24 +294,6 @@ onBeforeUnmount(() => {
     $socket.close();
   }
 });
-
-// debug ------------------------
-// var aaa = setInterval(() => {
-//   if (usersGps.value.length < 1) return;
-//   const position = {
-//     coords: {
-//       latitude: 36.25 + Math.random() / 100,
-//       longitude: 138.25 + Math.random() / 100,
-//       accuracy: 1,
-//     },
-//   };
-
-//   const userGps = usersGps.value.filter(
-//     (user: any) => user.userId === userInfo.userId
-//   );
-// UsersGpsntPos(userGps, position);
-// }, 2000);
-// debug ------------------------
 </script>
 
 <style scoped lang="scss">
