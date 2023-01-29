@@ -240,6 +240,8 @@ const scan = reactive({
   opacity: 0,
 });
 
+const stream = ref();
+
 const overlay = ref(false);
 const matchPercentageValue = ref(0);
 const interval = ref();
@@ -365,7 +367,7 @@ const startVideo = async () => {
     (constraints.video as any) = { facingMode: { exact: "environment" } };
   }
 
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  stream.value = await navigator.mediaDevices.getUserMedia(constraints);
 
   const webcam = document.getElementById("webcam") as HTMLVideoElement;
   const webcamCanvas = document.getElementById(
@@ -377,7 +379,7 @@ const startVideo = async () => {
     return;
   }
 
-  webcam.srcObject = stream;
+  webcam.srcObject = stream.value;
   webcam.play();
 
   refresh(webcam, webcamCanvas);
@@ -386,11 +388,16 @@ const startVideo = async () => {
 
 const stopVideo = () => {
   const webcam = document.getElementById("webcam") as HTMLVideoElement;
-  webcam.pause();
-  webcam.srcObject = null;
-  webcam.load();
-
-  clearInterval(scan.frameId);
+  if (webcam) {
+    webcam.pause();
+    webcam.srcObject = null;
+  }
+  if (scan.frameId) clearInterval(scan.frameId);
+  if (stream.value) {
+    stream.value.getTracks().forEach((track: any) => {
+      track.stop();
+    });
+  }
 };
 
 const refresh = (webcam: HTMLVideoElement, webcamCanvas: HTMLCanvasElement) => {
@@ -444,6 +451,10 @@ const showProgress = () => {
     matchPercentageValue.value += 1;
   }, 100);
 };
+
+defineExpose({
+  stopVideo,
+});
 </script>
 
 <style scoped lang="scss">
@@ -462,5 +473,10 @@ const showProgress = () => {
   padding: 0;
   height: 100%;
   width: 100%;
+}
+
+html,
+body {
+  overscroll-behavior-x: none !important;
 }
 </style>

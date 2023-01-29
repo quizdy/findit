@@ -16,6 +16,7 @@
         :venue="userInfo.venue"
         @setSnackbar="setSnackbar"
         @nextTarget="nextTarget"
+        ref="refTargetScan"
       />
       <Login
         v-if="currentComponent === 'login'"
@@ -126,11 +127,19 @@ const confirmDialog = reactive({
   params: null,
 });
 
+const refTargetScan = ref();
 let usersGps = ref<any[]>([]);
 
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
     await initGeolocation();
+  }
+  if (
+    currentComponent.value !== "targetScan" &&
+    typeof refTargetScan.value !== "undefined" &&
+    refTargetScan.value !== null
+  ) {
+    refTargetScan.value.stopVideo();
   }
   currentComponent.value = componentName;
 };

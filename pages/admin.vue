@@ -50,6 +50,7 @@
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
+        ref="refTargetEdit"
       />
     </v-main>
     <client-only>
@@ -130,7 +131,16 @@ const confirmDialog = reactive({
   params: null,
 });
 
+const refTargetEdit = ref();
+
 const changeComponent = (componentName: string) => {
+  if (
+    currentComponent.value !== "targetScan" &&
+    typeof refTargetEdit.value !== "undefined" &&
+    refTargetEdit.value !== null
+  ) {
+    refTargetEdit.value.stopVideo();
+  }
   currentComponent.value = componentName;
 };
 
