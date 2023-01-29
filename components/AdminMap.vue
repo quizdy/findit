@@ -77,14 +77,14 @@ onMounted(async () => {
     setTargetMarker(target.title, target.icon, latLng);
   });
 
+  google.maps.event.addListener($gmap.value, "zoom_changed", () => {
+    zoom.value = $gmap.value?.getZoom();
+  });
+
   $socket.on("userGps", (userGps: any) => {
     console.log(userGps);
     const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
     setUserMarker(userGps.userId, userGps);
-  });
-
-  google.maps.event.addListener($gmap.value, "zoom_changed", () => {
-    zoom.value = $gmap.value?.getZoom();
   });
 });
 
@@ -150,7 +150,7 @@ const setUserMarker = (no: number, user: any) => {
 
 <style scoped lang="scss">
 #map {
-  height: 90vh;
+  height: 90dvh;
   width: 100%;
 }
 </style>

@@ -61,7 +61,7 @@ const targets = ref(propsTargetInfo.venue.targets);
 <style scoped lang="scss">
 .layout {
   position: relative;
-  height: calc(100vh - 14.2rem);
+  height: calc(100dvh - 14.2rem);
   width: 100%;
 }
 

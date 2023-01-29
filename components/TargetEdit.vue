@@ -17,7 +17,7 @@
       <v-form>
         <v-window v-model="tab">
           <v-window-item key="tabInfo" value="tabInfo">
-            <v-container mt-0 pt-0 style="height: calc(100vh - 3rem)">
+            <v-container mt-0 pt-0 style="height: calc(100dvh - 3rem)">
               <v-row no-gutters>
                 <v-col cols="12">
                   <v-text-field
@@ -424,7 +424,7 @@ const showProgress = () => {
 <style scoped lang="scss">
 .layout {
   position: relative;
-  height: calc(100vh - 13.6rem);
+  height: calc(100dvh - 13.6rem);
   width: 100%;
 }
 

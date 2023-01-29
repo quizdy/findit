@@ -6,6 +6,14 @@
           <v-row no-gutters>
             <v-col cols="12">
               <div class="layout">
+                <v-progress-circular
+                  v-show="loading"
+                  indeterminate
+                  color="light-blue"
+                  :size="70"
+                  :width="7"
+                  style="margin: 50%"
+                ></v-progress-circular>
                 <video
                   id="webcam"
                   class="d-none"
@@ -16,6 +24,7 @@
                   :width="imageWidth"
                 ></video>
                 <canvas
+                  v-show="!loading"
                   id="webcamCanvas"
                   class="webcamCanvas"
                   :height="imageHeight"
@@ -108,6 +117,7 @@ const scan = reactive({
 const overlay = ref(false);
 const matchPercentageValue = ref(0);
 const interval = ref();
+const loading = ref(false);
 
 const imageHeight = 800;
 const imageWidth = 600;
@@ -117,7 +127,12 @@ onMounted(async () => {
 });
 
 const startVideo = async () => {
-  if (typeof window !== "object") return;
+  loading.value = true;
+  if (typeof window !== "object") {
+    loading.value = false;
+    return;
+  }
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     emitsTargetScan(
       "setSnackbar",
@@ -126,6 +141,7 @@ const startVideo = async () => {
       "warning",
       "カメラデバイスが無効です"
     );
+    loading.value = false;
     return;
   }
 
@@ -157,12 +173,16 @@ const startVideo = async () => {
     "webcamCanvas"
   ) as HTMLCanvasElement;
 
-  if (webcam === null || webcamCanvas === null) return;
+  if (webcam === null || webcamCanvas === null) {
+    loading.value = false;
+    return;
+  }
 
   webcam.srcObject = stream;
   webcam.play();
 
   refresh(webcam, webcamCanvas);
+  loading.value = false;
 };
 
 const stopVideo = () => {
@@ -230,7 +250,7 @@ const showProgress = () => {
 <style scoped lang="scss">
 .layout {
   position: relative;
-  height: calc(100vh - 14.2rem);
+  height: calc(100dvh - 14.2rem);
   width: 100%;
 }
 
