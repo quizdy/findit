@@ -212,12 +212,20 @@ const initGeolocation = async () => {
 
   const userGps = setUserGps(position);
 
-  $socket.emit("userGps", userGps);
+  // $socket.emit("userGps", userGps);
+  await useFetch("/api/SetGeolocationPos", {
+    method: "POST",
+    body: { gps: userGps },
+  });
 
   navigator.geolocation.watchPosition(
-    (position) => {
+    async (position) => {
       const userGps = setUserGps(position);
-      $socket.emit("userGps", userGps);
+      // $socket.emit("userGps", userGps);
+      await useFetch("/api/SetGeolocationPos", {
+        method: "POST",
+        body: { gps: userGps },
+      });
     },
     (e: any) => {
       // setSnackbar(true, 2000, "warning", e.message);
@@ -287,9 +295,17 @@ const setUsersGps = (userGps: any) => {
 };
 
 onMounted(() => {
-  $socket.on("userGps", (userGps: any) => {
-    setUsersGps(userGps);
-  });
+  // $socket.on("userGps", (userGps: any) => {
+  //   setUsersGps(userGps);
+  // });
+  const intervalId = setInterval(async () => {
+    const { data: res } = await useFetch("/api/GetGeolocationPos", {
+      method: "GET",
+    });
+    const userGps = (res.value as any)?.gps;
+    console.log("userGps", userGps);
+    if (userGps) setUsersGps(userGps.value);
+  }, 2000);
 
   $socket.io.on("reconnect_failed", () => {
     console.log("reconnect_failed");
