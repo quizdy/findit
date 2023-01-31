@@ -240,6 +240,7 @@ const initGeolocation = async () => {
   //   }
   // );
 
+<<<<<<< HEAD
   // debug ------------------------
   const pollingTestId = setInterval(async () => {
     const position = {
@@ -257,6 +258,24 @@ const initGeolocation = async () => {
     });
   }, 3500);
   // debug ------------------------
+=======
+  if ($socket) $socket.emit("userGps", userGps);
+
+  navigator.geolocation.watchPosition(
+    (position) => {
+      const userGps = setUserGps(position);
+      if ($socket) $socket.emit("userGps", userGps);
+    },
+    (e: any) => {
+      // setSnackbar(true, 2000, "warning", e.message);
+      return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 2000,
+    }
+  );
+>>>>>>> 94cb4248a782b2fa4825c1fe330dae31beb22654
 };
 
 const getUserGps = (position: any) => {
@@ -273,6 +292,7 @@ const getUserGps = (position: any) => {
 };
 
 onMounted(() => {
+<<<<<<< HEAD
   pollingMsgId.value = setInterval(async () => {
     const { data: res } = await useFetch("/api/GetMsg", {
       method: "GET",
@@ -281,6 +301,16 @@ onMounted(() => {
     if (msg) {
     }
   }, 3000);
+=======
+  if (!$socket) return;
+  $socket.on("userGps", (userGps: any) => {
+    setUsersGps(userGps);
+  });
+
+  $socket.io.on("reconnect_failed", () => {
+    console.log("reconnect_failed");
+  });
+>>>>>>> 94cb4248a782b2fa4825c1fe330dae31beb22654
 });
 
 onBeforeUnmount(() => {

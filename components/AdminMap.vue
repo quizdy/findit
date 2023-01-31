@@ -64,6 +64,7 @@ onMounted(async () => {
     setTargetMarker(target.title, target.icon, latLng);
   });
 
+<<<<<<< HEAD
   loading.value = false;
 
   watchUserPos();
@@ -71,6 +72,18 @@ onMounted(async () => {
   google.maps.event.addListener($gmap.value, "zoom_changed", () => {
     zoom.value = $gmap.value?.getZoom();
   });
+=======
+  google.maps.event.addListener($gmap.value, "zoom_changed", () => {
+    zoom.value = $gmap.value?.getZoom();
+  });
+
+  if (!$socket) return;
+  $socket.on("userGps", (userGps: any) => {
+    console.log(userGps);
+    const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
+    setUserMarker(userGps.userId, userGps);
+  });
+>>>>>>> 94cb4248a782b2fa4825c1fe330dae31beb22654
 });
 
 const setUserPos = (userGps: any) => {
