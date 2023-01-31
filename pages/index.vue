@@ -105,6 +105,7 @@ const currentComponent = ref("login");
 const userInfo = reactive({
   userId: "",
   userName: "",
+  image: "",
   comments: "",
   venue: {
     venueName: "",
@@ -175,6 +176,7 @@ const reload = () => {
 const setUserInfo = (user: any) => {
   userInfo.userId = user.userId;
   userInfo.userName = user.userName;
+  userInfo.image = user.image;
   userInfo.comments = user.comments;
   userInfo.venue = user.venue;
   changeComponent("targetInfo");
@@ -207,7 +209,7 @@ const initGeolocation = async () => {
   navigator.geolocation.getCurrentPosition(
     async (position) => {
       const userGps = getUserGps(position);
-      await useFetch("/api/SetPos", {
+      await useFetch("/api/UpdatePos", {
         method: "POST",
         body: { userGps: userGps },
       });
@@ -225,7 +227,7 @@ const initGeolocation = async () => {
   navigator.geolocation.watchPosition(
     async (position) => {
       const userGps = getUserGps(position);
-      await useFetch("/api/SetPos", {
+      await useFetch("/api/UpdatePos", {
         method: "POST",
         body: { userGps: userGps },
       });
@@ -263,6 +265,7 @@ const getUserGps = (position: any) => {
   return {
     userId: userInfo.userId,
     userName: userInfo.userName,
+    image: userInfo.image,
     gps: {
       lat: position.coords.latitude,
       lng: position.coords.longitude,

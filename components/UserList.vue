@@ -2,11 +2,14 @@
   <div>
     <v-card max-width="600" class="mx-auto">
       <v-toolbar color="light-blue" dark>
-        <v-btn @click="venueList"
+        <p class="ml-4">ユーザ</p>
+        <v-spacer></v-spacer>
+        <v-btn class="ml-1" @click="venueList"
           ><v-icon>mdi-format-list-bulleted</v-icon></v-btn
         >
-        <v-spacer></v-spacer>
-        <v-btn @click="addUser"><v-icon>mdi-plus-circle</v-icon></v-btn>
+        <v-btn class="ml-1" @click="addUser"
+          ><v-icon>mdi-plus-circle</v-icon></v-btn
+        >
       </v-toolbar>
       <v-list>
         <v-list-item v-if="users.length === 0">No User</v-list-item>
@@ -81,6 +84,10 @@ const addUser = () => {
   const user = {
     userId: users.value.length === 0 ? "1" : "" + (users.value.length + 1),
     userName: "userName" + Date.now(),
+    image:
+      "https://api.multiavatar.com/" +
+      Math.random().toString(32).substring(2) +
+      ".png",
     comments: "comments" + Date.now(),
     venue: {
       venueName: "",

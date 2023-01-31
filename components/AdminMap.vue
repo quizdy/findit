@@ -30,7 +30,7 @@ const emitsAdminMap = defineEmits<{
   (e: "changeComponent", componentName: string): void;
 }>();
 
-const propsTargetMap = defineProps<{
+const propsAdminMap = defineProps<{
   venue: any;
 }>();
 
@@ -52,13 +52,16 @@ onMounted(async () => {
   const mapId = document.getElementById("map") as HTMLElement;
 
   $gmap.value = new google.maps.Map(mapId, {
-    center: new google.maps.LatLng(venue.lat, venue.lng),
+    center: new google.maps.LatLng(
+      propsAdminMap.venue.lat,
+      propsAdminMap.venue.lng
+    ),
     zoom: zoom.value,
     disableDefaultUI: true,
     zoomControl: true,
   });
 
-  propsTargetMap.venue.targets.forEach((target: any) => {
+  propsAdminMap.venue.targets.forEach((target: any) => {
     const latLng = new google.maps.LatLng(target.lat, target.lng);
     target.icon = "/images/treasure1.png";
     setTargetMarker(target.title, target.icon, latLng);
@@ -142,6 +145,12 @@ const setUserMarker = (userGps: any) => {
   const userMarker = new google.maps.Marker({
     position: latLng,
     title: userGps.userName,
+    icon: {
+      url: "https://api.multiavatar.com/4.svg", //userGps.image,
+      scaledSize: new google.maps.Size(30, 30),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(0, 0),
+    },
   });
 
   userMarker.setMap($gmap.value);

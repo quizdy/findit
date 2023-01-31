@@ -142,8 +142,8 @@
                 <v-row dense>
                   <v-col cols="12">
                     <v-slider
-                      v-if="targetInfo.image"
-                      class="mx-4"
+                      :disabled="!targetInfo.image"
+                      class="mx-8"
                       max="100"
                       min="0"
                       color="blue"
@@ -216,16 +216,15 @@ const emitsTargetEdit = defineEmits<{
     params: any
   ): void;
   (e: "changeComponent", componentName: string): void;
-  (e: "setTargetInfo", targetInfo: any): void;
+  (e: "setVenueInfo", venue: any): void;
 }>();
 
 const propsTargetEdit = defineProps<{
-  venueName: string;
+  venue: any;
   target: any;
 }>();
 
 const tab = ref("tabInfo");
-const venueName = ref(propsTargetEdit.venueName);
 const targetInfo = reactive({
   no: propsTargetEdit.target.no,
   title: propsTargetEdit.target.title,
@@ -312,11 +311,11 @@ const confirmUpdateTarget = () => {
 const updateTarget = async () => {
   const { data: resUpdateTarget } = await useFetch("/api/UpdateTarget", {
     method: "POST",
-    body: { venueName: venueName.value, target: targetInfo },
+    body: { venueName: propsTargetEdit.venue.venueName, target: targetInfo },
   });
 
   if ((resUpdateTarget.value as any).msg === "") {
-    emitsTargetEdit("setTargetInfo", targetInfo);
+    emitsTargetEdit("setVenueInfo", propsTargetEdit.venue);
     emitsTargetEdit("changeComponent", "targetList");
   }
 };

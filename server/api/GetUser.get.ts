@@ -16,6 +16,7 @@ export default defineEventHandler(async (e) => {
     return {
       userId: '',
       userName: '',
+      image: '',
       comments: '',
       venue: {
         venueName: '',

@@ -158,6 +158,12 @@ const setUserMarker = (userGps: any) => {
   const userMarker = new google.maps.Marker({
     position: latLng,
     title: userGps.userName,
+    icon: {
+      url: "https://api.multiavatar.com/4.svg", //userGps.image,
+      scaledSize: new google.maps.Size(30, 30),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(0, 0),
+    },
   });
 
   userMarker.setMap($gmap.value);

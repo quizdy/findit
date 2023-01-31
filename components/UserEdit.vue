@@ -9,6 +9,9 @@
       </v-toolbar>
       <v-form>
         <v-container mt-0 pt-0>
+          <v-avatar class="mb-4" size="100">
+            <v-img :src="userInfo.image" @click="chgAvatar"></v-img>
+          </v-avatar>
           <v-row no-gutters>
             <v-col cols="12">
               <v-text-field
@@ -89,6 +92,7 @@ const propsUserList = defineProps<{
 const userInfo = reactive({
   userId: propsUserList.userInfo.userId,
   userName: propsUserList.userInfo.userName,
+  image: propsUserList.userInfo.image,
   comments: propsUserList.userInfo.comments,
   venue: propsUserList.userInfo.venue,
 });
@@ -136,6 +140,7 @@ const updateUser = async (params: any) => {
     body: {
       userId: userInfo.userId,
       userName: userInfo.userName,
+      image: userInfo.image,
       comments: userInfo.comments,
       venue: {
         venueName: userInfo.venue.venueName,
@@ -150,6 +155,14 @@ const updateUser = async (params: any) => {
 
 const cancelUser = () => {
   emitsUserEdit("changeComponent", "userList");
+};
+
+const chgAvatar = () => {
+  const url =
+    "https://api.multiavatar.com/" +
+    Math.random().toString(32).substring(2) +
+    ".png";
+  userInfo.image = url;
 };
 </script>
 

@@ -2,28 +2,37 @@
   <div>
     <v-card max-width="600" class="mx-auto">
       <v-toolbar color="light-blue" dark>
-        <v-btn @click="userList"><v-icon>mdi-account</v-icon></v-btn>
+        <p class="ml-4">会場</p>
         <v-spacer></v-spacer>
-        <v-btn @click="addVenue"><v-icon>mdi-plus-circle</v-icon></v-btn>
+        <v-btn class="ml-1" @click="userList"
+          ><v-icon>mdi-account</v-icon></v-btn
+        >
+        <v-btn class="ml-1" @click="addVenue"
+          ><v-icon>mdi-plus-circle</v-icon></v-btn
+        >
       </v-toolbar>
       <v-list>
         <v-list-item v-if="venues.length === 0">No Venue</v-list-item>
-        <v-list-item v-for="(venue, i) in venues" :key="i" :value="venue">
-          <v-list-item-title @click="selectedVenue(venue)">{{
-            venue.venueName
-          }}</v-list-item-title>
+        <v-list-item
+          v-for="(venue, i) in venues"
+          :key="i"
+          :value="venue"
+          :title="venue.venueName"
+          :prepend-avatar="venue.image"
+          @click="selectedVenue(venue)"
+        >
           <template v-slot:append>
+            <v-btn
+              color="grey-lighten-1"
+              icon="mdi-pencil"
+              variant="text"
+              @click.stop="editVenue(venue)"
+            ></v-btn>
             <v-btn
               color="grey-lighten-1"
               icon="mdi-delete"
               variant="text"
               @click.stop="confirmDeleteVenue(venue)"
-            ></v-btn>
-            <v-btn
-              color="grey-lighten-1"
-              icon="mdi-map"
-              variant="text"
-              @click.stop="showAdminMap(venue)"
             ></v-btn>
           </template>
         </v-list-item>
@@ -81,11 +90,6 @@ const confirmDeleteVenue = (venue: any) => {
   );
 };
 
-const showAdminMap = (venue: any) => {
-  emitsVenueList("setVenueInfo", venue);
-  emitsVenueList("changeComponent", "adminMap");
-};
-
 const addVenue = () => {
   const venue = {
     venueName: "venueName" + Date.now(),
@@ -94,6 +98,11 @@ const addVenue = () => {
     comments: "comments" + Date.now(),
     pos: 0,
   };
+  emitsVenueList("setVenueInfo", venue);
+  emitsVenueList("changeComponent", "venueEdit");
+};
+
+const editVenue = (venue: any) => {
   emitsVenueList("setVenueInfo", venue);
   emitsVenueList("changeComponent", "venueEdit");
 };

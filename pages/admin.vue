@@ -40,16 +40,17 @@
         :venue="venueInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
+        @setVenueInfo="setVenueInfo"
         @setTargetInfo="setTargetInfo"
         @changeComponent="changeComponent"
       />
       <TargetEdit
         v-if="currentComponent === 'targetEdit'"
-        :venueName="venueInfo.venueName"
+        :venue="venueInfo"
         :target="targetInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
-        @setTargetInfo="setTargetInfo"
+        @setVenueInfo="setVenueInfo"
         @changeComponent="changeComponent"
         ref="refTargetEdit"
       />
@@ -99,6 +100,7 @@ const currentComponent = ref("venueList");
 const userInfo = reactive({
   userId: "",
   userName: "",
+  image: "",
   comments: "",
   venue: {},
 });
@@ -107,6 +109,7 @@ const venueInfo = reactive({
   lat: 0.0,
   lng: 0.0,
   comments: "",
+  image: "",
   pos: 0,
   targets: [],
 });
@@ -180,6 +183,7 @@ const closeConfirmDialog = () => {
 const setUserInfo = (user: any) => {
   userInfo.userId = user.userId;
   userInfo.userName = user.userName;
+  userInfo.image = user.image;
   userInfo.comments = user.comments;
   userInfo.venue = user.venue;
 };
@@ -189,6 +193,7 @@ const setVenueInfo = async (venue: any) => {
   venueInfo.lat = venue.lat;
   venueInfo.lng = venue.lng;
   venueInfo.comments = venue.comments;
+  venueInfo.image = venue.image;
   venueInfo.pos = venue.pos;
 
   const { data: resGetVenue } = await useFetch("/api/GetVenue", {
