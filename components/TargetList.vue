@@ -56,25 +56,13 @@ const emitsTargetList = defineEmits<{
 }>();
 
 const propsTargetList = defineProps<{
-  venueInfo: any;
+  venue: any;
 }>();
 
 const venueInfo = reactive({
-  venueName: propsTargetList.venueInfo.venueName,
-  comments: propsTargetList.venueInfo.comments,
-  pos: propsTargetList.venueInfo.pos,
-  targets: [],
+  venueName: propsTargetList.venue.venueName,
+  targets: propsTargetList.venue.targets,
 });
-
-const { data: resGetVenue } = await useFetch("/api/GetVenue", {
-  method: "GET",
-  params: { venueName: venueInfo.venueName },
-});
-
-venueInfo.venueName = (resGetVenue.value as any).venue.venueName;
-venueInfo.comments = (resGetVenue.value as any).venue.comments;
-venueInfo.pos = (resGetVenue.value as any).venue.pos;
-venueInfo.targets = (resGetVenue.value as any).venue.targets;
 
 const venueList = () => {
   emitsTargetList("changeComponent", "venueList");
@@ -103,9 +91,9 @@ const addTarget = () => {
         ? 1
         : venueInfo.targets[venueInfo.targets.length - 1].no + 1,
     title: "test" + Date.now(),
-    lat: 0.0,
-    lng: 0.0,
-    gap: 80,
+    lat: 0,
+    lng: 0,
+    gap: 60,
     image: "",
     comments:
       "comments" +
@@ -114,7 +102,7 @@ const addTarget = () => {
       Date.now() +
       "comments" +
       Date.now(),
-    status: 0,
+    targetStatus: 0,
   };
   emitsTargetList("setTargetInfo", targetInfo);
   emitsTargetList("changeComponent", "targetEdit");

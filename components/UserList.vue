@@ -101,7 +101,7 @@ const deleteUser = async (user: any) => {
 
   if ((resDeleteUser.value as any).msg === "") {
     users.value = users.value.filter(
-      (user_: any) => user_.userId !== user.userId
+      (_user: any) => _user.userId !== user.userId
     );
   }
 };

@@ -89,6 +89,8 @@ const showAdminMap = (venue: any) => {
 const addVenue = () => {
   const venue = {
     venueName: "venueName" + Date.now(),
+    lat: 0.0,
+    lng: 0.0,
     comments: "comments" + Date.now(),
     pos: 0,
   };

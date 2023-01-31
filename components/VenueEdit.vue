@@ -19,6 +19,29 @@
               ></v-text-field>
             </v-col>
           </v-row>
+          <v-row dense>
+            <v-col cols="12">
+              <v-text-field
+                v-model="latLng"
+                label="緯度,経度"
+                append-inner-icon="mdi-map-marker"
+                @click:append-inner="showMap"
+                required
+                @focus="$event.target.select()"
+              >
+              </v-text-field
+            ></v-col>
+          </v-row>
+          <v-row dense>
+            <v-col cols="12">
+              <v-file-input
+                accept="image/png, image/jpeg, image/bmp"
+                placeholder="写真"
+                prepend-icon="mdi-camera"
+                @change="onVenueFileChanged"
+              ></v-file-input>
+            </v-col>
+          </v-row>
           <v-row no-gutters>
             <v-col cols="12">
               <v-textarea
@@ -64,15 +87,36 @@ const emitsVenueEdit = defineEmits<{
 }>();
 
 const propsVenueList = defineProps<{
-  venueInfo: any;
+  venue: any;
 }>();
 
 const venueInfo = reactive({
-  venueName: propsVenueList.venueInfo.venueName,
-  comments: propsVenueList.venueInfo.comments,
-  pos: propsVenueList.venueInfo.pos,
+  venueName: propsVenueList.venue.venueName,
+  lat: propsVenueList.venue.lat,
+  lng: propsVenueList.venue.lng,
+  comments: propsVenueList.venue.comments,
+  image: propsVenueList.venue.image,
+  pos: propsVenueList.venue.pos,
 });
 
+const latLng = ref(venueInfo.lat + "," + venueInfo.lng);
+
+const showMap = () => {
+  window.open(
+    "https://www.google.co.jp/maps/@" + latLng.value + ",14z",
+    "_blank"
+  );
+};
+
+const onVenueFileChanged = (e: Event) => {
+  const files = (e.target as HTMLInputElement).files;
+  const file = files![0];
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = async (e: any) => {
+    venueInfo.image = e.currentTarget.result;
+  };
+};
 const confirmVenue = () => {
   if (!venueInfo.venueName) {
     emitsVenueEdit(
@@ -83,6 +127,20 @@ const confirmVenue = () => {
       "会場名を入力して下さい"
     );
     return;
+  }
+
+  if (!latLng.value || (latLng.value.match(/,/g) || []).length !== 1) {
+    emitsVenueEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "緯度,経度をカンマ区切りで登録してください"
+    );
+    return;
+  } else {
+    venueInfo.lat = latLng.value.split(",")[0];
+    venueInfo.lng = latLng.value.split(",")[1];
   }
 
   emitsVenueEdit(
@@ -98,7 +156,7 @@ const confirmVenue = () => {
 const updateVenue = async () => {
   const { data: resUpdateVenue } = await useFetch("/api/UpdateVenue", {
     method: "POST",
-    body: { venueName: venueInfo.venueName, comments: venueInfo.comments },
+    body: { venue: venueInfo },
   });
 
   if ((resUpdateVenue.value as any).msg === "") {
@@ -109,6 +167,30 @@ const updateVenue = async () => {
 const cancelVenue = () => {
   emitsVenueEdit("changeComponent", "venueList");
 };
+
+onMounted(async () => {
+  if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
+    emitsVenueEdit("setSnackbar", true, 2000, "warning", "位置情報が無効です");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      if (venueInfo.lat === 0 && venueInfo.lng === 0) {
+        latLng.value =
+          position.coords.latitude + "," + position.coords.longitude;
+      }
+    },
+    (e: any) => {
+      // setSnackbar(true, 2000, "warning", e.message);
+      return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 2000,
+    }
+  );
+});
 </script>
 
 <style scoped lang="scss"></style>

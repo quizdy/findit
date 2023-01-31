@@ -12,7 +12,7 @@
                   color="light-blue"
                   :size="70"
                   :width="7"
-                  style="margin: 50%"
+                  style="margin: 50% calc(50% - 2rem)"
                 ></v-progress-circular>
                 <video
                   id="webcam"
@@ -118,7 +118,7 @@ const stream = ref();
 
 const overlay = ref(false);
 const matchPercentageValue = ref(0);
-const interval = ref();
+const progressInterval = ref();
 const loading = ref(false);
 
 const imageHeight = 800;
@@ -157,7 +157,9 @@ const startVideo = async () => {
   ).requestPermission;
 
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
-    (device) => device.kind === "videoinput" && device.label.includes("USB")
+    (device) =>
+      device.kind === "videoinput" &&
+      (device.label.includes("USB") || device.label.includes("Webcam"))
   );
 
   if (0 < devices.length) {
@@ -234,9 +236,9 @@ const showProgress = () => {
   webcam.pause();
   overlay.value = true;
   matchPercentageValue.value = 0;
-  interval.value = setInterval(async () => {
+  progressInterval.value = setInterval(async () => {
     if (matchPercentageValue.value >= scan.matchPercentage) {
-      clearInterval(interval.value);
+      clearInterval(progressInterval.value);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       overlay.value = false;
       if (

@@ -1,6 +1,7 @@
 {
     "private": true,
     "scripts": {
+        "local": "npx nuxi dev -p 8443 --https --ssl-cert ../keys/nitech.pem --ssl-key ../keys/nitech-key.pem",
         "build": "nuxt build",
         "dev": "nuxt dev",
         "generate": "nuxt generate",
@@ -23,8 +24,6 @@
         "path": "^0.12.7",
         "resemblejs": "^4.1.0",
         "sass": "^1.57.1",
-        "socket.io": "4.5.2",
-        "socket.io-client": "4.5.2",
         "vuetify": "^3.1.2"
     }
 }

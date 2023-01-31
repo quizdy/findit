@@ -2,8 +2,7 @@
 export default {
   runtimeConfig: {
     public: {
-      GMAP_API_KEY: process.env.GMAP_API_KEY,
-      SOCKET_IO: process.env.SOCKET_IO,
+      GMAP_API_KEY: process.env.GMAP_API_KEY
     },
   },
   app: {
@@ -35,5 +34,5 @@ export default {
     prefix: 'Swiper',
     styleLang: 'css',
     modules: ['navigation', 'pagination'],
-  }],'~/modules/socket'],
+  }]],
 };

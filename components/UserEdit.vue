@@ -105,13 +105,6 @@ resGetVenues.value?.venues.forEach((venue: any) => {
 });
 
 const getVenue = async () => {
-  // const { data: resGetVenue } = await useFetch("/api/GetVenue", {
-  //   method: "GET",
-  //   params: { venueName: selectedVenue.value },
-  // });
-
-  // user.venue = (resGetVenue.value as any).venue;
-
   userInfo.venue.venueName = selectedVenue;
 };
 

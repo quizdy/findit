@@ -48,6 +48,16 @@
 </template>
 
 <script setup lang="ts">
+const emitsTargetMap = defineEmits<{
+  (
+    e: "setSnackbar",
+    show: boolean,
+    timeout: number,
+    color: string,
+    msg: string
+  ): void;
+}>();
+
 const propsTargetInfo = defineProps<{
   venue: any;
 }>();

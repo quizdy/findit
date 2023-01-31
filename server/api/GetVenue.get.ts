@@ -15,7 +15,10 @@ export default defineEventHandler(async (e) => {
     return {
       venue: {
         venueName: "",
+        lat: 0,
+        lng: 0,
         comments: "",
+        image: "",
         pos: 0,
         targets: [],
       }

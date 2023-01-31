@@ -4,12 +4,13 @@
       <TargetInfo
         v-if="currentComponent === 'targetInfo'"
         :venue="userInfo.venue"
+        @setSnackbar="setSnackbar"
       />
       <TargetMap
         v-if="currentComponent === 'targetMap'"
         :venue="userInfo.venue"
-        :usersGps="usersGps"
         @setSnackbar="setSnackbar"
+        ref="refTargetMap"
       />
       <TargetScan
         v-if="currentComponent === 'targetScan'"
@@ -100,7 +101,6 @@
 </template>
 
 <script setup lang="ts">
-const { $socket } = useNuxtApp();
 const currentComponent = ref("login");
 const userInfo = reactive({
   userId: "",
@@ -127,12 +127,20 @@ const confirmDialog = reactive({
   params: null,
 });
 
+const refTargetMap = ref();
 const refTargetScan = ref();
-let usersGps = ref<any[]>([]);
+const pollingMsgId = ref();
 
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
     await initGeolocation();
+  }
+  if (
+    currentComponent.value !== "targetMap" &&
+    typeof refTargetMap.value !== "undefined" &&
+    refTargetMap.value !== null
+  ) {
+    refTargetMap.value.stopDrawMap();
   }
   if (
     currentComponent.value !== "targetScan" &&
@@ -196,50 +204,63 @@ const initGeolocation = async () => {
     return;
   }
 
-  let position;
+  // navigator.geolocation.getCurrentPosition(
+  //   async (position) => {
+  //     const userGps = getUserGps(position);
+  //     await useFetch("/api/SetPos", {
+  //       method: "POST",
+  //       body: { userGps: userGps },
+  //     });
+  //   },
+  //   (e: any) => {
+  //     // setSnackbar(true, 2000, "warning", e.message);
+  //     return;
+  //   },
+  //   {
+  //     enableHighAccuracy: true,
+  //     timeout: 2000,
+  //   }
+  // );
 
-  try {
-    position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 2000,
-      });
+  // navigator.geolocation.watchPosition(
+  //   async (position) => {
+  //     const userGps = getUserGps(position);
+  //     await useFetch("/api/SetPos", {
+  //       method: "POST",
+  //       body: { userGps: userGps },
+  //     });
+  //   },
+  //   (e: any) => {
+  //     // setSnackbar(true, 2000, "warning", e.message);
+  //     return;
+  //   },
+  //   {
+  //     enableHighAccuracy: true,
+  //     timeout: 2000,
+  //   }
+  // );
+
+  // debug ------------------------
+  const pollingTestId = setInterval(async () => {
+    const position = {
+      coords: {
+        latitude: 35.15700033 + Math.random() / 1000000,
+        longitude: 136.9259228 + Math.random() / 1000000,
+        accuracy: 1,
+      },
+    };
+
+    const userGps = getUserGps(position);
+    await useFetch("/api/UpdatePos", {
+      method: "POST",
+      body: { userGps: userGps },
     });
-  } catch (e: any) {
-    setSnackbar(true, 2000, "warning", e.message);
-    return;
-  }
-
-  const userGps = setUserGps(position);
-
-  // $socket.emit("userGps", userGps);
-  await useFetch("/api/SetGeolocationPos", {
-    method: "POST",
-    body: { gps: userGps },
-  });
-
-  navigator.geolocation.watchPosition(
-    async (position) => {
-      const userGps = setUserGps(position);
-      // $socket.emit("userGps", userGps);
-      await useFetch("/api/SetGeolocationPos", {
-        method: "POST",
-        body: { gps: userGps },
-      });
-    },
-    (e: any) => {
-      // setSnackbar(true, 2000, "warning", e.message);
-      return;
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 2000,
-    }
-  );
+  }, 3500);
+  // debug ------------------------
 };
 
-const setUserGps = (position: any) => {
-  const userGps = {
+const getUserGps = (position: any) => {
+  return {
     userId: userInfo.userId,
     userName: userInfo.userName,
     gps: {
@@ -249,93 +270,22 @@ const setUserGps = (position: any) => {
     },
     self: true,
   };
-
-  if (!usersGps.value.some((user: any) => user.userId === userInfo.userId)) {
-    usersGps.value = [...usersGps.value, userGps];
-  } else {
-    usersGps.value = usersGps.value.map((user) =>
-      user.userId === userInfo.userId ? userGps : user
-    );
-  }
-
-  return userGps;
-};
-
-const setUsersGps = (userGps: any) => {
-  if (usersGps.value.some((user: any) => user.userId === userGps.userId)) {
-    usersGps.value = usersGps.value.map((user) =>
-      user.userId === userGps.userId
-        ? {
-            userId: user.userId,
-            userName: user.userName,
-            gps: {
-              lat: userGps.gps.lat,
-              lng: userGps.gps.lng,
-              accuracy: userGps.gps.accuracy,
-            },
-            self: user.self,
-          }
-        : user
-    );
-  } else {
-    usersGps.value = [
-      ...usersGps.value,
-      {
-        userId: userGps.userId,
-        userName: userGps.userName,
-        gps: {
-          lat: userGps.gps.lat,
-          lng: userGps.gps.lng,
-          accuracy: userGps.gps.accuracy,
-        },
-        self: false,
-      },
-    ];
-  }
 };
 
 onMounted(() => {
-  // $socket.on("userGps", (userGps: any) => {
-  //   setUsersGps(userGps);
-  // });
-  const intervalId = setInterval(async () => {
-    const { data: res } = await useFetch("/api/GetGeolocationPos", {
+  pollingMsgId.value = setInterval(async () => {
+    const { data: res } = await useFetch("/api/GetMsg", {
       method: "GET",
     });
-    const userGps = (res.value as any)?.gps;
-    console.log("userGps", userGps);
-    if (userGps) setUsersGps(userGps.value);
-  }, 2000);
-
-  $socket.io.on("reconnect_failed", () => {
-    console.log("reconnect_failed");
-  });
+    const msg = (res.value as any)?.msg;
+    if (msg) {
+    }
+  }, 3000);
 });
 
 onBeforeUnmount(() => {
-  if ($socket) {
-    console.log("disconnest");
-    $socket.close();
-  }
+  clearInterval(pollingMsgId.value);
 });
-
-// debug ------------------------
-// var aaa = setInterval(() => {
-//   if (usersGps.value.length < 1) return;
-//   const position = {
-//     coords: {
-//       latitude: 36.25 + Math.random() / 100,
-//       longitude: 138.25 + Math.random() / 100,
-//       accuracy: 1,
-//     },
-//   };
-
-//   const userGps = usersGps.value.filter(
-//     (user: any) => user.userId === userInfo.userId
-//   );
-// UsersGpsntPos(userGps, position);
-// }, 2000);
-// debug ------------------------
 </script>
 
 <style scoped lang="scss">

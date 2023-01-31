@@ -33,8 +33,12 @@
                   <v-text-field
                     v-model="latLng"
                     label="緯度,経度"
+                    append-inner-icon="mdi-map-marker"
+                    @click:append-inner="showMap"
                     required
-                  ></v-text-field
+                    @focus="$event.target.select()"
+                  >
+                  </v-text-field
                 ></v-col>
               </v-row>
               <v-row dense>
@@ -105,7 +109,7 @@
                         color="light-blue"
                         :size="70"
                         :width="7"
-                        style="margin: 50%"
+                        style="margin: 50% calc(50% - 2rem)"
                       ></v-progress-circular>
                       <video
                         id="webcam"
@@ -212,24 +216,25 @@ const emitsTargetEdit = defineEmits<{
     params: any
   ): void;
   (e: "changeComponent", componentName: string): void;
+  (e: "setTargetInfo", targetInfo: any): void;
 }>();
 
 const propsTargetEdit = defineProps<{
   venueName: string;
-  targetInfo: any;
+  target: any;
 }>();
 
 const tab = ref("tabInfo");
 const venueName = ref(propsTargetEdit.venueName);
 const targetInfo = reactive({
-  no: propsTargetEdit.targetInfo.no,
-  title: propsTargetEdit.targetInfo.title,
-  lat: propsTargetEdit.targetInfo.lat,
-  lng: propsTargetEdit.targetInfo.lng,
-  gap: propsTargetEdit.targetInfo.gap,
-  image: propsTargetEdit.targetInfo.image,
-  comments: propsTargetEdit.targetInfo.comments,
-  status: 0,
+  no: propsTargetEdit.target.no,
+  title: propsTargetEdit.target.title,
+  lat: propsTargetEdit.target.lat,
+  lng: propsTargetEdit.target.lng,
+  gap: propsTargetEdit.target.gap,
+  image: propsTargetEdit.target.image,
+  comments: propsTargetEdit.target.comments,
+  targetStatus: propsTargetEdit.target.targetStatus,
 });
 
 const latLng = ref(targetInfo.lat + "," + targetInfo.lng);
@@ -249,6 +254,13 @@ const loading = ref(false);
 
 const imageHeight = 800;
 const imageWidth = 600;
+
+const showMap = () => {
+  window.open(
+    "https://www.google.co.jp/maps/@" + latLng.value + ",14z",
+    "_blank"
+  );
+};
 
 const confirmUpdateTarget = () => {
   if (!targetInfo.title) {
@@ -304,6 +316,7 @@ const updateTarget = async () => {
   });
 
   if ((resUpdateTarget.value as any).msg === "") {
+    emitsTargetEdit("setTargetInfo", targetInfo);
     emitsTargetEdit("changeComponent", "targetList");
   }
 };
@@ -318,13 +331,22 @@ onMounted(async () => {
     return;
   }
 
-  const position: any = await new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-
-  if (targetInfo.lat === 0 && targetInfo.lng === 0) {
-    latLng.value = position.coords.latitude + "," + position.coords.longitude;
-  }
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      if (targetInfo.lat === 0 && targetInfo.lng === 0) {
+        latLng.value =
+          position.coords.latitude + "," + position.coords.longitude;
+      }
+    },
+    (e: any) => {
+      // setSnackbar(true, 2000, "warning", e.message);
+      return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 2000,
+    }
+  );
 });
 
 const startVideo = async () => {
@@ -356,7 +378,9 @@ const startVideo = async () => {
   ).requestPermission;
 
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
-    (device) => device.kind === "videoinput" && device.label.includes("USB")
+    (device) =>
+      device.kind === "videoinput" &&
+      (device.label.includes("USB") || device.label.includes("Webcam"))
   );
 
   if (0 < devices.length) {
@@ -473,10 +497,5 @@ defineExpose({
   padding: 0;
   height: 100%;
   width: 100%;
-}
-
-html,
-body {
-  overscroll-behavior-x: none !important;
 }
 </style>

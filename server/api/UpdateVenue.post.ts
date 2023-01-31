@@ -11,11 +11,14 @@ export default defineEventHandler(async (e) => {
   const venuesDirPath = path.join(__dirname, VENUES_PATH)
   if (!fs.existsSync(venuesDirPath)) fs.mkdirSync(venuesDirPath, {recursive: true})
 
-  const venueJsonPath = path.join(venuesDirPath, body.venueName + '.json')
+  const venueJsonPath = path.join(venuesDirPath, body.venue.venueName + '.json')
 
   const venue = {
-    venueName: body.venueName,
-    comments: body.comments,
+    venueName: body.venue.venueName,
+    lat: body.venue.lat,
+    lng: body.venue.lng,
+    comments: body.venue.comments,
+    image: body.venue.image,
     pos: 0,
     targets: []
   }

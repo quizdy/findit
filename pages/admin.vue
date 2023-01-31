@@ -24,20 +24,20 @@
       />
       <AdminMap
         v-if="currentComponent === 'adminMap'"
-        :venueInfo="venueInfo"
+        :venue="venueInfo"
         @setSnackbar="setSnackbar"
         @changeComponent="changeComponent"
       />
       <VenueEdit
         v-if="currentComponent === 'venueEdit'"
-        :venueInfo="venueInfo"
+        :venue="venueInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
       />
       <TargetList
         v-if="currentComponent === 'targetList'"
-        :venueInfo="venueInfo"
+        :venue="venueInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @setTargetInfo="setTargetInfo"
@@ -46,9 +46,10 @@
       <TargetEdit
         v-if="currentComponent === 'targetEdit'"
         :venueName="venueInfo.venueName"
-        :targetInfo="targetInfo"
+        :target="targetInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
+        @setTargetInfo="setTargetInfo"
         @changeComponent="changeComponent"
         ref="refTargetEdit"
       />
@@ -103,6 +104,8 @@ const userInfo = reactive({
 });
 const venueInfo = reactive({
   venueName: "",
+  lat: 0.0,
+  lng: 0.0,
   comments: "",
   pos: 0,
   targets: [],
@@ -181,10 +184,19 @@ const setUserInfo = (user: any) => {
   userInfo.venue = user.venue;
 };
 
-const setVenueInfo = (venue: any) => {
+const setVenueInfo = async (venue: any) => {
   venueInfo.venueName = venue.venueName;
+  venueInfo.lat = venue.lat;
+  venueInfo.lng = venue.lng;
   venueInfo.comments = venue.comments;
   venueInfo.pos = venue.pos;
+
+  const { data: resGetVenue } = await useFetch("/api/GetVenue", {
+    method: "GET",
+    params: { venueName: venue.venueName },
+  });
+
+  venueInfo.targets = (resGetVenue.value as any).venue.targets;
 };
 
 const setTargetInfo = (target: any) => {
