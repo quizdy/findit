@@ -13,10 +13,14 @@
       </v-toolbar>
       <v-list>
         <v-list-item v-if="users.length === 0">No User</v-list-item>
-        <v-list-item v-for="(user, i) in users" :key="i" :value="user">
-          <v-list-item-title @click="selectedUser(user)">{{
-            user.userName
-          }}</v-list-item-title>
+        <v-list-item
+          v-for="(user, i) in users"
+          :key="i"
+          :value="user"
+          :title="user.userName"
+          :prepend-avatar="user.image"
+          @click="selectedUser(user)"
+        >
           <template v-slot:append>
             <v-btn
               color="grey-lighten-1"
@@ -84,10 +88,7 @@ const addUser = () => {
   const user = {
     userId: users.value.length === 0 ? "1" : "" + (users.value.length + 1),
     userName: "userName" + Date.now(),
-    image:
-      "https://api.multiavatar.com/" +
-      Math.random().toString(32).substring(2) +
-      ".png",
+    image: "",
     comments: "comments" + Date.now(),
     venue: {
       venueName: "",

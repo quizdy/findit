@@ -111,7 +111,7 @@ const userInfo = reactive({
     venueName: "",
     comments: "",
     pos: 0,
-    targets: [],
+    targets: <any[]>[],
   },
 });
 const snackbar = reactive({
@@ -243,21 +243,21 @@ const initGeolocation = async () => {
   );
 
   // debug ------------------------
-  // const pollingTestId = setInterval(async () => {
-  //   const position = {
-  //     coords: {
-  //       latitude: 35.15700033 + Math.random() / 1000000,
-  //       longitude: 136.9259228 + Math.random() / 1000000,
-  //       accuracy: 1,
-  //     },
-  //   };
+  const pollingTestId = setInterval(async () => {
+    const position = {
+      coords: {
+        latitude: 35.15700033 + Math.random() / 1000,
+        longitude: 136.9259228 + Math.random() / 1000,
+        accuracy: 1,
+      },
+    };
 
-  //   const userGps = getUserGps(position);
-  //   await useFetch("/api/UpdatePos", {
-  //     method: "POST",
-  //     body: { userGps: userGps },
-  //   });
-  // }, 3500);
+    const userGps = getUserGps(position);
+    await useFetch("/api/UpdatePos", {
+      method: "POST",
+      body: { userGps: userGps },
+    });
+  }, 3500);
   // debug ------------------------
 };
 
