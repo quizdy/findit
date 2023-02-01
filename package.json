@@ -7,7 +7,7 @@
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
         "clean": "npm cache clean --force",
-        "start": "node .output/server/index.mjs"
+        "start": "source .env && node .output/server/index.mjs"
     },
     "devDependencies": {
         "@types/google.maps": "^3.51.0",
