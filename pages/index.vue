@@ -271,11 +271,15 @@ onMounted(() => {
   pollingMsgId.value = setInterval(async () => {
     const { data: res } = await useFetch("/api/GetMsg", {
       method: "GET",
+      params: {
+        venueName: userInfo.venue.venueName,
+      },
     });
-    const msg = (res.value as any)?.msg;
-    if (msg) {
+    const message = (res.value as any)?.message;
+    if (message) {
+      alert(message);
     }
-  }, 3000);
+  }, 1000);
 });
 
 onBeforeUnmount(() => {

@@ -24,8 +24,8 @@
     ></v-progress-circular>
   </v-card>
   <client-only>
-    <v-dialog v-model="msgDialog" persistent>
-      <v-card max-width="800" class="mx-auto">
+    <v-dialog v-model="msgDialog">
+      <v-card width="100%" max-width="800" class="mx-auto">
         <v-card-title class="text-h5">
           <span class="text-h6">メッセージ送信</span>
         </v-card-title>
@@ -33,7 +33,23 @@
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field v-model="msg"></v-text-field>
+                <v-text-field
+                  v-model="msg"
+                  label="メッセージ"
+                  variant="solo"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-select
+                  label="参加者"
+                  :items="users"
+                  item-text="userName"
+                  item-value="userId"
+                  v-model="selectedUsers"
+                  variant="solo"
+                ></v-select>
               </v-col>
             </v-row>
           </v-container>
@@ -84,7 +100,15 @@ const pollingPosId = ref();
 const loading = ref(false);
 const msgDialog = ref(false);
 const userId = ref("");
+const users = ref();
+const selectedUsers = ref();
 const msg = ref("");
+
+const { data: resGetUsers } = await useFetch("/api/GetUsers", {
+  method: "GET",
+});
+
+users.value = resGetUsers.value?.users;
 
 const closeMsgDialog = () => {
   msgDialog.value = false;
@@ -225,13 +249,17 @@ const venueList = () => {
 const reset = async () => {
   await useFetch("/api/ClearPos", {
     method: "POST",
-    body: { userId: userId, msg: msg.value },
   });
 };
 
 const sendMsg = async () => {
   await useFetch("/api/SendMsg", {
     method: "POST",
+    body: {
+      venueName: propsAdminMap.venue.venueName,
+      users: selectedUsers,
+      msg: msg,
+    },
   });
 };
 
