@@ -47,10 +47,7 @@
         <v-icon>mdi-magnify-scan</v-icon>
         <span>Scan</span>
       </v-btn>
-      <v-btn
-        currentComponent="confirmLogout"
-        @click="confirmDialog.show = true"
-      >
+      <v-btn currentComponent="confirmLogout" @click="showConfirmDialog">
         <v-icon>mdi-door</v-icon>
         <span>Logout</span>
       </v-btn>
@@ -60,10 +57,11 @@
         v-model="snackbar.show"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
+        top
       >
         {{ snackbar.msg }}
       </v-snackbar>
-      <v-dialog v-model="confirmDialog.show" persistent>
+      <v-dialog v-model="confirmDialog" persistent>
         <v-card max-width="600" class="mx-auto">
           <v-card-title class="text-h5"> ログアウト </v-card-title>
           <v-card-text>ログアウトします。よろしいですか？</v-card-text>
@@ -120,13 +118,7 @@ const snackbar = reactive({
   color: "",
   msg: "",
 });
-const confirmDialog = reactive({
-  show: false,
-  title: "",
-  msg: "",
-  func: null,
-  params: null,
-});
+const confirmDialog = ref(false);
 
 const refTargetMap = ref();
 const refTargetScan = ref();
@@ -166,7 +158,7 @@ const setSnackbar = (
 };
 
 const closeConfirmDialog = () => {
-  confirmDialog.show = false;
+  confirmDialog.value = false;
 };
 
 const reload = () => {
