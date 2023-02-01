@@ -22,7 +22,10 @@ export default defineEventHandler(async (e) => {
     const venue = JSON.parse(fs.readFileSync(path.join(venuesDirPath, files[i]), 'utf-8'))
     const json = {
       venueName: venue.venueName,
+      lat: venue.lat,
+      lng: venue.lng,
       comments: venue.comments,
+      image: venue.image,
       pos:  venue.pos,
     }
     venues.push(json)

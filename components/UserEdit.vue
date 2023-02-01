@@ -10,22 +10,31 @@
       <v-form>
         <v-container mt-0 pt-0>
           <v-row no-gutters>
-            <v-col cols="12">
-              <v-text-field
-                v-model="userInfo.userId"
-                readonly
-                label="ユーザＩＤ"
-              ></v-text-field>
+            <v-col cols="4" class="d-flex justify-center align-center">
+              <v-avatar size="120">
+                <v-img :src="userInfo.image" @click="chgAvatar"></v-img>
+              </v-avatar>
             </v-col>
-          </v-row>
-          <v-row no-gutters>
-            <v-col cols="12">
-              <v-text-field
-                v-model="userInfo.userName"
-                label="ユーザ名"
-                required
-                @focus="$event.target.select()"
-              ></v-text-field>
+            <v-col cols="8">
+              <v-row no-gutters>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="userInfo.userId"
+                    readonly
+                    label="ユーザＩＤ"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row no-gutters>
+                <v-col cols="12">
+                  <v-text-field
+                    v-model="userInfo.userName"
+                    label="ユーザ名"
+                    required
+                    @focus="$event.target.select()"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -89,11 +98,12 @@ const propsUserList = defineProps<{
 const userInfo = reactive({
   userId: propsUserList.userInfo.userId,
   userName: propsUserList.userInfo.userName,
+  image: propsUserList.userInfo.image,
   comments: propsUserList.userInfo.comments,
   venue: propsUserList.userInfo.venue,
 });
 
-const venuesInfo = ref([]);
+const venuesInfo = ref(<any[]>[]);
 const selectedVenue = ref(propsUserList.userInfo.venue.venueName);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
@@ -136,6 +146,7 @@ const updateUser = async (params: any) => {
     body: {
       userId: userInfo.userId,
       userName: userInfo.userName,
+      image: userInfo.image,
       comments: userInfo.comments,
       venue: {
         venueName: userInfo.venue.venueName,
@@ -151,6 +162,31 @@ const updateUser = async (params: any) => {
 const cancelUser = () => {
   emitsUserEdit("changeComponent", "userList");
 };
+
+const chgAvatar = async () => {
+  const url =
+    "https://api.multiavatar.com/" +
+    Math.random().toString(32).substring(2) +
+    ".png";
+
+  // userInfo.image = await toDataURL(url);
+  userInfo.image = url;
+};
+
+const toDataURL = (url: string) =>
+  fetch(url)
+    .then((response) => response.blob())
+    .then(
+      (blob) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        })
+    );
+
+if (!userInfo.image) chgAvatar();
 </script>
 
 <style scoped lang="scss"></style>

@@ -23,6 +23,7 @@ export default defineEventHandler(async (e) => {
     const json = {
       userId: user.userId,
       userName: user.userName,
+      image: user.image,
       comments: user.comments,
       venue: user.venue,
     }

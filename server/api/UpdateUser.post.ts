@@ -16,6 +16,7 @@ export default defineEventHandler(async (e) => {
   const user = {
     userId: body.userId,
     userName: body.userName,
+    image: body.image,
     comments: body.comments,
     venue: body.venue,
   }

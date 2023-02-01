@@ -1,5 +1,13 @@
 export default defineEventHandler(async (e) => {
-  return {
-    usersGps: await useStorage().getItem('usersGps')
+  const usersGps = await useStorage().getItem('usersGps')
+  if (usersGps) {
+    return {
+      usersGps: usersGps
+    }
+  }
+  else {
+    return {
+      usersGps: []
+    }
   }
 })

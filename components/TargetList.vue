@@ -2,18 +2,22 @@
   <div>
     <v-card max-width="600" class="mx-auto">
       <v-toolbar color="light-blue" dark>
-        <v-btn @click="venueList()"
+        <p class="ml-4">ターゲット</p>
+        <v-spacer></v-spacer>
+        <v-btn class="ml-1" @click="venueList"
           ><v-icon>mdi-arrow-left-circle</v-icon></v-btn
         >
-        <v-spacer></v-spacer>
-        <v-btn @click="addTarget()"><v-icon>mdi-plus-circle</v-icon></v-btn>
+        <v-btn class="ml-1" @click="showAdminMap"
+          ><v-icon>mdi-map</v-icon></v-btn
+        >
+        <v-btn class="ml-1" @click="addTarget"
+          ><v-icon>mdi-plus-circle</v-icon></v-btn
+        >
       </v-toolbar>
       <v-list>
-        <v-list-item v-if="venueInfo.targets.length === 0"
-          >No Target</v-list-item
-        >
+        <v-list-item v-if="targets.length === 0">No Target</v-list-item>
         <v-list-item
-          v-for="(target, i) in venueInfo.targets"
+          v-for="(target, i) in targets"
           :key="i"
           :value="target"
           :title="target.title"
@@ -52,6 +56,7 @@ const emitsTargetList = defineEmits<{
     params: any
   ): void;
   (e: "changeComponent", componentName: string): void;
+  (e: "setVenueInfo", venue: any): void;
   (e: "setTargetInfo", targetInfo: any): void;
 }>();
 
@@ -59,13 +64,15 @@ const propsTargetList = defineProps<{
   venue: any;
 }>();
 
-const venueInfo = reactive({
-  venueName: propsTargetList.venue.venueName,
-  targets: propsTargetList.venue.targets,
-});
+const { venueName, targets } = toRefs(propsTargetList.venue);
 
 const venueList = () => {
   emitsTargetList("changeComponent", "venueList");
+};
+
+const showAdminMap = () => {
+  emitsTargetList("setVenueInfo", propsTargetList.venue);
+  emitsTargetList("changeComponent", "adminMap");
 };
 
 const selectedTarget = (target: any) => {
@@ -87,9 +94,9 @@ const confirmDeleteTarget = (target: any) => {
 const addTarget = () => {
   const targetInfo = {
     no:
-      venueInfo.targets.length === 0
+      targets.value.length === 0
         ? 1
-        : venueInfo.targets[venueInfo.targets.length - 1].no + 1,
+        : targets.value[targets.value.length - 1].no + 1,
     title: "test" + Date.now(),
     lat: 0,
     lng: 0,
@@ -111,11 +118,11 @@ const addTarget = () => {
 const deleteTarget = async (target: any) => {
   const { data: resDeleteTarget } = await useFetch("/api/DeleteTarget", {
     method: "POST",
-    body: { venueName: venueInfo.venueName, targetNo: target.no },
+    body: { venueName: venueName.value, targetNo: target.no },
   });
 
   if ((resDeleteTarget.value as any).msg === "") {
-    venueInfo.targets = venueInfo.targets.filter(
+    targets.value = targets.value.filter(
       (target_: any) => target_.no !== target.no
     );
   }
