@@ -99,11 +99,11 @@ const venueInfo = reactive({
   pos: propsVenueList.venue.pos,
 });
 
-const latLng = ref(venueInfo.lat + "," + venueInfo.lng);
+const latLng = ref(venueInfo.lat.trim() + "," + venueInfo.lng.trim());
 
 const showMap = () => {
   window.open(
-    "https://www.google.co.jp/maps/@" + latLng.value + ",14z",
+    "https://www.google.co.jp/maps/@" + latLng.value + ",18z",
     "_blank"
   );
 };
@@ -139,8 +139,8 @@ const confirmVenue = () => {
     );
     return;
   } else {
-    venueInfo.lat = latLng.value.split(",")[0];
-    venueInfo.lng = latLng.value.split(",")[1];
+    venueInfo.lat = latLng.value.split(",")[0].trim();
+    venueInfo.lng = latLng.value.split(",")[1].trim();
   }
 
   emitsVenueEdit(

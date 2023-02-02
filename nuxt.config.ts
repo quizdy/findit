@@ -2,7 +2,7 @@
 export default {
   runtimeConfig: {
     public: {
-      GMAP_API_KEY: process.env.GMAP_API_KEY
+      GMAP_API_KEY: process.env.GMAP_API_KEY || "AIzaSyCYsLDv3eHNGZ-HFcXUjoA5r442Aj10ND0"
     },
   },
   app: {
