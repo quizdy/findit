@@ -60,6 +60,9 @@ const users = ref();
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   method: "GET",
+  params: {
+    venueName: "",
+  },
 });
 
 users.value = resGetUsers.value?.users;

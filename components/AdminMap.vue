@@ -33,11 +33,12 @@
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field
+                <v-textarea
+                  solo
                   v-model="msg"
                   label="メッセージ"
                   variant="solo"
-                ></v-text-field>
+                ></v-textarea>
               </v-col>
             </v-row>
             <v-row>
@@ -45,10 +46,11 @@
                 <v-select
                   label="参加者"
                   :items="users"
-                  item-text="userName"
+                  item-title="userName"
                   item-value="userId"
                   v-model="selectedUsers"
                   variant="solo"
+                  multiple
                 ></v-select>
               </v-col>
             </v-row>
@@ -106,10 +108,14 @@ const msg = ref("");
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   method: "GET",
+  params: {
+    venueName: propsAdminMap.venue.venueName,
+  },
 });
 
 users.value = resGetUsers.value?.users;
 
+console.log(users.value);
 const closeMsgDialog = () => {
   msgDialog.value = false;
 };
@@ -253,6 +259,15 @@ const reset = async () => {
 };
 
 const sendMsg = async () => {
+  if (!msg.value) {
+    emitsAdminMap(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "メッセージを入力して下さい"
+    );
+  }
   await useFetch("/api/SendMsg", {
     method: "POST",
     body: {

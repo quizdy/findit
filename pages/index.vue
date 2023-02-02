@@ -248,9 +248,9 @@ const initGeolocation = async () => {
 
   const pollingTestId = setInterval(async () => {
     pos.coords.latitude =
-      pos.coords.latitude + Math.floor(Math.random() * 11) / 10000;
+      pos.coords.latitude + Math.floor(Math.random() * 11) / 100000;
     pos.coords.longitude =
-      pos.coords.longitude + Math.floor(Math.random() * 11) / 10000;
+      pos.coords.longitude + Math.floor(Math.random() * 11) / 100000;
     const userGps = getUserGps(pos);
     await useFetch("/api/UpdatePos", {
       method: "POST",
@@ -280,6 +280,7 @@ onMounted(() => {
       method: "GET",
       params: {
         venueName: userInfo.venue.venueName,
+        userId: userInfo.userId,
       },
     });
     const message = (res.value as any)?.message;
