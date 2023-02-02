@@ -236,7 +236,7 @@ const targetInfo = reactive({
   targetStatus: propsTargetEdit.target.targetStatus,
 });
 
-const latLng = ref(targetInfo.lat + "," + targetInfo.lng);
+const latLng = ref(targetInfo.lat.trim() + "," + targetInfo.lng.trim());
 
 const scan = reactive({
   frameId: 0,
@@ -256,7 +256,7 @@ const imageWidth = 600;
 
 const showMap = () => {
   window.open(
-    "https://www.google.co.jp/maps/@" + latLng.value + ",14z",
+    "https://www.google.co.jp/maps/@" + latLng.value + ",18z",
     "_blank"
   );
 };
@@ -294,8 +294,8 @@ const confirmUpdateTarget = () => {
     );
     return;
   } else {
-    targetInfo.lat = latLng.value.split(",")[0];
-    targetInfo.lng = latLng.value.split(",")[1];
+    targetInfo.lat = latLng.value.split(",")[0].trim();
+    targetInfo.lng = latLng.value.split(",")[1].trim();
   }
 
   emitsTargetEdit(

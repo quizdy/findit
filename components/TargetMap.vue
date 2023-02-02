@@ -70,23 +70,13 @@ onMounted(async () => {
     setTargetMarker(target.title, target.icon, latLng);
   });
 
-  const { data: res } = await useFetch("/api/GetPos", {
-    method: "GET",
-  });
-  const usersGps = (res.value as any)?.usersGps;
-
-  const userGps = usersGps.filter((_userGps: any) => _userGps.self === true)[0];
-  setUserPos(userGps);
-  const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
-  $gmap.value?.panTo(latLng);
-
-  loading.value = false;
-
-  watchUserPos();
-
   google.maps.event.addListener($gmap.value, "zoom_changed", () => {
     zoom.value = $gmap.value?.getZoom();
   });
+
+  watchUsersPos();
+
+  loading.value = false;
 });
 
 const setUserPos = (userGps: any) => {
@@ -113,19 +103,24 @@ const setUserPos = (userGps: any) => {
   }
 };
 
-const watchUserPos = () => {
-  pollingPosId.value = setInterval(async () => {
-    const { data: res } = await useFetch("/api/GetPos", {
-      method: "GET",
-    });
-    const usersGps = (res.value as any)?.usersGps;
-
-    if (0 < usersGps.length) {
-      usersGps.forEach((_userGps: any) => {
-        if (_userGps) setUserPos(_userGps);
-      });
-    }
+const watchUsersPos = () => {
+  pollingPosId.value = setInterval(() => {
+    getUsersPos();
   }, 3000);
+  getUsersPos();
+};
+
+const getUsersPos = async () => {
+  const { data: res } = await useFetch("/api/GetPos", {
+    method: "GET",
+  });
+  const usersGps = (res.value as any)?.usersGps;
+
+  if (0 < usersGps.length) {
+    usersGps.forEach((_userGps: any) => {
+      if (_userGps) setUserPos(_userGps);
+    });
+  }
 };
 
 const setTargetMarker = (title: string, icon: string, latLng: any) => {
