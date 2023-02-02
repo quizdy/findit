@@ -47,7 +47,7 @@
         <v-icon>mdi-magnify-scan</v-icon>
         <span>Scan</span>
       </v-btn>
-      <v-btn currentComponent="confirmLogout" @click="showConfirmDialog">
+      <v-btn currentComponent="confirmLogout" @click="confirmDialog = true">
         <v-icon>mdi-door</v-icon>
         <span>Logout</span>
       </v-btn>
@@ -200,6 +200,25 @@ const initGeolocation = async () => {
 
   navigator.geolocation.getCurrentPosition(
     async (position) => {
+      // debug ------------------------
+      const pos = {
+        coords: {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        },
+      };
+
+      const pollingTestId = setInterval(async () => {
+        pos.coords.latitude = pos.coords.latitude + 0.001;
+        pos.coords.longitude = pos.coords.longitude + 0.001;
+        console.log("index", pos.coords.latitude, pos.coords.longitude);
+        const userGps = getUserGps(position);
+        // await useFetch("/api/UpdatePos", {
+        //   method: "POST",
+        //   body: { userGps: userGps },
+        // });
+      }, 3500);
+      // debug ------------------------
       const userGps = getUserGps(position);
       await useFetch("/api/UpdatePos", {
         method: "POST",
@@ -216,41 +235,23 @@ const initGeolocation = async () => {
     }
   );
 
-  navigator.geolocation.watchPosition(
-    async (position) => {
-      const userGps = getUserGps(position);
-      await useFetch("/api/UpdatePos", {
-        method: "POST",
-        body: { userGps: userGps },
-      });
-    },
-    (e: any) => {
-      // setSnackbar(true, 2000, "warning", e.message);
-      return;
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 2000,
-    }
-  );
-
-  // debug ------------------------
-  const pollingTestId = setInterval(async () => {
-    const position = {
-      coords: {
-        latitude: 35.15700033 + Math.random() / 1000,
-        longitude: 136.9259228 + Math.random() / 1000,
-        accuracy: 1,
-      },
-    };
-
-    const userGps = getUserGps(position);
-    await useFetch("/api/UpdatePos", {
-      method: "POST",
-      body: { userGps: userGps },
-    });
-  }, 3500);
-  // debug ------------------------
+  // navigator.geolocation.watchPosition(
+  //   async (position) => {
+  //     const userGps = getUserGps(position);
+  //     await useFetch("/api/UpdatePos", {
+  //       method: "POST",
+  //       body: { userGps: userGps },
+  //     });
+  //   },
+  //   (e: any) => {
+  //     // setSnackbar(true, 2000, "warning", e.message);
+  //     return;
+  //   },
+  //   {
+  //     enableHighAccuracy: true,
+  //     timeout: 2000,
+  //   }
+  // );
 };
 
 const getUserGps = (position: any) => {
