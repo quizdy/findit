@@ -99,12 +99,12 @@ const $config = useRuntimeConfig();
 const $gmap = ref<google.maps.Map>();
 const zoom = ref(18);
 const pollingPosId = ref();
+const pollingMsgId = ref();
 const loading = ref(false);
 const msgDialog = ref(false);
-const userId = ref("");
 const users = ref();
 const selectedUsers = ref();
-const AdminMsg = ref("");
+const adminMsg = ref("");
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   method: "GET",
@@ -258,7 +258,7 @@ const reset = async () => {
 };
 
 const sendMsg = async () => {
-  if (!AdminMsg.value) {
+  if (!adminMsg.value) {
     emitsAdminMap(
       "setSnackbar",
       true,
@@ -273,12 +273,32 @@ const sendMsg = async () => {
     body: {
       venueName: propsAdminMap.venue.venueName,
       users: Object.values(selectedUsers.value),
-      msg: AdminMsg,
+      msg: adminMsg.value,
     },
   });
 
-  AdminMsg.value = "";
+  adminMsg.value = "";
 };
+
+onMounted(() => {
+  pollingMsgId.value = setInterval(async () => {
+    const { data: res } = await useFetch("/api/GetMsg", {
+      method: "GET",
+      params: {
+        venueName: propsAdminMap.venue.venueName,
+        userId: "admin",
+      },
+    });
+    const message = (res.value as any)?.message;
+    if (message) {
+      emitsAdminMap("setSnackbar", true, 2000, "info", message);
+    }
+  }, 1000);
+});
+
+onBeforeUnmount(() => {
+  clearInterval(pollingMsgId.value);
+});
 
 defineExpose({
   stopDrawMap,

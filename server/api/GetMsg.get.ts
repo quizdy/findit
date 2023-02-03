@@ -4,13 +4,18 @@ export default defineEventHandler(async (e) => {
   const userId = query.userId as string
 
   let messages = await useStorage().getItem('messages')
-
   if (messages) {
     const targetMessage = messages.filter((_msg: any) => (_msg.venueName === venueName && _msg.users.includes(userId)))
-    if (targetMessage.length === 1) {
+    if (0 < targetMessage.length) {
       const msg = targetMessage[0].msg
-      const replaceMessage = messages.filter((_msg: any) => (_msg.venueName !== venueName || !_msg.users.includes(userId)))
-      useStorage().setItem('messages', replaceMessage)
+      for(let i = 0; i < messages.length; i++) {
+        if (messages[i].venueName === venueName) {
+          const pos = messages[i].users.indexOf(userId)
+          messages[i].users = messages[i].users.splice(pos, 1)
+        }
+      }
+      useStorage().setItem('messages', messages)
+      
       return {
         message: msg
       }
