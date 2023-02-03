@@ -21,7 +21,7 @@ export default {
       style: [
         {
           children:
-            "body { margin: 0; padding: 0; min-height: 100vh; min-height: -webkit-fill-available;}",
+            "body { margin: 0; padding: 0; min-height: 100dvh; min-height: -webkit-fill-available; overflow: hidden; position: fixed; top: 0; left: 0; right: 0;}",
         },
       ],
     },

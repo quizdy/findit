@@ -57,7 +57,7 @@
         v-model="snackbar.show"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
-        top
+        location="top"
       >
         {{ snackbar.msg }}
       </v-snackbar>
@@ -127,6 +127,7 @@ const pollingMsgId = ref();
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
     await initGeolocation();
+    initGetMsg();
   }
   if (
     currentComponent.value !== "targetMap" &&
@@ -274,7 +275,7 @@ const getUserGps = (position: any) => {
   };
 };
 
-onMounted(() => {
+const initGetMsg = () => {
   pollingMsgId.value = setInterval(async () => {
     const { data: res } = await useFetch("/api/GetMsg", {
       method: "GET",
@@ -288,7 +289,9 @@ onMounted(() => {
       alert(message);
     }
   }, 1000);
-});
+};
+
+onMounted(() => {});
 
 onBeforeUnmount(() => {
   clearInterval(pollingMsgId.value);
