@@ -11,7 +11,7 @@ export default defineEventHandler(async (e) => {
       for(let i = 0; i < messages.length; i++) {
         if (messages[i].venueName === venueName) {
           const pos = messages[i].users.indexOf(userId)
-          messages[i].users = messages[i].users.splice(pos, 1)
+          messages[i].users.splice(pos, 1)
         }
       }
       useStorage().setItem('messages', messages)
