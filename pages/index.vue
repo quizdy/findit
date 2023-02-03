@@ -47,9 +47,13 @@
         <v-icon>mdi-magnify-scan</v-icon>
         <span>Scan</span>
       </v-btn>
-      <v-btn currentComponent="confirmLogout" @click="confirmDialog = true">
+      <v-btn @click="msgDialog = true">
+        <v-icon>mdi-email-fast-outline</v-icon>
+        <span>Mail</span>
+      </v-btn>
+      <v-btn @click="confirmDialog = true">
         <v-icon>mdi-door</v-icon>
-        <span>Logout</span>
+        <span>Exit</span>
       </v-btn>
     </v-bottom-navigation>
     <client-only>
@@ -61,10 +65,17 @@
       >
         {{ snackbar.msg }}
       </v-snackbar>
+      <v-dialog v-model="msgDialog">
+        <MsgDialog
+          :venue="userInfo.venue"
+          @setSnackbar="setSnackbar"
+          @closeMsgDialog="closeMsgDialog"
+        />
+      </v-dialog>
       <v-dialog v-model="confirmDialog" persistent>
         <v-card max-width="600" class="mx-auto">
-          <v-card-title class="text-h5"> ログアウト </v-card-title>
-          <v-card-text>ログアウトします。よろしいですか？</v-card-text>
+          <v-card-title class="text-h5"> 終了 </v-card-title>
+          <v-card-text>終了します。よろしいですか？</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
@@ -118,6 +129,7 @@ const snackbar = reactive({
   color: "",
   msg: "",
 });
+const msgDialog = ref(false);
 const confirmDialog = ref(false);
 
 const refTargetMap = ref();
@@ -156,6 +168,10 @@ const setSnackbar = (
   snackbar.timeout = timeout;
   snackbar.color = color;
   snackbar.msg = msg;
+};
+
+const closeMsgDialog = () => {
+  msgDialog.value = false;
 };
 
 const closeConfirmDialog = () => {
@@ -199,65 +215,65 @@ const initGeolocation = async () => {
     return;
   }
 
-  // navigator.geolocation.getCurrentPosition(
-  //   async (position) => {
-  //     const userGps = getUserGps(position);
-  //     await useFetch("/api/UpdatePos", {
-  //       method: "POST",
-  //       body: { userGps: userGps },
-  //     });
-  //   },
-  //   (e: any) => {
-  //     // setSnackbar(true, 2000, "warning", e.message);
-  //     return;
-  //   },
-  //   {
-  //     enableHighAccuracy: true,
-  //     timeout: 2000,
-  //   }
-  // );
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const userGps = getUserGps(position);
+      await useFetch("/api/UpdatePos", {
+        method: "POST",
+        body: { userGps: userGps },
+      });
+    },
+    (e: any) => {
+      // setSnackbar(true, 2000, "warning", e.message);
+      return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 2000,
+    }
+  );
 
-  // navigator.geolocation.watchPosition(
-  //   async (position) => {
-  //     const userGps = getUserGps(position);
-  //     await useFetch("/api/UpdatePos", {
-  //       method: "POST",
-  //       body: { userGps: userGps },
-  //     });
-  //   },
-  //   (e: any) => {
-  //     // setSnackbar(true, 2000, "warning", e.message);
-  //     return;
-  //   },
-  //   {
-  //     enableHighAccuracy: true,
-  //     timeout: 2000,
-  //   }
-  // );
+  navigator.geolocation.watchPosition(
+    async (position) => {
+      const userGps = getUserGps(position);
+      await useFetch("/api/UpdatePos", {
+        method: "POST",
+        body: { userGps: userGps },
+      });
+    },
+    (e: any) => {
+      // setSnackbar(true, 2000, "warning", e.message);
+      return;
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 2000,
+    }
+  );
 
   // debug ------------------------
-  await useFetch("/api/ClearPos", {
-    method: "POST",
-  });
+  // await useFetch("/api/ClearPos", {
+  //   method: "POST",
+  // });
 
-  const pos = {
-    coords: {
-      latitude: 35.18936160259076,
-      longitude: 136.98873472643598,
-    },
-  };
+  // const pos = {
+  //   coords: {
+  //     latitude: 35.18936160259076,
+  //     longitude: 136.98873472643598,
+  //   },
+  // };
 
-  const pollingTestId = setInterval(async () => {
-    pos.coords.latitude =
-      pos.coords.latitude + Math.floor(Math.random() * 11) / 100000;
-    pos.coords.longitude =
-      pos.coords.longitude + Math.floor(Math.random() * 11) / 100000;
-    const userGps = getUserGps(pos);
-    await useFetch("/api/UpdatePos", {
-      method: "POST",
-      body: { userGps: userGps },
-    });
-  }, 3500);
+  // const pollingTestId = setInterval(async () => {
+  //   pos.coords.latitude =
+  //     pos.coords.latitude + Math.floor(Math.random() * 11) / 100000;
+  //   pos.coords.longitude =
+  //     pos.coords.longitude + Math.floor(Math.random() * 11) / 100000;
+  //   const userGps = getUserGps(pos);
+  //   await useFetch("/api/UpdatePos", {
+  //     method: "POST",
+  //     body: { userGps: userGps },
+  //   });
+  // }, 3500);
   // debug ------------------------
 };
 
@@ -286,7 +302,7 @@ const initGetMsg = () => {
     });
     const message = (res.value as any)?.message;
     if (message) {
-      alert(message);
+      setSnackbar(true, 2000, "info", message);
     }
   }, 1000);
 };
