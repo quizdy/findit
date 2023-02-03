@@ -26,18 +26,19 @@
   <client-only>
     <v-dialog v-model="msgDialog">
       <v-card width="100%" max-width="800" class="mx-auto">
-        <v-card-title class="text-h5">
-          <span class="text-h6">メッセージ送信</span>
+        <v-card-title class="text-h6 justify-center mt-4">
+          メッセージ送信
         </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field
-                  v-model="msg"
+                <v-textarea
+                  solo
+                  v-model="adminMsg"
                   label="メッセージ"
                   variant="solo"
-                ></v-text-field>
+                ></v-textarea>
               </v-col>
             </v-row>
             <v-row>
@@ -45,19 +46,19 @@
                 <v-select
                   label="参加者"
                   :items="users"
-                  item-text="userName"
+                  item-title="userName"
                   item-value="userId"
                   v-model="selectedUsers"
                   variant="solo"
+                  multiple
                 ></v-select>
               </v-col>
             </v-row>
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn
-            color="green-darken-1"
+            color="blue-darken-1"
             variant="text"
             @click="
               closeMsgDialog();
@@ -66,7 +67,8 @@
           >
             メッセージ送信
           </v-btn>
-          <v-btn color="green-darken-1" variant="text" @click="closeMsgDialog">
+          <v-spacer></v-spacer>
+          <v-btn color="blue-darken-1" variant="text" @click="closeMsgDialog">
             キャンセル
           </v-btn>
         </v-card-actions>
@@ -84,7 +86,7 @@ const emitsAdminMap = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
-    msg: string
+    adminMsg: string
   ): void;
   (e: "changeComponent", componentName: string): void;
 }>();
@@ -102,10 +104,13 @@ const msgDialog = ref(false);
 const userId = ref("");
 const users = ref();
 const selectedUsers = ref();
-const msg = ref("");
+const AdminMsg = ref("");
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   method: "GET",
+  params: {
+    venueName: propsAdminMap.venue.venueName,
+  },
 });
 
 users.value = resGetUsers.value?.users;
@@ -253,14 +258,26 @@ const reset = async () => {
 };
 
 const sendMsg = async () => {
+  if (!AdminMsg.value) {
+    emitsAdminMap(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "メッセージを入力して下さい"
+    );
+  }
+
   await useFetch("/api/SendMsg", {
     method: "POST",
     body: {
       venueName: propsAdminMap.venue.venueName,
-      users: selectedUsers,
-      msg: msg,
+      users: Object.values(selectedUsers.value),
+      msg: AdminMsg,
     },
   });
+
+  AdminMsg.value = "";
 };
 
 defineExpose({
