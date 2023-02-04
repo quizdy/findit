@@ -17,17 +17,20 @@ export default defineEventHandler(async (e) => {
       useStorage().setItem('messages', messages)
       
       return {
+        userId: userId,
         message: msg
       }
     }
     else {
       return {
+        userId: "",
         message: ""
       }
     }
   }
   else {
     return {
+      userId: "",
       message: ""
     }
   }

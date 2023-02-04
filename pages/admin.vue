@@ -60,6 +60,7 @@
         v-model="snackbar.show"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
+        @click="snackbar.show = false"
       >
         {{ snackbar.msg }}
       </v-snackbar>

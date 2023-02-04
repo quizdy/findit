@@ -179,7 +179,7 @@ onMounted(async () => {
   }
 
   navigator.geolocation.getCurrentPosition(
-    async (position) => {
+    (position) => {
       if (venueInfo.lat === 0 && venueInfo.lng === 0) {
         latLng.value =
           position.coords.latitude + "," + position.coords.longitude;
