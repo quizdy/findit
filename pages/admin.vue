@@ -10,7 +10,7 @@
       />
       <UserEdit
         v-if="currentComponent === 'userEdit'"
-        :userInfo="userInfo"
+        :user="userInfo"
         @setSnackbar="setSnackbar"
         @showConfirmDialog="showConfirmDialog"
         @changeComponent="changeComponent"
@@ -60,6 +60,7 @@
         v-model="snackbar.show"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
+        location="bottom left"
         @click="snackbar.show = false"
       >
         {{ snackbar.msg }}

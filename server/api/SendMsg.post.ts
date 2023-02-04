@@ -2,6 +2,7 @@ export default defineEventHandler(async (e) => {
   const body = await readBody(e)
   const message = {
     venueName: body.venueName,
+    sender: body.sender,
     users: body.users,
     msg: body.msg
   }

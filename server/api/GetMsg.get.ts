@@ -7,6 +7,7 @@ export default defineEventHandler(async (e) => {
   if (messages) {
     const targetMessage = messages.filter((_msg: any) => (_msg.venueName === venueName && _msg.users.includes(userId)))
     if (0 < targetMessage.length) {
+      const sender = targetMessage[0].sender
       const msg = targetMessage[0].msg
       for(let i = 0; i < messages.length; i++) {
         if (messages[i].venueName === venueName) {
@@ -17,20 +18,20 @@ export default defineEventHandler(async (e) => {
       useStorage().setItem('messages', messages)
       
       return {
-        userId: userId,
+        sender: sender,
         message: msg
       }
     }
     else {
       return {
-        userId: "",
+        sender: "",
         message: ""
       }
     }
   }
   else {
     return {
-      userId: "",
+      sender: "",
       message: ""
     }
   }

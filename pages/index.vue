@@ -3,8 +3,9 @@
     <v-main>
       <TargetInfo
         v-if="currentComponent === 'targetInfo'"
-        :venue="userInfo.venue"
+        :user="userInfo"
         @setSnackbar="setSnackbar"
+        @openMsgDialog="openMsgDialog"
       />
       <TargetMap
         v-if="currentComponent === 'targetMap'"
@@ -47,10 +48,6 @@
         <v-icon>mdi-magnify-scan</v-icon>
         <span>Scan</span>
       </v-btn>
-      <v-btn @click="msgDialog = true">
-        <v-icon>mdi-email-fast-outline</v-icon>
-        <span>Mail</span>
-      </v-btn>
       <v-btn @click="confirmDialog = true">
         <v-icon>mdi-door</v-icon>
         <span>Exit</span>
@@ -62,12 +59,13 @@
         :timeout="snackbar.timeout"
         :color="snackbar.color"
         location="top"
+        @click="snackbar.show = false"
       >
         {{ snackbar.msg }}
       </v-snackbar>
       <v-dialog v-model="msgDialog">
         <MsgDialog
-          :venue="userInfo.venue"
+          :user="userInfo"
           @setSnackbar="setSnackbar"
           @closeMsgDialog="closeMsgDialog"
         />
@@ -168,6 +166,10 @@ const setSnackbar = (
   snackbar.timeout = timeout;
   snackbar.color = color;
   snackbar.msg = msg;
+};
+
+const openMsgDialog = () => {
+  msgDialog.value = true;
 };
 
 const closeMsgDialog = () => {
@@ -306,7 +308,7 @@ const initGetMsg = () => {
     });
     const message = (res.value as any)?.message;
     if (message) {
-      setSnackbar(true, 2000, "info", message);
+      setSnackbar(true, -1, "info", message);
     }
   }, 1000);
 };

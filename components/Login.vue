@@ -38,6 +38,16 @@ const emitsLogin = defineEmits<{
 }>();
 
 const userId = ref("");
+const bg = ref(["/images/bg.jpg"]);
+
+const { data: resGetVenues } = await useFetch("/api/GetVenues", {
+  method: "GET",
+});
+
+const venues = resGetVenues.value?.venues;
+venues?.forEach((venue) => {
+  bg.value.push(venue.image);
+});
 
 const validateCheck = () => {
   if (userId.value.length > 8) {
@@ -90,6 +100,8 @@ const login = async () => {
 
   emitsLogin("setUserInfo", user);
 };
+
+onMounted(() => {});
 </script>
 
 <style scoped lang="scss">

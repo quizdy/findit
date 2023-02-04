@@ -43,14 +43,15 @@ const emitsMsgDialog = defineEmits<{
 }>();
 
 const propsMsgDialog = defineProps<{
-  venue: any;
+  user: any;
 }>();
 
 const sendMsg = async (msg: string) => {
   await useFetch("/api/SendMsg", {
     method: "POST",
     body: {
-      venueName: propsMsgDialog.venue.venueName,
+      venueName: propsMsgDialog.user.venue.venueName,
+      sender: propsMsgDialog.user.userName,
       users: ["admin"],
       msg: msg,
     },

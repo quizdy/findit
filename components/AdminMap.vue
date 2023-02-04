@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="600" class="mx-auto">
+  <v-card class="mx-auto">
     <v-toolbar color="light-blue" dark>
       <p class="ml-4">会場マップ</p>
       <v-spacer></v-spacer>
@@ -304,9 +304,9 @@ onMounted(() => {
       },
     });
     const message = (res.value as any)?.message;
-    const userId = (res.value as any)?.userId;
+    const sender = (res.value as any)?.sender;
     if (message) {
-      emitsAdminMap("setSnackbar", true, 8000, "info", userId + ":" + message);
+      emitsAdminMap("setSnackbar", true, -1, "info", sender + ":" + message);
     }
   }, 1000);
 });

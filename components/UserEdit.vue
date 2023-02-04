@@ -92,19 +92,19 @@ const emitsUserEdit = defineEmits<{
 }>();
 
 const propsUserList = defineProps<{
-  userInfo: any;
+  user: any;
 }>();
 
 const userInfo = reactive({
-  userId: propsUserList.userInfo.userId,
-  userName: propsUserList.userInfo.userName,
-  image: propsUserList.userInfo.image,
-  comments: propsUserList.userInfo.comments,
-  venue: propsUserList.userInfo.venue,
+  userId: propsUserList.user.userId,
+  userName: propsUserList.user.userName,
+  image: propsUserList.user.image,
+  comments: propsUserList.user.comments,
+  venue: propsUserList.user.venue,
 });
 
 const venuesInfo = ref(<any[]>[]);
-const selectedVenue = ref(propsUserList.userInfo.venue.venueName);
+const selectedVenue = ref(propsUserList.user.venue.venueName);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",

@@ -1,8 +1,18 @@
 <template>
   <div>
+    <v-toolbar class="ma-0 py-4" height="10" color="light-blue" dark>
+      <v-avatar class="mx-4" size="28">
+        <v-img :src="propsTargetInfo.user.image"></v-img>
+      </v-avatar>
+      <small class="pt-1">{{ propsTargetInfo.user.userName }}</small>
+      <v-spacer></v-spacer>
+      <v-btn @click="openMsgDialog">
+        <v-icon>mdi-email-fast-outline</v-icon>
+      </v-btn>
+    </v-toolbar>
     <Swiper
       :slides-per-view="1"
-      :initial-slide="venue.pos"
+      :initial-slide="propsTargetInfo.user.venue.pos"
       :loop="false"
       :effect="'creative'"
       :creative-effect="{
@@ -16,7 +26,7 @@
       }"
     >
       <SwiperSlide v-for="(target, i) in targets" :key="i">
-        <v-card max-width="600" class="mx-auto mt-2">
+        <v-card max-width="600" class="mx-auto rounded-0">
           <v-sheet class="d-flex flex-column">
             <div class="layout">
               <v-icon
@@ -61,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-const emitsTargetMap = defineEmits<{
+const emitsTargetInfo = defineEmits<{
   (
     e: "setSnackbar",
     show: boolean,
@@ -69,16 +79,21 @@ const emitsTargetMap = defineEmits<{
     color: string,
     msg: string
   ): void;
+  (e: "openMsgDialog"): void;
 }>();
 
 const propsTargetInfo = defineProps<{
-  venue: any;
+  user: any;
 }>();
 
 const imageHeight = 800;
 const imageWidth = 600;
 
-const targets = ref(propsTargetInfo.venue.targets);
+const targets = ref(propsTargetInfo.user.venue.targets);
+
+const openMsgDialog = () => {
+  emitsTargetInfo("openMsgDialog");
+};
 </script>
 
 <style scoped lang="scss">
