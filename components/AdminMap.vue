@@ -103,7 +103,7 @@ const pollingMsgId = ref();
 const loading = ref(false);
 const msgDialog = ref(false);
 const users = ref();
-const selectedUsers = ref();
+const selectedUsers = ref(<any[]>[]);
 const adminMsg = ref("");
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
@@ -266,6 +266,18 @@ const sendMsg = async () => {
       "warning",
       "メッセージを入力して下さい"
     );
+    return;
+  }
+
+  if (Object.values(selectedUsers.value).length < 1) {
+    emitsAdminMap(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "参加者を指定してください"
+    );
+    return;
   }
 
   await useFetch("/api/SendMsg", {
@@ -276,6 +288,8 @@ const sendMsg = async () => {
       msg: adminMsg.value,
     },
   });
+
+  emitsAdminMap("setSnackbar", true, 2000, "info", "メッセージを送信しました");
 
   adminMsg.value = "";
 };
@@ -290,8 +304,9 @@ onMounted(() => {
       },
     });
     const message = (res.value as any)?.message;
+    const userId = (res.value as any)?.userId;
     if (message) {
-      emitsAdminMap("setSnackbar", true, 2000, "info", message);
+      emitsAdminMap("setSnackbar", true, 8000, "info", userId + ":" + message);
     }
   }, 1000);
 });

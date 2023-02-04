@@ -33,6 +33,8 @@ const zoom = ref(18);
 const pollingPosId = ref();
 const loading = ref(false);
 
+let userMarkers = ref(<any[]>[]);
+
 onMounted(async () => {
   loading.value = true;
   const loader = new Loader({
@@ -74,53 +76,54 @@ onMounted(async () => {
     zoom.value = $gmap.value?.getZoom();
   });
 
-  watchUsersPos();
+  const usersPos = await getUsersPos();
+  const myself = usersPos.filter((_userPos) => _userPos.self === true)[0];
+  const latLng = new google.maps.LatLng(myself.gps.lat, myself.gps.lng);
+  $gmap.value?.panTo(latLng);
+  // new google.maps.Circle({
+  //   map: $gmap.value,
+  //   center: latLng,
+  //   radius: userGps.gps.accuracy,
+  //   strokeColor: "#0081C9",
+  //   strokeOpacity: 0.5,
+  //   strokeWeight: 0.75,
+  //   fillColor: "#0081C9",
+  //   fillOpacity: 0.18,
+  // });
+  // if (typeof google.maps.geometry !== "undefined") {
+  //   const distance = google.maps.geometry.spherical.computeDistanceBetween(
+  //     latLng,
+  //     targetLatLng
+  //   )
+  // };
 
   loading.value = false;
+
+  watchUsersPos();
 });
 
 const setUserPos = (userGps: any) => {
   setUserMarker(userGps);
-  if (userGps.self) {
-    const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
-    $gmap.value?.panTo(latLng);
-    // new google.maps.Circle({
-    //   map: $gmap.value,
-    //   center: latLng,
-    //   radius: userGps.gps.accuracy,
-    //   strokeColor: "#0081C9",
-    //   strokeOpacity: 0.5,
-    //   strokeWeight: 0.75,
-    //   fillColor: "#0081C9",
-    //   fillOpacity: 0.18,
-    // });
-    // if (typeof google.maps.geometry !== "undefined") {
-    //   const distance = google.maps.geometry.spherical.computeDistanceBetween(
-    //     latLng,
-    //     targetLatLng
-    //   )
-    // };
-  }
 };
 
 const watchUsersPos = () => {
   pollingPosId.value = setInterval(() => {
-    getUsersPos();
+    setUsersPos();
   }, 3000);
-  getUsersPos();
 };
 
-const getUsersPos = async () => {
+const getUsersPos = async (): Promise<any[]> => {
   const { data: res } = await useFetch("/api/GetPos", {
     method: "GET",
   });
-  const usersGps = (res.value as any)?.usersGps;
+  return (res.value as any)?.usersGps;
+};
 
-  if (0 < usersGps.length) {
-    usersGps.forEach((_userGps: any) => {
-      if (_userGps) setUserPos(_userGps);
-    });
-  }
+const setUsersPos = async () => {
+  const usersPos = await getUsersPos();
+  usersPos.forEach((_userPos: any) => {
+    setUserPos(_userPos);
+  });
 };
 
 const setTargetMarker = (title: string, icon: string, latLng: any) => {
@@ -135,8 +138,6 @@ const setTargetMarker = (title: string, icon: string, latLng: any) => {
   });
   targetMarker.setMap($gmap.value);
 };
-
-let userMarkers = ref(<any[]>[]);
 
 const setUserMarker = (userGps: any) => {
   const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);

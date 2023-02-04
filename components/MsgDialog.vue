@@ -55,6 +55,7 @@ const sendMsg = async (msg: string) => {
       msg: msg,
     },
   });
+  emitsMsgDialog("setSnackbar", true, 2000, "info", "メッセージを送信しました");
   emitsMsgDialog("closeMsgDialog");
 };
 </script>

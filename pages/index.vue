@@ -216,12 +216,9 @@ const initGeolocation = async () => {
   }
 
   navigator.geolocation.getCurrentPosition(
-    async (position) => {
+    (position) => {
       const userGps = getUserGps(position);
-      await useFetch("/api/UpdatePos", {
-        method: "POST",
-        body: { userGps: userGps },
-      });
+      setUserGps(userGps);
     },
     (e: any) => {
       // setSnackbar(true, 2000, "warning", e.message);
@@ -289,6 +286,13 @@ const getUserGps = (position: any) => {
     },
     self: true,
   };
+};
+
+const setUserGps = async (userGps: any) => {
+  await useFetch("/api/UpdatePos", {
+    method: "POST",
+    body: { userGps: userGps },
+  });
 };
 
 const initGetMsg = () => {
