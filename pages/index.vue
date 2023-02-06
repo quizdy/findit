@@ -9,7 +9,7 @@
       />
       <TargetMap
         v-if="currentComponent === 'targetMap'"
-        :venue="userInfo.venue"
+        :user="userInfo"
         @setSnackbar="setSnackbar"
         ref="refTargetMap"
       />
@@ -82,6 +82,7 @@
               variant="text"
               @click="
                 closeConfirmDialog();
+                clearPos();
                 reload();
               "
             >
@@ -219,7 +220,7 @@ const openAdmin = () => {
   window.open("/admin", "_blank");
 };
 
-const initGeolocation = async () => {
+const initGeolocation = () => {
   if (!navigator.geolocation || !navigator.geolocation.watchPosition) {
     setSnackbar(true, 2000, "warning", "geolocation is invalid");
     return;
@@ -241,12 +242,9 @@ const initGeolocation = async () => {
   );
 
   navigator.geolocation.watchPosition(
-    async (position) => {
+    (position) => {
       const userGps = getUserGps(position);
-      await useFetch("/api/UpdatePos", {
-        method: "POST",
-        body: { userGps: userGps },
-      });
+      setUserGps(userGps);
     },
     (e: any) => {
       // setSnackbar(true, 2000, "warning", e.message);
@@ -294,7 +292,6 @@ const getUserGps = (position: any) => {
       lng: position.coords.longitude,
       accuracy: position.coords.accuracy,
     },
-    self: true,
   };
 };
 
@@ -354,14 +351,30 @@ const initMedia = async () => {
     (constraints.video as any) = { facingMode: { exact: "environment" } };
   }
 
-  stream.value = await navigator.mediaDevices.getUserMedia(constraints);
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then((st) => {
+      stream.value = st;
+    })
+    .catch((e) => {
+      setSnackbar(true, 2000, "warning", e.message);
+    });
+};
+
+const clearPos = async () => {
+  await useFetch("/api/ClearPos", {
+    method: "POST",
+    params: {
+      userId: userInfo.userId,
+    },
+  });
 };
 
 onMounted(() => {});
 
 onBeforeUnmount(() => {
   clearInterval(pollingMsgId.value);
-
+  clearPos();
   if (stream.value) {
     stream.value.getTracks().forEach((track: any) => {
       track.stop();

@@ -23,6 +23,7 @@
         "path": "^0.12.7",
         "resemblejs": "^4.1.0",
         "sass": "^1.57.1",
+        "vuedraggable": "^4.1.0",
         "vuetify": "^3.1.2"
     }
 }

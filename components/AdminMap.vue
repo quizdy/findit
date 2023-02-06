@@ -155,30 +155,6 @@ onMounted(async () => {
   });
 });
 
-const setUserPos = (userGps: any) => {
-  setUserMarker(userGps);
-  // if (userGps.self) {
-  //   const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
-  //   $gmap.value?.panTo(latLng);
-  //   new google.maps.Circle({
-  //     map: $gmap.value,
-  //     center: latLng,
-  //     radius: userGps.gps.accuracy,
-  //     strokeColor: "#0081C9",
-  //     strokeOpacity: 0.5,
-  //     strokeWeight: 0.75,
-  //     fillColor: "#0081C9",
-  //     fillOpacity: 0.18,
-  //   });
-  //   if (typeof google.maps.geometry !== "undefined") {
-  //     const distance = google.maps.geometry.spherical.computeDistanceBetween(
-  //       latLng,
-  //       targetLatLng
-  //     )
-  //   };
-  // }
-};
-
 const watchUserPos = () => {
   pollingPosId.value = setInterval(async () => {
     const { data: res } = await useFetch("/api/GetPos", {
@@ -188,7 +164,7 @@ const watchUserPos = () => {
 
     if (0 < usersGps.length) {
       usersGps.forEach((_userGps: any) => {
-        if (_userGps) setUserPos(_userGps);
+        if (_userGps) setUserMarker(_userGps);
       });
     }
   }, 3000);
@@ -254,6 +230,9 @@ const venueList = () => {
 const reset = async () => {
   await useFetch("/api/ClearPos", {
     method: "POST",
+    params: {
+      userId: "",
+    },
   });
 };
 

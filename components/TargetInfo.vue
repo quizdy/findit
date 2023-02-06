@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar class="ma-0 py-4" height="10" color="light-blue" dark>
+    <v-toolbar class="mx-0 mt-0 mb-4 py-4" height="10" color="light-blue" dark>
       <v-avatar class="mx-4" size="28">
         <v-img :src="propsTargetInfo.user.image"></v-img>
       </v-avatar>
@@ -61,8 +61,8 @@
                 </template>
               </v-img>
             </div>
-            <h3 class="mx-8 mt-4">{{ target.title }}</h3>
-            <small class="mx-8 mt-2">{{ target.comments }}</small>
+            <h3 class="mx-8 mt-3">{{ target.title }}</h3>
+            <small class="mx-8 mt-1">{{ target.comments }}</small>
           </v-sheet>
         </v-card>
       </SwiperSlide>

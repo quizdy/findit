@@ -11,7 +11,7 @@
         <v-container mt-0 pt-0>
           <v-row no-gutters>
             <v-col cols="4" class="d-flex justify-center align-center">
-              <v-avatar size="120">
+              <v-avatar class="mb-4" size="100">
                 <v-img :src="userInfo.image" @click="chgAvatar"></v-img>
               </v-avatar>
             </v-col>
@@ -38,13 +38,23 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <v-col cols="12">
+            <v-col cols="10">
               <v-select
-                v-model="selectedVenue"
+                v-model="selectedVenueName"
                 label="会場"
                 :items="venuesInfo"
                 @update:modelValue="getVenue"
               ></v-select>
+            </v-col>
+            <v-col cols="2">
+              <v-btn
+                :disabled="!selectedVenueName"
+                class="mx-2 mt-1"
+                rounded
+                icon
+                @click="openTargetSortDialog"
+                ><v-icon dense>mdi-sort</v-icon></v-btn
+              >
             </v-col>
           </v-row>
           <v-row no-gutters>
@@ -69,6 +79,15 @@
       </v-form>
     </v-card>
   </div>
+  <client-only>
+    <v-dialog v-model="targetSortDialog">
+      <TargetSortDialog
+        :venue="userInfo.venue"
+        @setSortTargets="setSortTargets"
+        @closeTargetSortDialog="targetSortDialog = false"
+      />
+    </v-dialog>
+  </client-only>
 </template>
 
 <script setup lang="ts">
@@ -104,7 +123,8 @@ const userInfo = reactive({
 });
 
 const venuesInfo = ref(<any[]>[]);
-const selectedVenue = ref(propsUserList.user.venue.venueName);
+const selectedVenueName = ref(propsUserList.user.venue.venueName);
+const targetSortDialog = ref(false);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",
@@ -115,7 +135,25 @@ resGetVenues.value?.venues.forEach((venue: any) => {
 });
 
 const getVenue = async () => {
-  userInfo.venue.venueName = selectedVenue;
+  const { data: resGetVenue } = await useFetch("/api/GetVenue", {
+    method: "GET",
+    params: { venueName: selectedVenueName.value },
+  });
+
+  userInfo.venue = (resGetVenue.value as any).venue;
+
+  if (userInfo.venue.targets.length < 1) {
+    emitsUserEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "指定した会場にはターゲットの登録がありません"
+    );
+    selectedVenueName.value = "";
+    userInfo.venue.venueName = "";
+    return;
+  }
 };
 
 const confirmUpdateUser = () => {
@@ -126,6 +164,17 @@ const confirmUpdateUser = () => {
       2000,
       "warning",
       "ユーザ名を入力して下さい"
+    );
+    return;
+  }
+
+  if (!userInfo.venue.venueName) {
+    emitsUserEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "会場を指定してください"
     );
     return;
   }
@@ -148,9 +197,7 @@ const updateUser = async (params: any) => {
       userName: userInfo.userName,
       image: userInfo.image,
       comments: userInfo.comments,
-      venue: {
-        venueName: userInfo.venue.venueName,
-      },
+      venue: userInfo.venue,
     },
   });
 
@@ -161,6 +208,14 @@ const updateUser = async (params: any) => {
 
 const cancelUser = () => {
   emitsUserEdit("changeComponent", "userList");
+};
+
+const openTargetSortDialog = () => {
+  targetSortDialog.value = true;
+};
+
+const setSortTargets = (targets: any[]) => {
+  userInfo.venue.targets = targets;
 };
 
 const chgAvatar = async () => {

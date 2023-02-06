@@ -24,7 +24,7 @@ const emitsTargetMap = defineEmits<{
 }>();
 
 const propsTargetMap = defineProps<{
-  venue: any;
+  user: any;
 }>();
 
 const $config = useRuntimeConfig();
@@ -48,8 +48,8 @@ onMounted(async () => {
 
   $gmap.value = new google.maps.Map(mapId, {
     center: new google.maps.LatLng(
-      propsTargetMap.venue.lat,
-      propsTargetMap.venue.lng
+      propsTargetMap.user.venue.lat,
+      propsTargetMap.user.venue.lng
     ),
     zoom: zoom.value,
     disableDefaultUI: true,
@@ -66,7 +66,7 @@ onMounted(async () => {
   $gmap.value.mapTypes.set("noText", styledMapType);
   $gmap.value.setMapTypeId("noText");
 
-  propsTargetMap.venue.targets.forEach((target: any) => {
+  propsTargetMap.user.venue.targets.forEach((target: any) => {
     const latLng = new google.maps.LatLng(target.lat, target.lng);
     target.icon = "/images/treasure1.png";
     setTargetMarker(target.title, target.icon, latLng);
@@ -77,7 +77,9 @@ onMounted(async () => {
   });
 
   const usersPos = await getUsersPos();
-  const myself = usersPos.filter((_userPos) => _userPos.self === true)[0];
+  const myself = usersPos.filter(
+    (_userPos) => _userPos.userId === propsTargetMap.user.userId
+  )[0];
   const latLng = new google.maps.LatLng(myself.gps.lat, myself.gps.lng);
   $gmap.value?.panTo(latLng);
   // new google.maps.Circle({
