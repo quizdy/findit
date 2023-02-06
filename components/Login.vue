@@ -1,5 +1,17 @@
 <template>
-  <div class="background">
+  <div class="wrapper">
+    <div
+      v-for="(venue, i) in venues"
+      :key="i"
+      class="background-image"
+      :style="
+        'background-image: url(' +
+        venue.image +
+        '); animation: fadeInOut 3s ease-in ' +
+        i * 3 +
+        's infinite;'
+      "
+    ></div>
     <v-form @submit.prevent="login">
       <v-container>
         <v-row>
@@ -38,16 +50,12 @@ const emitsLogin = defineEmits<{
 }>();
 
 const userId = ref("");
-const bg = ref(["/images/bg.jpg"]);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",
 });
 
 const venues = resGetVenues.value?.venues;
-venues?.forEach((venue) => {
-  bg.value.push(venue.image);
-});
 
 const validateCheck = () => {
   if (userId.value.length > 8) {
@@ -102,10 +110,12 @@ const login = async () => {
 };
 
 onMounted(() => {});
+
+onBeforeUnmount(() => {});
 </script>
 
 <style scoped lang="scss">
-.background {
+.wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,8 +124,31 @@ onMounted(() => {});
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("/images/bg.jpg") no-repeat center center;
+}
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   background-size: cover;
-  opacity: 0.8;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>
