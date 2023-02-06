@@ -88,10 +88,6 @@
 <script setup lang="ts">
 import resemble from "resemblejs";
 
-interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
-  requestPermission?: () => Promise<"granted" | "denied">;
-}
-
 const emitsTargetScan = defineEmits<{
   (
     e: "setSnackbar",
@@ -106,6 +102,7 @@ const emitsTargetScan = defineEmits<{
 
 const propsTargetScan = defineProps<{
   venue: any;
+  stream: any;
 }>();
 
 const scan = reactive({
@@ -113,8 +110,6 @@ const scan = reactive({
   matchPercentage: 0.0,
   opacity: 0,
 });
-
-const stream = ref();
 
 const overlay = ref(false);
 const matchPercentageValue = ref(0);
@@ -130,47 +125,6 @@ onMounted(async () => {
 
 const startVideo = async () => {
   loading.value = true;
-  if (typeof window !== "object") {
-    loading.value = false;
-    return;
-  }
-
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    emitsTargetScan(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "カメラデバイスが無効です"
-    );
-    loading.value = false;
-    return;
-  }
-
-  const constraints = {
-    audio: false,
-    video: { facingMode: { exact: "environment" } },
-  };
-
-  const requestPermission = (
-    DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
-  ).requestPermission;
-
-  const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
-    (device) =>
-      device.kind === "videoinput" &&
-      (device.label.includes("USB") || device.label.includes("Webcam"))
-  );
-
-  if (0 < devices.length) {
-    (constraints.video as any) = true;
-  }
-
-  if (typeof requestPermission === "function") {
-    (constraints.video as any) = { facingMode: { exact: "environment" } };
-  }
-
-  stream.value = await navigator.mediaDevices.getUserMedia(constraints);
 
   const webcam = document.getElementById("webcam") as HTMLVideoElement;
   const webcamCanvas = document.getElementById(
@@ -182,7 +136,7 @@ const startVideo = async () => {
     return;
   }
 
-  webcam.srcObject = stream.value;
+  webcam.srcObject = propsTargetScan.stream;
   webcam.play();
 
   refresh(webcam, webcamCanvas);
@@ -196,11 +150,6 @@ const stopVideo = async () => {
     webcam.srcObject = null;
   }
   if (scan.frameId) clearInterval(scan.frameId);
-  if (stream.value) {
-    stream.value.getTracks().forEach((track: any) => {
-      track.stop();
-    });
-  }
 };
 
 const refresh = (webcam: HTMLVideoElement, webcamCanvas: HTMLCanvasElement) => {

@@ -16,6 +16,7 @@
       <TargetScan
         v-if="currentComponent === 'targetScan'"
         :venue="userInfo.venue"
+        :stream="stream"
         @setSnackbar="setSnackbar"
         @nextTarget="nextTarget"
         ref="refTargetScan"
@@ -108,6 +109,10 @@
 </template>
 
 <script setup lang="ts">
+interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
+  requestPermission?: () => Promise<"granted" | "denied">;
+}
+
 const currentComponent = ref("login");
 const userInfo = reactive({
   userId: "",
@@ -134,9 +139,12 @@ const refTargetMap = ref();
 const refTargetScan = ref();
 const pollingMsgId = ref();
 
+const stream = ref();
+
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
     await initGeolocation();
+    await initMedia();
     initGetMsg();
   }
   if (
@@ -313,10 +321,52 @@ const initGetMsg = () => {
   }, 1000);
 };
 
+const initMedia = async () => {
+  if (typeof window !== "object") {
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setSnackbar(true, 2000, "warning", "カメラデバイスが無効です");
+    return;
+  }
+
+  const constraints = {
+    audio: false,
+    video: { facingMode: { exact: "environment" } },
+  };
+
+  const requestPermission = (
+    DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
+  ).requestPermission;
+
+  const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
+    (device) =>
+      device.kind === "videoinput" &&
+      (device.label.includes("USB") || device.label.includes("Webcam"))
+  );
+
+  if (0 < devices.length) {
+    (constraints.video as any) = true;
+  }
+
+  if (typeof requestPermission === "function") {
+    (constraints.video as any) = { facingMode: { exact: "environment" } };
+  }
+
+  stream.value = await navigator.mediaDevices.getUserMedia(constraints);
+};
+
 onMounted(() => {});
 
 onBeforeUnmount(() => {
   clearInterval(pollingMsgId.value);
+
+  if (stream.value) {
+    stream.value.getTracks().forEach((track: any) => {
+      track.stop();
+    });
+  }
 });
 </script>
 

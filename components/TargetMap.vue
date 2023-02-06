@@ -134,6 +134,7 @@ const setTargetMarker = (title: string, icon: string, latLng: any) => {
       scaledSize: new google.maps.Size(30, 30),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(0, 0),
+      zIndex: 1,
     },
   });
   targetMarker.setMap($gmap.value);
@@ -159,6 +160,7 @@ const setUserMarker = (userGps: any) => {
       scaledSize: new google.maps.Size(30, 30),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(0, 0),
+      zIndex: 1000 - userMarkers.value.length,
     },
   });
 
