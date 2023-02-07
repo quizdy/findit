@@ -209,25 +209,32 @@ const setUserInfo = (user: any) => {
   changeComponent("targetInfo");
 };
 
-const nextTarget = () => {
+const nextTarget = async () => {
   if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
+    changeComponent("targetInfo");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos++;
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
-    changeComponent("targetInfo");
+    broadMsg(
+      userInfo.userName +
+        "さんが、「" +
+        userInfo.venue.targets[userInfo.venue.pos].title +
+        "」を発見しました。"
+    );
   } else {
-    setSnackbar(true, 5000, "success", "おめでとう");
+    setSnackbar(true, 5000, "success", "top", "おめでとう");
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos = 0;
     changeComponent("targetInfo");
+    broadMsg(
+      userInfo.userName +
+        "さんが、「" +
+        userInfo.venue.targets[userInfo.venue.pos].title +
+        "」を発見しました。"
+    );
   }
-
-  broadMsg(
-    userInfo.userName +
-      "さんが、「" +
-      userInfo.venue.targets[userInfo.venue.pos].title +
-      "」を発見しました。"
-  );
 };
 
 const broadMsg = async (msg: string) => {
@@ -265,7 +272,7 @@ const initAttendee = async () => {
 
 const initGeolocation = () => {
   if (!navigator.geolocation || !navigator.geolocation.watchPosition) {
-    setSnackbar(true, 2000, "warning", "geolocation is invalid");
+    setSnackbar(true, 2000, "warning", "top", "geolocation is invalid");
     return;
   }
 
@@ -356,7 +363,7 @@ const initGetMsg = () => {
     });
     const message = (res.value as any)?.message;
     if (message) {
-      setSnackbar(true, -1, "info", message);
+      setSnackbar(true, -1, "info", "top", message);
     }
   }, 1000);
 };
@@ -367,7 +374,7 @@ const initMedia = async () => {
   }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    setSnackbar(true, 2000, "warning", "カメラデバイスが無効です");
+    setSnackbar(true, 2000, "warning", "top", "カメラデバイスが無効です");
     return;
   }
 
@@ -400,7 +407,7 @@ const initMedia = async () => {
       stream.value = st;
     })
     .catch((e) => {
-      setSnackbar(true, 2000, "warning", e.message);
+      setSnackbar(true, 2000, "warning", "top", e.message);
     });
 };
 

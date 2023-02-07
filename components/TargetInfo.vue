@@ -29,13 +29,15 @@
         <v-card max-width="600" class="mx-auto rounded-0">
           <v-sheet class="d-flex flex-column">
             <div class="layout">
-              <v-icon
-                v-show="target.targetStatus === 2"
-                size="10rem"
-                color="success"
-                class="check"
-                >mdi-check-circle</v-icon
-              >
+              <transition name="fade">
+                <v-icon
+                  v-show="target.targetStatus === 2"
+                  size="10rem"
+                  color="success"
+                  class="check"
+                  >mdi-check-circle</v-icon
+                >
+              </transition>
               <v-img
                 :class="[
                   i > 0 && target.targetStatus === 0 ? 'passive' : '',
@@ -120,5 +122,15 @@ const openMsgDialog = () => {
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

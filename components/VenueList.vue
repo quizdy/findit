@@ -96,7 +96,7 @@ const addVenue = () => {
     venueName: "venueName" + Date.now(),
     lat: 0.0,
     lng: 0.0,
-    comments: "comments" + Date.now(),
+    comments: "",
     pos: 0,
   };
   emitsVenueList("setVenueInfo", venue);

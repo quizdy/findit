@@ -44,16 +44,17 @@
               <v-row dense>
                 <v-col cols="6" style="text-align: center">
                   <v-text-field
-                    v-model="targetInfo.gap"
+                    v-model.number="targetInfo.gap"
                     label="誤差"
                     required
+                    @focus="$event.target.select()"
                     hide-details="auto"
+                    inputmode="numeric"
                   ></v-text-field
                 ></v-col>
                 <v-col cols="6" style="text-align: center">
                   <v-select
                     v-model="targetInfo.icon"
-                    label="アイコン"
                     :items="$config.ICONS"
                     :item-title="$config.ICONS.title"
                     :item-value="$config.ICONS.value"

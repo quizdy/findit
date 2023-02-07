@@ -92,7 +92,7 @@ const addUser = () => {
     userId: users.value.length === 0 ? "1" : "" + (users.value.length + 1),
     userName: "userName" + Date.now(),
     image: "",
-    comments: "comments" + Date.now(),
+    comments: "",
     venue: {
       venueName: "",
       comments: "",

@@ -65,6 +65,7 @@ const propsTargetList = defineProps<{
   venue: any;
 }>();
 
+const $config = useRuntimeConfig();
 const { venueName, targets } = toRefs(propsTargetList.venue);
 
 const venueList = () => {
@@ -102,15 +103,9 @@ const addTarget = () => {
     lat: 0,
     lng: 0,
     gap: 60,
-    icon: "",
+    icon: $config.ICONS[0].value,
     image: "",
-    comments:
-      "comments" +
-      Date.now() +
-      "comments" +
-      Date.now() +
-      "comments" +
-      Date.now(),
+    comments: "",
     targetStatus: 0,
   };
   emitsTargetList("setTargetInfo", targetInfo);
