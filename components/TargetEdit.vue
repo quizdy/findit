@@ -147,33 +147,30 @@
                           width: imageWidth,
                         }"
                       />
+                      <v-slider
+                        :disabled="!targetInfo.image"
+                        class="mx-8 slider"
+                        direction="vertical"
+                        max="100"
+                        min="0"
+                        color="blue"
+                        dense
+                        v-model="scan.opacity"
+                      ></v-slider>
                     </div>
-                  </v-col>
-                </v-row>
-                <v-row dense>
-                  <v-col cols="12">
-                    <v-slider
-                      :disabled="!targetInfo.image"
-                      class="mx-8"
-                      max="100"
-                      min="0"
-                      color="blue"
-                      dense
-                      v-model="scan.opacity"
-                    ></v-slider>
                   </v-col>
                 </v-row>
                 <v-row dense>
                   <v-col cols="6">
                     <v-btn
                       v-if="targetInfo.image"
-                      class="mx-4 mb-4"
+                      class="ma-4"
                       @click="scanImage"
                       ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
                     >
                   </v-col>
                   <v-col cols="6" style="text-align: right">
-                    <v-btn class="mx-4 mb-4" @click="saveImage"
+                    <v-btn class="ma-4" @click="saveImage"
                       ><v-icon>mdi-content-save</v-icon>保存する</v-btn
                     >
                   </v-col>
@@ -216,6 +213,7 @@ const emitsTargetEdit = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (
@@ -286,6 +284,7 @@ const confirmUpdateTarget = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "ターゲット名を入力して下さい"
     );
     return;
@@ -297,6 +296,7 @@ const confirmUpdateTarget = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "写真を登録してください"
     );
     return;
@@ -308,6 +308,7 @@ const confirmUpdateTarget = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "緯度,経度をカンマ区切りで登録してください"
     );
     return;
@@ -344,7 +345,14 @@ const cancelTarget = () => {
 
 onMounted(async () => {
   if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
-    emitsTargetEdit("setSnackbar", true, 2000, "warning", "位置情報が無効です");
+    emitsTargetEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "bottom",
+      "位置情報が無効です"
+    );
     return;
   }
 
@@ -379,6 +387,7 @@ const startVideo = async () => {
       true,
       2000,
       "warning",
+      "bottom",
       "カメラデバイスが無効です"
     );
     loading.value = false;
@@ -461,7 +470,7 @@ const saveImage = () => {
   const mp3 = new Audio("/sounds/shutter.mp3");
   mp3.play();
 
-  emitsTargetEdit("setSnackbar", true, 2000, "success", "保存しました");
+  emitsTargetEdit("setSnackbar", true, 2000, "success", "top", "保存しました");
 };
 
 const scanImage = () => {
@@ -516,5 +525,15 @@ defineExpose({
   padding: 0;
   height: 100%;
   width: 100%;
+}
+
+.layout .slider {
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: -3rem;
+  margin: 0;
+  padding: 3rem 2rem;
+  height: 100%;
 }
 </style>

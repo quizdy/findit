@@ -37,6 +37,7 @@ const emitsMsgDialog = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     adminMsg: string
   ): void;
   (e: "closeMsgDialog"): void;
@@ -56,7 +57,14 @@ const sendMsg = async (msg: string) => {
       msg: msg,
     },
   });
-  emitsMsgDialog("setSnackbar", true, 2000, "info", "メッセージを送信しました");
+  emitsMsgDialog(
+    "setSnackbar",
+    true,
+    2000,
+    "info",
+    "top",
+    "メッセージを送信しました"
+  );
   emitsMsgDialog("closeMsgDialog");
 };
 </script>

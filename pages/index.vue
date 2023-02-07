@@ -131,6 +131,7 @@ const snackbar = reactive({
   show: false,
   timeout: 2000,
   color: "",
+  location: "top",
   msg: "",
 });
 
@@ -173,11 +174,13 @@ const setSnackbar = (
   show: boolean,
   timeout: number,
   color: string,
+  location: string,
   msg: string
 ) => {
   snackbar.show = show;
   snackbar.timeout = timeout;
   snackbar.color = color;
+  snackbar.location = location;
   snackbar.msg = msg;
 };
 

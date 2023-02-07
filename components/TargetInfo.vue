@@ -77,6 +77,7 @@ const emitsTargetInfo = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (e: "openMsgDialog"): void;

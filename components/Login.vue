@@ -43,6 +43,7 @@ const emitsLogin = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (e: "setUserInfo", user: any): void;
@@ -59,7 +60,14 @@ const venues = resGetVenues.value?.venues;
 
 const validateCheck = () => {
   if (userId.value.length > 8) {
-    emitsLogin("setSnackbar", true, 2000, "warning", "8文字以下にしてください");
+    emitsLogin(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "top",
+      "8文字以下にしてください"
+    );
     userId.value = userId.value.slice(0, -1);
     return;
   }
@@ -72,6 +80,7 @@ const login = async () => {
       true,
       2000,
       "warning",
+      "top",
       "ユーザＩＤを入力して下さい"
     );
     return;
@@ -88,6 +97,7 @@ const login = async () => {
       true,
       2000,
       "warning",
+      "top",
       "ユーザが見つかりませんでした"
     );
     return;
@@ -101,6 +111,7 @@ const login = async () => {
       true,
       2000,
       "warning",
+      "top",
       "ターゲットが登録されていません"
     );
     return;

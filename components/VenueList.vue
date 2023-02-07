@@ -48,6 +48,7 @@ const emitsVenueList = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (
@@ -62,7 +63,7 @@ const emitsVenueList = defineEmits<{
   (e: "setVenueInfo", venueInfo: any): void;
 }>();
 
-const venues = ref();
+const venues = ref(<any[]>[]);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",

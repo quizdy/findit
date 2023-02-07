@@ -45,6 +45,7 @@ const emitsTargetList = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (

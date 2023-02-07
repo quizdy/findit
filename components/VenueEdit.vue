@@ -73,6 +73,7 @@ const emitsVenueEdit = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (
@@ -128,6 +129,7 @@ const confirmVenue = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "会場名を入力して下さい"
     );
     return;
@@ -139,6 +141,7 @@ const confirmVenue = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "緯度,経度をカンマ区切りで登録してください"
     );
     return;
@@ -174,7 +177,14 @@ const cancelVenue = () => {
 
 onMounted(async () => {
   if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
-    emitsVenueEdit("setSnackbar", true, 2000, "warning", "位置情報が無効です");
+    emitsVenueEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "bottom",
+      "位置情報が無効です"
+    );
     return;
   }
 

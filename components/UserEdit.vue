@@ -97,6 +97,7 @@ const emitsUserEdit = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (
@@ -148,6 +149,7 @@ const getVenue = async () => {
       true,
       2000,
       "warning",
+      "bottom",
       "指定した会場にはターゲットの登録がありません"
     );
     selectedVenueName.value = "";
@@ -163,6 +165,7 @@ const confirmUpdateUser = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "ユーザ名を入力して下さい"
     );
     return;
@@ -174,6 +177,7 @@ const confirmUpdateUser = () => {
       true,
       2000,
       "warning",
+      "bottom",
       "会場を指定してください"
     );
     return;

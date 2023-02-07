@@ -60,7 +60,7 @@
         v-model="snackbar.show"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
-        location="bottom left"
+        :location="snackbar.location"
         @click="snackbar.show = false"
       >
         {{ snackbar.msg }}
@@ -130,6 +130,7 @@ const snackbar = reactive({
   show: false,
   timeout: 2000,
   color: "",
+  location: "bottom",
   msg: "",
 });
 const confirmDialog = reactive({
@@ -157,11 +158,13 @@ const setSnackbar = (
   show: boolean,
   timeout: number,
   color: string,
+  location: string,
   msg: string
 ) => {
   snackbar.show = show;
   snackbar.timeout = timeout;
   snackbar.color = color;
+  snackbar.location = location;
   snackbar.msg = msg;
 };
 

@@ -94,6 +94,7 @@ const emitsTargetScan = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
   (e: "changeComponent", componentName: string): void;

@@ -86,6 +86,7 @@ const emitsAdminMap = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     adminMsg: string
   ): void;
   (e: "changeComponent", componentName: string): void;
@@ -264,6 +265,7 @@ const sendMsg = async () => {
       true,
       2000,
       "warning",
+      "bottom",
       "メッセージを入力して下さい"
     );
     return;
@@ -275,6 +277,7 @@ const sendMsg = async () => {
       true,
       2000,
       "warning",
+      "bottom",
       "参加者を指定してください"
     );
     return;
@@ -289,7 +292,14 @@ const sendMsg = async () => {
     },
   });
 
-  emitsAdminMap("setSnackbar", true, 2000, "info", "メッセージを送信しました");
+  emitsAdminMap(
+    "setSnackbar",
+    true,
+    2000,
+    "info",
+    "bottom",
+    "メッセージを送信しました"
+  );
 
   adminMsg.value = "";
 };
@@ -306,7 +316,14 @@ onMounted(() => {
     const message = (res.value as any)?.message;
     const sender = (res.value as any)?.sender;
     if (message) {
-      emitsAdminMap("setSnackbar", true, -1, "info", sender + ":" + message);
+      emitsAdminMap(
+        "setSnackbar",
+        true,
+        -1,
+        "info",
+        "bottom left",
+        sender + ":" + message
+      );
     }
   }, 1000);
 });

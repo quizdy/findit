@@ -19,6 +19,7 @@ const emitsTargetMap = defineEmits<{
     show: boolean,
     timeout: number,
     color: string,
+    location: string,
     msg: string
   ): void;
 }>();
