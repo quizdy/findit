@@ -57,7 +57,7 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="12" style="text-align: right">
+            <v-col cols="12" style="text-align: center">
               <v-btn class="mx-4" min-width="300" @click="scanImage"
                 ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
               >

@@ -161,6 +161,9 @@ const confirmVenue = () => {
 };
 
 const updateVenue = async () => {
+  if (!venueInfo.image) {
+    venueInfo.image = "/images/T24-42.png";
+  }
   const { data: resUpdateVenue } = await useFetch("/api/UpdateVenue", {
     method: "POST",
     body: { venue: venueInfo },

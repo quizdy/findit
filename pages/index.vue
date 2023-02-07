@@ -26,6 +26,7 @@
         @setSnackbar="setSnackbar"
         @setUserInfo="setUserInfo"
       />
+      <Finish v-if="currentComponent === 'finish'" />
     </v-main>
     <v-bottom-navigation
       v-model="currentComponent"
@@ -212,10 +213,10 @@ const setUserInfo = (user: any) => {
 const nextTarget = async () => {
   if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
     changeComponent("targetInfo");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos++;
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const mp3 = new Audio("/sounds/checked.mp3");
+    mp3.play();
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
     broadMsg(
       userInfo.userName +
@@ -224,16 +225,10 @@ const nextTarget = async () => {
         "」を発見しました。"
     );
   } else {
-    setSnackbar(true, 5000, "success", "top", "おめでとう");
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
     userInfo.venue.pos = 0;
-    changeComponent("targetInfo");
-    broadMsg(
-      userInfo.userName +
-        "さんが、「" +
-        userInfo.venue.targets[userInfo.venue.pos].title +
-        "」を発見しました。"
-    );
+    changeComponent("finish");
+    broadMsg(userInfo.userName + "さんが、ゴールしました。");
   }
 };
 
@@ -425,11 +420,11 @@ onMounted(() => {});
 onBeforeUnmount(() => {
   clearInterval(pollingMsgId.value);
   clearPos();
-  if (stream.value) {
-    stream.value.getTracks().forEach((track: any) => {
-      track.stop();
-    });
-  }
+  // if (stream.value) {
+  //   stream.value.getTracks().forEach((track: any) => {
+  //     track.stop();
+  //   });
+  // }
 });
 </script>
 
