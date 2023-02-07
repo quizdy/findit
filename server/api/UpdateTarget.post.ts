@@ -29,6 +29,7 @@ export default defineEventHandler(async (e) => {
       lat: body.target.lat,
       lng: body.target.lng,
       gap: body.target.gap,
+      icon: body.target.icon,
       image: body.target.image,
       comments: body.target.comments,
       targetStatus: 0,
@@ -40,6 +41,7 @@ export default defineEventHandler(async (e) => {
     venueJson.targets[pos].lat = body.target.lat
     venueJson.targets[pos].lng = body.target.lng
     venueJson.targets[pos].gap = body.target.gap
+    venueJson.targets[pos].icon = body.target.icon
     venueJson.targets[pos].image = body.target.image
     venueJson.targets[pos].comments = body.target.comments
     venueJson.targets[pos].targetStatus = 0

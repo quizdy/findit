@@ -101,6 +101,7 @@ const addTarget = () => {
     lat: 0,
     lng: 0,
     gap: 60,
+    icon: "",
     image: "",
     comments:
       "comments" +

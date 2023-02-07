@@ -33,6 +33,7 @@ const zoom = ref(18);
 const pollingPosId = ref();
 const loading = ref(false);
 
+let targetMarkers = ref(<any[]>[]);
 let userMarkers = ref(<any[]>[]);
 
 onMounted(async () => {
@@ -67,10 +68,10 @@ onMounted(async () => {
   $gmap.value.setMapTypeId("noText");
 
   propsTargetMap.user.venue.targets.forEach((target: any) => {
-    const latLng = new google.maps.LatLng(target.lat, target.lng);
-    target.icon = "/images/treasure1.png";
-    setTargetMarker(target.title, target.icon, latLng);
+    setTargetMarker(target);
   });
+
+  showTargetMarker(propsTargetMap.user.venue.pos);
 
   google.maps.event.addListener($gmap.value, "zoom_changed", () => {
     zoom.value = $gmap.value?.getZoom();
@@ -128,20 +129,6 @@ const setUsersPos = async () => {
   });
 };
 
-const setTargetMarker = (title: string, icon: string, latLng: any) => {
-  const targetMarker = new google.maps.Marker({
-    position: latLng,
-    icon: {
-      url: icon,
-      scaledSize: new google.maps.Size(30, 30),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(0, 0),
-      zIndex: 1,
-    },
-  });
-  targetMarker.setMap($gmap.value);
-};
-
 const setUserMarker = (userGps: any) => {
   const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
 
@@ -162,8 +149,8 @@ const setUserMarker = (userGps: any) => {
       scaledSize: new google.maps.Size(30, 30),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(0, 0),
-      zIndex: 1000 - userMarkers.value.length,
     },
+    zIndex: 1000 - userMarkers.value.length,
   });
 
   userMarker.setMap($gmap.value);
@@ -173,6 +160,50 @@ const setUserMarker = (userGps: any) => {
     {
       userId: userGps.userId,
       userMarker: userMarker,
+    },
+  ];
+};
+
+const showTargetMarker = (no: number) => {
+  targetMarkers.value.forEach((_marker) => {
+    if (_marker.no === no + 1) {
+      _marker.targetMarker.setVisible(true);
+    } else {
+      _marker.targetMarker.setVisible(false);
+    }
+  });
+};
+
+const setTargetMarker = (target: any) => {
+  const latLng = new google.maps.LatLng(target.lat, target.lng);
+
+  const markers = targetMarkers.value.filter(
+    (_marker) => _marker.no === target.no
+  );
+
+  if (0 < markers.length) {
+    return;
+  }
+  console.log("target.icon", target.icon);
+  const targetMarker = new google.maps.Marker({
+    position: latLng,
+    icon: {
+      url: target.icon,
+      scaledSize: new google.maps.Size(30, 30),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(0, 0),
+    },
+    visible: false,
+    zIndex: 1,
+  });
+
+  targetMarker.setMap($gmap.value);
+
+  targetMarkers.value = [
+    ...targetMarkers.value,
+    {
+      no: target.no,
+      targetMarker: targetMarker,
     },
   ];
 };

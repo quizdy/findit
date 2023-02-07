@@ -45,7 +45,7 @@
               <v-col cols="12">
                 <v-select
                   label="参加者"
-                  :items="users"
+                  :items="attendee"
                   item-title="userName"
                   item-value="userId"
                   v-model="selectedUsers"
@@ -101,10 +101,14 @@ const zoom = ref(18);
 const pollingPosId = ref();
 const pollingMsgId = ref();
 const loading = ref(false);
+
 const msgDialog = ref(false);
-const users = ref();
+const attendee = ref();
 const selectedUsers = ref(<any[]>[]);
 const adminMsg = ref("");
+
+let targetMarkers = ref(<any[]>[]);
+let userMarkers = ref(<any[]>[]);
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   method: "GET",
@@ -113,7 +117,7 @@ const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   },
 });
 
-users.value = resGetUsers.value?.users;
+attendee.value = resGetUsers.value?.users;
 
 const closeMsgDialog = () => {
   msgDialog.value = false;
@@ -141,9 +145,7 @@ onMounted(async () => {
   });
 
   propsAdminMap.venue.targets.forEach((target: any) => {
-    const latLng = new google.maps.LatLng(target.lat, target.lng);
-    target.icon = "/images/treasure1.png";
-    setTargetMarker(target.title, target.icon, latLng);
+    setTargetMarker(target);
   });
 
   loading.value = false;
@@ -169,21 +171,6 @@ const watchUserPos = () => {
     }
   }, 3000);
 };
-
-const setTargetMarker = (title: string, icon: string, latLng: any) => {
-  const targetMarker = new google.maps.Marker({
-    position: latLng,
-    icon: {
-      url: icon,
-      scaledSize: new google.maps.Size(30, 30),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(0, 0),
-    },
-  });
-  targetMarker.setMap($gmap.value);
-};
-
-let userMarkers = ref(<any[]>[]);
 
 const setUserMarker = (userGps: any) => {
   const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
@@ -215,6 +202,40 @@ const setUserMarker = (userGps: any) => {
     {
       userId: userGps.userId,
       userMarker: userMarker,
+    },
+  ];
+};
+
+const setTargetMarker = (target: any) => {
+  const latLng = new google.maps.LatLng(target.lat, target.lng);
+
+  const markers = targetMarkers.value.filter(
+    (_marker) => _marker.no === target.no
+  );
+
+  if (0 < markers.length) {
+    return;
+  }
+
+  const targetMarker = new google.maps.Marker({
+    position: latLng,
+    icon: {
+      url: target.icon,
+      scaledSize: new google.maps.Size(30, 30),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(0, 0),
+    },
+    visible: true,
+    zIndex: 1,
+  });
+
+  targetMarker.setMap($gmap.value);
+
+  targetMarkers.value = [
+    ...targetMarkers.value,
+    {
+      no: target.no,
+      targetMarker: targetMarker,
     },
   ];
 };

@@ -133,6 +133,9 @@ const snackbar = reactive({
   color: "",
   msg: "",
 });
+
+const attendee = ref([]);
+
 const msgDialog = ref(false);
 const confirmDialog = ref(false);
 
@@ -144,6 +147,7 @@ const stream = ref();
 
 const changeComponent = async (componentName: string) => {
   if (currentComponent.value === "login" && componentName === "targetInfo") {
+    await initAttendee();
     await initGeolocation();
     await initMedia();
     initGetMsg();
@@ -214,10 +218,46 @@ const nextTarget = () => {
     userInfo.venue.pos = 0;
     changeComponent("targetInfo");
   }
+
+  broadMsg(
+    userInfo.userName +
+      "さんが、「" +
+      userInfo.venue.targets[userInfo.venue.pos].title +
+      "」を発見しました。"
+  );
+};
+
+const broadMsg = async (msg: string) => {
+  await useFetch("/api/SendMsg", {
+    method: "POST",
+    body: {
+      venueName: userInfo.venue.venueName,
+      sender: userInfo.userName,
+      users: attendee.value,
+      msg: msg,
+    },
+  });
 };
 
 const openAdmin = () => {
   window.open("/admin", "_blank");
+};
+
+const initAttendee = async () => {
+  const { data: resGetUsers } = await useFetch("/api/GetUsers", {
+    method: "GET",
+    params: {
+      venueName: userInfo.venue.venueName,
+    },
+  });
+
+  resGetUsers.value?.users.forEach((_user) => {
+    if (_user.userId !== userInfo.userId) {
+      attendee.value.push(_user.userId);
+    }
+  });
+
+  attendee.value.push("admin");
 };
 
 const initGeolocation = () => {

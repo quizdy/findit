@@ -47,13 +47,30 @@
                     v-model="targetInfo.gap"
                     label="誤差"
                     required
+                    hide-details="auto"
                   ></v-text-field
                 ></v-col>
                 <v-col cols="6" style="text-align: center">
-                  <div
-                    v-if="targetInfo.image"
-                    class="d-flex align-center justify-center"
-                  >
+                  <v-select
+                    v-model="targetInfo.icon"
+                    label="アイコン"
+                    :items="$config.ICONS"
+                    :item-title="$config.ICONS.title"
+                    :item-value="$config.ICONS.value"
+                    variant="solo"
+                    hide-details="auto"
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row class="mb-2">
+                <v-col cols="12">
+                  <div v-if="targetInfo.image" class="d-flex align-center">
+                    <img
+                      class="rounded-circle mx-4"
+                      :src="targetInfo.image"
+                      height="50"
+                      width="50"
+                    />
                     <v-chip
                       class="ma-2"
                       color="success"
@@ -63,12 +80,6 @@
                       <v-icon start icon="mdi-check-bold"></v-icon>
                       写真の登録済み
                     </v-chip>
-                    <img
-                      class="rounded-circle"
-                      :src="targetInfo.image"
-                      height="50"
-                      width="50"
-                    />
                   </div>
                   <div v-else>
                     <v-chip class="ma-2" color="gray" label text-color="white">
@@ -224,6 +235,8 @@ const propsTargetEdit = defineProps<{
   target: any;
 }>();
 
+const $config = useRuntimeConfig();
+
 const tab = ref("tabInfo");
 const targetInfo = reactive({
   no: propsTargetEdit.target.no,
@@ -231,6 +244,7 @@ const targetInfo = reactive({
   lat: propsTargetEdit.target.lat,
   lng: propsTargetEdit.target.lng,
   gap: propsTargetEdit.target.gap,
+  icon: propsTargetEdit.target.icon,
   image: propsTargetEdit.target.image,
   comments: propsTargetEdit.target.comments,
   targetStatus: propsTargetEdit.target.targetStatus,
@@ -446,6 +460,8 @@ const saveImage = () => {
 
   const mp3 = new Audio("/sounds/shutter.mp3");
   mp3.play();
+
+  emitsTargetEdit("setSnackbar", true, 2000, "success", "保存しました");
 };
 
 const scanImage = () => {

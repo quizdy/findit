@@ -2,7 +2,15 @@
 export default {
   runtimeConfig: {
     public: {
-      GMAP_API_KEY: process.env.GMAP_API_KEY || "AIzaSyCYsLDv3eHNGZ-HFcXUjoA5r442Aj10ND0"
+      GMAP_API_KEY: process.env.GMAP_API_KEY || "AIzaSyCYsLDv3eHNGZ-HFcXUjoA5r442Aj10ND0",
+      ICONS: [{
+        title: "アイコン１",
+        value: "/images/treasure1.png",
+      }, 
+      {
+        title: "アイコン２",
+        value: "/images/treasure2.png",
+      },]
     },
   },
   app: {
