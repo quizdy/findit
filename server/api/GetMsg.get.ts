@@ -9,6 +9,7 @@ export default defineEventHandler(async (e) => {
     if (0 < targetMessage.length) {
       const sender = targetMessage[0].sender
       const msg = targetMessage[0].msg
+      const mission = targetMessage[0].mission
       for(let i = 0; i < messages.length; i++) {
         if (messages[i].venueName === venueName) {
           const pos = messages[i].users.indexOf(userId)
@@ -19,20 +20,21 @@ export default defineEventHandler(async (e) => {
       
       return {
         sender: sender,
-        message: msg
+        message: msg,
+        mission: mission,
       }
     }
     else {
       return {
         sender: "",
-        message: ""
+        message: "",
       }
     }
   }
   else {
     return {
       sender: "",
-      message: ""
+      message: "",
     }
   }
 })

@@ -9,6 +9,9 @@
       <v-btn class="ml-1" @click="msgDialog = true"
         ><v-icon>mdi-email-fast-outline</v-icon></v-btn
       >
+      <v-btn class="ml-1" @click="missionDialog = true"
+        ><v-icon>mdi-alert-box</v-icon></v-btn
+      >
       <v-btn class="ml-1" @click="reset"
         ><v-icon>mdi-rotate-left</v-icon></v-btn
       >
@@ -74,6 +77,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="missionDialog">
+      <MissionDialog
+        :venue="propsAdminMap.venue"
+        @closeMissionDialog="closeMissionDialog"
+      />
+    </v-dialog>
   </client-only>
 </template>
 
@@ -104,6 +113,7 @@ const pollingMsgId = ref();
 const loading = ref(false);
 
 const msgDialog = ref(false);
+const missionDialog = ref(false);
 const attendee = ref();
 const selectedUsers = ref(<any[]>[]);
 const adminMsg = ref("");
@@ -122,6 +132,10 @@ attendee.value = resGetUsers.value?.users;
 
 const closeMsgDialog = () => {
   msgDialog.value = false;
+};
+
+const closeMissionDialog = () => {
+  missionDialog.value = false;
 };
 
 onMounted(async () => {
@@ -287,6 +301,7 @@ const sendMsg = async () => {
     method: "POST",
     body: {
       venueName: propsAdminMap.venue.venueName,
+      sender: "admin",
       users: Object.values(selectedUsers.value),
       msg: adminMsg.value,
     },

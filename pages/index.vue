@@ -115,6 +115,8 @@ interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
   requestPermission?: () => Promise<"granted" | "denied">;
 }
 
+const checkedMp3 = ref();
+
 const currentComponent = ref("login");
 const userInfo = reactive({
   userId: "",
@@ -126,6 +128,7 @@ const userInfo = reactive({
     comments: "",
     pos: 0,
     targets: <any[]>[],
+    missions: <any[]>[],
   },
 });
 const snackbar = reactive({
@@ -207,28 +210,37 @@ const setUserInfo = (user: any) => {
   userInfo.image = user.image;
   userInfo.comments = user.comments;
   userInfo.venue = user.venue;
+
+  userInfo.venue.missions = user.venue.targets.filter(
+    (_target: any) => _target.mission
+  );
+
+  userInfo.venue.targets = user.venue.targets.filter(
+    (_target: any) => !_target.mission
+  );
+
   changeComponent("targetInfo");
 };
 
 const nextTarget = async () => {
+  changeComponent("targetInfo");
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  checkedMp3.value.play();
+  userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
+
   if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
-    changeComponent("targetInfo");
-    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
-    userInfo.venue.pos++;
-    const mp3 = new Audio("/sounds/checked.mp3");
-    mp3.play();
-    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
     broadMsg(
-      userInfo.userName +
-        "さんが、「" +
+      "「" +
         userInfo.venue.targets[userInfo.venue.pos].title +
         "」を発見しました。"
     );
+    userInfo.venue.pos++;
+    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
   } else {
-    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
+    broadMsg("ゴールしました。");
     userInfo.venue.pos = 0;
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     changeComponent("finish");
-    broadMsg(userInfo.userName + "さんが、ゴールしました。");
   }
 };
 
@@ -291,7 +303,6 @@ const initGeolocation = () => {
   navigator.geolocation.watchPosition(
     (position) => {
       const userPos = getUserPos(position);
-      console.log("watchPosition");
       setUserPos(userPos);
     },
     (e: any) => {
@@ -370,7 +381,11 @@ const initGetMsg = () => {
     });
     const message = (res.value as any)?.message;
     if (message) {
-      setSnackbar(true, -1, "info", "top", message);
+      if (message === "mission") {
+        alert("mission");
+      } else {
+        setSnackbar(true, -1, "info", "top", message);
+      }
     }
   }, 1000);
 };
@@ -427,7 +442,9 @@ const clearPos = async () => {
   });
 };
 
-onMounted(() => {});
+onMounted(() => {
+  checkedMp3.value = new Audio("/sounds/checked.mp3");
+});
 
 onBeforeUnmount(() => {
   clearInterval(pollingMsgId.value);

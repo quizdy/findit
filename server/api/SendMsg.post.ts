@@ -4,7 +4,8 @@ export default defineEventHandler(async (e) => {
     venueName: body.venueName,
     sender: body.sender,
     users: body.users,
-    msg: body.msg
+    msg: body.msg,
+    mission: body.mission
   }
 
   let messages = await useStorage().getItem('messages')

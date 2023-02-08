@@ -64,7 +64,7 @@
                 </v-col>
               </v-row>
               <v-row class="mb-2">
-                <v-col cols="12">
+                <v-col cols="9">
                   <div v-if="targetInfo.image" class="d-flex align-center">
                     <img
                       class="rounded-circle mx-4"
@@ -79,7 +79,7 @@
                       text-color="white"
                     >
                       <v-icon start icon="mdi-check-bold"></v-icon>
-                      写真の登録済み
+                      <small>写真の登録済み</small>
                     </v-chip>
                   </div>
                   <div v-else>
@@ -87,6 +87,20 @@
                       写真が未登録です
                     </v-chip>
                   </div>
+                </v-col>
+                <v-col cols="3">
+                  <v-tooltip
+                    :text="targetInfo.mission ? 'ミッション' : '通常'"
+                    location="bottom"
+                  >
+                    <template v-slot:activator="{ props }">
+                      <v-switch
+                        :="props"
+                        color="info"
+                        v-model="targetInfo.mission"
+                      ></v-switch>
+                    </template>
+                  </v-tooltip>
                 </v-col>
               </v-row>
               <v-row no-gutters>
@@ -208,6 +222,8 @@ interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
   requestPermission?: () => Promise<"granted" | "denied">;
 }
 
+const shutterMp3 = ref();
+
 const emitsTargetEdit = defineEmits<{
   (
     e: "setSnackbar",
@@ -245,6 +261,7 @@ const targetInfo = reactive({
   gap: propsTargetEdit.target.gap,
   icon: propsTargetEdit.target.icon,
   image: propsTargetEdit.target.image,
+  mission: propsTargetEdit.target.mission,
   comments: propsTargetEdit.target.comments,
   targetStatus: propsTargetEdit.target.targetStatus,
 });
@@ -345,6 +362,8 @@ const cancelTarget = () => {
 };
 
 onMounted(async () => {
+  shutterMp3.value = new Audio("/sounds/shutter.mp3");
+
   if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
     emitsTargetEdit(
       "setSnackbar",
@@ -468,8 +487,7 @@ const saveImage = () => {
   const base64 = webcamCanvas.toDataURL("image/png");
   targetInfo.image = base64;
 
-  const mp3 = new Audio("/sounds/shutter.mp3");
-  mp3.play();
+  shutterMp3.value.play();
 
   emitsTargetEdit("setSnackbar", true, 2000, "success", "top", "保存しました");
 };

@@ -19,10 +19,10 @@
         "@mdi/font": "^7.1.96",
         "fs": "^0.0.1-security",
         "mlly": "^1.1.0",
-        "nuxt-swiper": "^0.1.9",
         "path": "^0.12.7",
         "resemblejs": "^4.1.0",
         "sass": "^1.57.1",
+        "swiper": "^9.0.3",
         "vuedraggable": "^4.1.0",
         "vuetify": "^3.1.2"
     }

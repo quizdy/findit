@@ -10,6 +10,14 @@ export default {
       {
         title: "アイコン２",
         value: "/images/treasure2.png",
+      },
+      {
+        title: "アイコン３",
+        value: "/images/treasure3.png",
+      },
+      {
+        title: "アイコン４",
+        value: "/images/treasure4.png",
       },]
     },
   },
@@ -38,9 +46,5 @@ export default {
   build: {
     transpile: ['vuetify'],
   },
-  modules: [['nuxt-swiper', {
-    prefix: 'Swiper',
-    styleLang: 'css',
-    modules: ['navigation', 'pagination'],
-  }]],
+  modules: [],
 };
