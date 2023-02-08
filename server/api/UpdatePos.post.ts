@@ -1,20 +1,20 @@
 export default defineEventHandler(async (e) => {
   const body = await readBody(e)
-  const userGps = body.userGps
+  const userPos = body.userPos
 
-  let usersGps = await useStorage().getItem('usersGps')
+  let usersPos = await useStorage().getItem('usersPos')
 
-  if (!usersGps) usersGps = []
+  if (!usersPos) usersPos = []
 
-  if (!usersGps.some((_userGps: any) => _userGps.userId === userGps.userId)) {
-    usersGps = [...usersGps, userGps];
+  if (!usersPos.some((_userPos: any) => _userPos.userId === userPos.userId)) {
+    usersPos = [...usersPos, userPos];
   } else {
-    usersGps = usersGps.map((_userGps: any) =>
-      _userGps.userId === userGps.userId ? userGps : _userGps
+    usersPos = usersPos.map((_userPos: any) =>
+      _userPos.userId === userPos.userId ? userPos : _userPos
     );
   }
 
-  useStorage().setItem('usersGps', usersGps)
+  useStorage().setItem('usersPos', usersPos)
 
   return {
     msg: ''

@@ -271,28 +271,31 @@ const initGeolocation = () => {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const userGps = getUserGps(position);
-      setUserGps(userGps);
-    },
-    (e: any) => {
-      // setSnackbar(true, 2000, "warning", e.message);
-      return;
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 2000,
-    }
-  );
+  clearPos();
+
+  // navigator.geolocation.getCurrentPosition(
+  //   (position) => {
+  //     const userPos = getUserPos(position);
+  //     setUserPos(userPos);
+  //   },
+  //   (e: any) => {
+  //     setSnackbar(true, 2000, "warning", "top", e.message);
+  //     return;
+  //   },
+  //   {
+  //     enableHighAccuracy: true,
+  //     timeout: 2000,
+  //   }
+  // );
 
   navigator.geolocation.watchPosition(
     (position) => {
-      const userGps = getUserGps(position);
-      setUserGps(userGps);
+      const userPos = getUserPos(position);
+      console.log("watchPosition");
+      setUserPos(userPos);
     },
     (e: any) => {
-      // setSnackbar(true, 2000, "warning", e.message);
+      setSnackbar(true, 2000, "warning", "top", e.message);
       return;
     },
     {
@@ -302,32 +305,41 @@ const initGeolocation = () => {
   );
 
   // debug ------------------------
-  // await useFetch("/api/ClearPos", {
-  //   method: "POST",
-  // });
 
-  // const pos = {
-  //   coords: {
-  //     latitude: 35.18936160259076,
-  //     longitude: 136.98873472643598,
-  //   },
-  // };
+  const pos = {
+    // Kosaka
+    // coords: {
+    //   latitude: 35.18936160259076,
+    //   longitude: 136.98873472643598,
+    // },
+    // Nit
+    coords: {
+      latitude: 35.157010833329714,
+      longitude: 136.92591221034223,
+    },
+  };
 
-  // const pollingTestId = setInterval(async () => {
-  //   pos.coords.latitude =
-  //     pos.coords.latitude + Math.floor(Math.random() * 11) / 100000;
-  //   pos.coords.longitude =
-  //     pos.coords.longitude + Math.floor(Math.random() * 11) / 100000;
-  //   const userGps = getUserGps(pos);
-  //   await useFetch("/api/UpdatePos", {
-  //     method: "POST",
-  //     body: { userGps: userGps },
-  //   });
-  // }, 3500);
+  const pollingTestId = setInterval(async () => {
+    pos.coords.latitude =
+      pos.coords.latitude +
+      (Math.random() < 0.5
+        ? Math.floor(Math.random() * -11) / 100000
+        : Math.floor(Math.random() * 11) / 100000);
+    pos.coords.longitude =
+      pos.coords.longitude +
+      (Math.random() < 0.5
+        ? Math.floor(Math.random() * -11) / 100000
+        : Math.floor(Math.random() * 11) / 100000);
+    const userPos = getUserPos(pos);
+    await useFetch("/api/UpdatePos", {
+      method: "POST",
+      body: { userPos: userPos },
+    });
+  }, 2500);
   // debug ------------------------
 };
 
-const getUserGps = (position: any) => {
+const getUserPos = (position: any) => {
   return {
     userId: userInfo.userId,
     userName: userInfo.userName,
@@ -340,10 +352,10 @@ const getUserGps = (position: any) => {
   };
 };
 
-const setUserGps = async (userGps: any) => {
+const setUserPos = async (userPos: any) => {
   await useFetch("/api/UpdatePos", {
     method: "POST",
-    body: { userGps: userGps },
+    body: { userPos: userPos },
   });
 };
 

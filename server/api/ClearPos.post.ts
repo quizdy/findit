@@ -3,17 +3,17 @@ export default defineEventHandler(async (e) => {
   const userId = query.userId as string
 
   if (userId === "") {
-    useStorage().setItem('usersGps', [])
+    useStorage().setItem('usersPos', [])
     return {
       msg: ''
     }
   }
 
-  let usersGps = await useStorage().getItem('usersGps')
+  let usersPos = await useStorage().getItem('usersPos')
 
-  if (usersGps) {
-    usersGps = usersGps.filter((_userGps: any) => _userGps.userId !== userId)
-    useStorage().setItem('usersGps', usersGps)
+  if (usersPos) {
+    usersPos = usersPos.filter((_userPos: any) => _userPos.userId !== userId)
+    useStorage().setItem('usersPos', usersPos)
   }
   
   return {

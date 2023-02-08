@@ -82,12 +82,14 @@ onMounted(async () => {
   const myself = usersPos.filter(
     (_userPos) => _userPos.userId === propsTargetMap.user.userId
   )[0];
+  setUserPos(myself);
   const latLng = new google.maps.LatLng(myself.gps.lat, myself.gps.lng);
   $gmap.value?.panTo(latLng);
+
   // new google.maps.Circle({
   //   map: $gmap.value,
   //   center: latLng,
-  //   radius: userGps.gps.accuracy,
+  //   radius: userPos.gps.accuracy,
   //   strokeColor: "#0081C9",
   //   strokeOpacity: 0.5,
   //   strokeWeight: 0.75,
@@ -106,8 +108,8 @@ onMounted(async () => {
   watchUsersPos();
 });
 
-const setUserPos = (userGps: any) => {
-  setUserMarker(userGps);
+const setUserPos = (userPos: any) => {
+  setUserMarker(userPos);
 };
 
 const watchUsersPos = () => {
@@ -120,7 +122,7 @@ const getUsersPos = async (): Promise<any[]> => {
   const { data: res } = await useFetch("/api/GetPos", {
     method: "GET",
   });
-  return (res.value as any)?.usersGps;
+  return (res.value as any)?.usersPos;
 };
 
 const setUsersPos = async () => {
@@ -130,11 +132,11 @@ const setUsersPos = async () => {
   });
 };
 
-const setUserMarker = (userGps: any) => {
-  const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
+const setUserMarker = (userPos: any) => {
+  const latLng = new google.maps.LatLng(userPos.gps.lat, userPos.gps.lng);
 
   const markers = userMarkers.value.filter(
-    (_marker) => _marker.userId === userGps.userId
+    (_marker) => _marker.userId === userPos.userId
   );
 
   if (0 < markers.length) {
@@ -144,9 +146,9 @@ const setUserMarker = (userGps: any) => {
 
   const userMarker = new google.maps.Marker({
     position: latLng,
-    title: userGps.userName,
+    title: userPos.userName,
     icon: {
-      url: userGps.image,
+      url: userPos.image,
       scaledSize: new google.maps.Size(30, 30),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(0, 0),
@@ -159,7 +161,7 @@ const setUserMarker = (userGps: any) => {
   userMarkers.value = [
     ...userMarkers.value,
     {
-      userId: userGps.userId,
+      userId: userPos.userId,
       userMarker: userMarker,
     },
   ];
@@ -185,7 +187,7 @@ const setTargetMarker = (target: any) => {
   if (0 < markers.length) {
     return;
   }
-  console.log("target.icon", target.icon);
+
   const targetMarker = new google.maps.Marker({
     position: latLng,
     icon: {

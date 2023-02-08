@@ -163,21 +163,21 @@ const watchUserPos = () => {
     const { data: res } = await useFetch("/api/GetPos", {
       method: "GET",
     });
-    const usersGps = (res.value as any)?.usersGps;
+    const usersPos = (res.value as any)?.usersPos;
 
-    if (0 < usersGps.length) {
-      usersGps.forEach((_userGps: any) => {
-        if (_userGps) setUserMarker(_userGps);
+    if (0 < usersPos.length) {
+      usersPos.forEach((_userPos: any) => {
+        if (_userPos) setUserMarker(_userPos);
       });
     }
   }, 3000);
 };
 
-const setUserMarker = (userGps: any) => {
-  const latLng = new google.maps.LatLng(userGps.gps.lat, userGps.gps.lng);
+const setUserMarker = (userPos: any) => {
+  const latLng = new google.maps.LatLng(userPos.gps.lat, userPos.gps.lng);
 
   const markers = userMarkers.value.filter(
-    (_marker) => _marker.userId === userGps.userId
+    (_marker) => _marker.userId === userPos.userId
   );
 
   if (0 < markers.length) {
@@ -187,9 +187,9 @@ const setUserMarker = (userGps: any) => {
 
   const userMarker = new google.maps.Marker({
     position: latLng,
-    title: userGps.userName,
+    title: userPos.userName,
     icon: {
-      url: userGps.image,
+      url: userPos.image,
       scaledSize: new google.maps.Size(30, 30),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(0, 0),
@@ -201,7 +201,7 @@ const setUserMarker = (userGps: any) => {
   userMarkers.value = [
     ...userMarkers.value,
     {
-      userId: userGps.userId,
+      userId: userPos.userId,
       userMarker: userMarker,
     },
   ];

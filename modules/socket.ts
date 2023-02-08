@@ -13,8 +13,8 @@ export default (_: any, nuxt: any) => {
               console.info("disconnect:", socket.id);
             });
 
-            socket.on("userGps", (params) => {
-              io.emit("userGps", params);
+            socket.on("userPos", (params) => {
+              io.emit("userPos", params);
             });
         })
     })
