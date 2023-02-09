@@ -224,17 +224,16 @@ const setUserInfo = (user: any) => {
 
 const nextTarget = async () => {
   changeComponent("targetInfo");
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   checkedMp3.value.play();
   userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
-
+  userInfo.venue.pos++;
   if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
     broadMsg(
       "「" +
         userInfo.venue.targets[userInfo.venue.pos].title +
         "」を発見しました。"
     );
-    userInfo.venue.pos++;
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
   } else {
     broadMsg("ゴールしました。");
