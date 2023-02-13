@@ -325,36 +325,36 @@ const initGeolocation = () => {
 
   // debug ------------------------
 
-  const pos = {
-    // Kosaka
-    // coords: {
-    //   latitude: 35.18936160259076,
-    //   longitude: 136.98873472643598,
-    // },
-    // Nit
-    coords: {
-      latitude: 35.157010833329714,
-      longitude: 136.92591221034223,
-    },
-  };
+  // const pos = {
+  //   // Kosaka
+  //   // coords: {
+  //   //   latitude: 35.18936160259076,
+  //   //   longitude: 136.98873472643598,
+  //   // },
+  //   // Nit
+  //   coords: {
+  //     latitude: 35.157010833329714,
+  //     longitude: 136.92591221034223,
+  //   },
+  // };
 
-  const pollingTestId = setInterval(async () => {
-    pos.coords.latitude =
-      pos.coords.latitude +
-      (Math.random() < 0.5
-        ? Math.floor(Math.random() * -11) / 100000
-        : Math.floor(Math.random() * 11) / 100000);
-    pos.coords.longitude =
-      pos.coords.longitude +
-      (Math.random() < 0.5
-        ? Math.floor(Math.random() * -11) / 100000
-        : Math.floor(Math.random() * 11) / 100000);
-    const userPos = getUserPos(pos);
-    await useFetch("/api/UpdatePos", {
-      method: "POST",
-      body: { userPos: userPos },
-    });
-  }, 2500);
+  // const pollingTestId = setInterval(async () => {
+  //   pos.coords.latitude =
+  //     pos.coords.latitude +
+  //     (Math.random() < 0.5
+  //       ? Math.floor(Math.random() * -11) / 100000
+  //       : Math.floor(Math.random() * 11) / 100000);
+  //   pos.coords.longitude =
+  //     pos.coords.longitude +
+  //     (Math.random() < 0.5
+  //       ? Math.floor(Math.random() * -11) / 100000
+  //       : Math.floor(Math.random() * 11) / 100000);
+  //   const userPos = getUserPos(pos);
+  //   await useFetch("/api/UpdatePos", {
+  //     method: "POST",
+  //     body: { userPos: userPos },
+  //   });
+  // }, 2500);
   // debug ------------------------
 };
 
