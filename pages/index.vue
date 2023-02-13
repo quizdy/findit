@@ -226,15 +226,13 @@ const nextTarget = async () => {
   changeComponent("targetInfo");
   await new Promise((resolve) => setTimeout(resolve, 1000));
   checkedMp3.value.play();
-  userInfo.venue.targets[userInfo.venue.pos].targetStatus = 2;
+  const target = userInfo.venue.targets[userInfo.venue.pos];
+  target.targetStatus = 2;
+  updateStatus(target.no, 2);
   userInfo.venue.pos++;
   if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
-    broadMsg(
-      "「" +
-        userInfo.venue.targets[userInfo.venue.pos].title +
-        "」を発見しました。"
-    );
-    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
+    broadMsg("「" + target.title + "」を発見しました。");
+    target.targetStatus = 1;
   } else {
     broadMsg("ゴールしました。");
     userInfo.venue.pos = 0;
@@ -251,6 +249,17 @@ const broadMsg = async (msg: string) => {
       sender: userInfo.userName,
       users: attendee.value,
       msg: msg,
+    },
+  });
+};
+
+const updateStatus = async (targetNo: number, targetStatus: number) => {
+  await useFetch("/api/UpdateStatus", {
+    method: "POST",
+    body: {
+      userId: userInfo.userId,
+      no: targetNo,
+      targetStatus: targetStatus,
     },
   });
 };
@@ -411,7 +420,8 @@ const initMedia = async () => {
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
     (device) =>
       device.kind === "videoinput" &&
-      (device.label.includes("USB") || device.label.includes("Webcam"))
+      (device.label.toLowerCase().includes("usb") ||
+        device.label.toLowerCase().includes("webcam"))
   );
 
   if (0 < devices.length) {
@@ -428,7 +438,7 @@ const initMedia = async () => {
       stream.value = st;
     })
     .catch((e) => {
-      setSnackbar(true, 2000, "warning", "top", e.message);
+      setSnackbar(true, 2000, "warning", "top", e.name);
     });
 };
 

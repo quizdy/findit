@@ -52,7 +52,7 @@
                 class="mx-2 mt-1"
                 rounded
                 icon
-                @click="openTargetSortDialog"
+                @click="openTargetDialog"
                 ><v-icon dense>mdi-sort</v-icon></v-btn
               >
             </v-col>
@@ -81,10 +81,11 @@
   </div>
   <client-only>
     <v-dialog v-model="targetSortDialog">
-      <TargetSortDialog
-        :venue="userInfo.venue"
+      <TargetDialog
+        :user="userInfo"
+        @setSnackbar="setSnackbar"
         @setSortTargets="setSortTargets"
-        @closeTargetSortDialog="targetSortDialog = false"
+        @closeTargetDialog="targetSortDialog = false"
       />
     </v-dialog>
   </client-only>
@@ -134,6 +135,16 @@ const { data: resGetVenues } = await useFetch("/api/GetVenues", {
 resGetVenues.value?.venues.forEach((venue: any) => {
   venuesInfo.value.push(venue.venueName);
 });
+
+const setSnackbar = (
+  show: boolean,
+  timeout: number,
+  color: string,
+  location: string,
+  msg: string
+) => {
+  emitsUserEdit("setSnackbar", show, timeout, color, location, msg);
+};
 
 const getVenue = async () => {
   const { data: resGetVenue } = await useFetch("/api/GetVenue", {
@@ -214,7 +225,7 @@ const cancelUser = () => {
   emitsUserEdit("changeComponent", "userList");
 };
 
-const openTargetSortDialog = () => {
+const openTargetDialog = () => {
   targetSortDialog.value = true;
 };
 
