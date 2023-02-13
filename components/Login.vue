@@ -1,17 +1,12 @@
 <template>
   <div class="wrapper">
-    <div
-      v-for="(venue, i) in venues"
-      :key="i"
-      class="background-image"
-      :style="
-        'background-image: url(' +
-        venue.image +
-        '); animation: fadeInOut 3s ease-in ' +
-        i * 3 +
-        's infinite;'
-      "
-    ></div>
+    <transition name="fade" v-for="(venue, i) in venues" :key="i">
+      <div
+        v-show="visibleVenues[i]"
+        class="background-image"
+        :style="'background-image: url(' + venue.image + ');'"
+      ></div>
+    </transition>
     <v-form @submit.prevent="login">
       <v-container>
         <v-row>
@@ -47,7 +42,6 @@ const emitsLogin = defineEmits<{
     msg: string
   ): void;
   (e: "setUserInfo", user: any): void;
-  (e: "setVenue", venue: any): void;
 }>();
 
 const userId = ref("");
@@ -57,6 +51,12 @@ const { data: resGetVenues } = await useFetch("/api/GetVenues", {
 });
 
 const venues = resGetVenues.value?.venues;
+
+const visibleVenues = ref(<boolean[]>[true]);
+
+for (let i = 1; i < venues?.length; i++) {
+  visibleVenues.value.push(false);
+}
 
 const validateCheck = () => {
   if (userId.value.length > 8) {
@@ -120,9 +120,23 @@ const login = async () => {
   emitsLogin("setUserInfo", user);
 };
 
-onMounted(() => {});
+const sliderInterval = ref();
+onMounted(() => {
+  let pos = 0;
+  sliderInterval.value = setInterval(() => {
+    visibleVenues.value[pos] = false;
+    if (pos === visibleVenues.value.length - 1) {
+      pos = 0;
+    } else {
+      pos++;
+    }
+    visibleVenues.value[pos] = true;
+  }, 5000);
+});
 
-onBeforeUnmount(() => {});
+onBeforeUnmount(() => {
+  clearInterval(sliderInterval.value);
+});
 </script>
 
 <style scoped lang="scss">
@@ -148,18 +162,13 @@ onBeforeUnmount(() => {});
   background-size: cover;
 }
 
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

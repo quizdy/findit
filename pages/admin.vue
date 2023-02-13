@@ -54,6 +54,11 @@
         @changeComponent="changeComponent"
         ref="refTargetEdit"
       />
+      <AdminLogin
+        v-if="currentComponent === 'adminLogin'"
+        @setSnackbar="setSnackbar"
+        @changeComponent="changeComponent"
+      />
     </v-main>
     <client-only>
       <v-snackbar
@@ -98,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-const currentComponent = ref("venueList");
+const currentComponent = ref("adminLogin");
 const userInfo = reactive({
   userId: "",
   userName: "",
@@ -146,7 +151,6 @@ const refTargetEdit = ref();
 
 const changeComponent = (componentName: string) => {
   if (
-    currentComponent.value !== "targetScan" &&
     typeof refTargetEdit.value !== "undefined" &&
     refTargetEdit.value !== null
   ) {

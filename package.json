@@ -1,6 +1,7 @@
 {
     "private": true,
     "scripts": {
+        "local": "npx nuxi dev -p 8443 --https --ssl-cert ../keys/nitech.pem --ssl-key ../keys/nitech-key.pem",
         "build": "nuxt build",
         "dev": "nuxt dev",
         "generate": "nuxt generate",

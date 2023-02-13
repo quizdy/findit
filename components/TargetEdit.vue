@@ -77,16 +77,29 @@
                       color="success"
                       label
                       text-color="white"
+                      @click="openFileInput"
                     >
                       <v-icon start icon="mdi-check-bold"></v-icon>
                       <small>写真の登録済み</small>
                     </v-chip>
                   </div>
                   <div v-else>
-                    <v-chip class="ma-2" color="gray" label text-color="white">
+                    <v-chip
+                      class="ma-2"
+                      color="gray"
+                      label
+                      text-color="white"
+                      @click="openFileInput"
+                    >
                       写真が未登録です
                     </v-chip>
                   </div>
+                  <v-file-input
+                    class="d-none"
+                    ref="refFileInput"
+                    accept="image/png, image/jpeg, image/bmp"
+                    @change="onTargetFileChanged"
+                  ></v-file-input>
                 </v-col>
                 <v-col cols="3">
                   <v-tooltip
@@ -98,6 +111,7 @@
                         :="props"
                         color="info"
                         v-model="targetInfo.mission"
+                        hide-details="false"
                       ></v-switch>
                     </template>
                   </v-tooltip>
@@ -274,6 +288,7 @@ const scan = reactive({
   opacity: 0,
 });
 
+const refFileInput = ref();
 const stream = ref();
 
 const overlay = ref(false);
@@ -293,6 +308,20 @@ const showMap = () => {
     "https://www.google.co.jp/maps/@" + lat + "," + lng + ",18z",
     "_blank"
   );
+};
+
+const openFileInput = () => {
+  refFileInput.value.click();
+};
+
+const onTargetFileChanged = (e: Event) => {
+  const files = (e.target as HTMLInputElement).files;
+  const file = files![0];
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = async (e: any) => {
+    targetInfo.image = e.currentTarget.result;
+  };
 };
 
 const confirmUpdateTarget = () => {
@@ -426,11 +455,21 @@ const startVideo = async () => {
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
     (device) =>
       device.kind === "videoinput" &&
-      (device.label.includes("USB") || device.label.includes("Webcam"))
+      (device.label.toLowerCase().includes("usb") ||
+        device.label.toLowerCase().includes("webcam"))
   );
 
   if (0 < devices.length) {
     (constraints.video as any) = true;
+  } else {
+    emitsTargetEdit(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "bottom",
+      "カメラデバイスが見つかりませんでした"
+    );
   }
 
   if (typeof requestPermission === "function") {
@@ -489,7 +528,14 @@ const saveImage = () => {
 
   shutterMp3.value.play();
 
-  emitsTargetEdit("setSnackbar", true, 2000, "success", "top", "保存しました");
+  emitsTargetEdit(
+    "setSnackbar",
+    true,
+    2000,
+    "success",
+    "bottom",
+    "保存しました"
+  );
 };
 
 const scanImage = () => {
