@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-toolbar class="mx-0 mt-0 mb-4 py-4" height="10" color="light-blue" dark>
+  <div style="max-width: 600px; margin: 0 auto">
+    <v-toolbar class="mx-0 mt-0 py-4" height="10" color="light-blue" dark>
       <v-avatar class="mx-4" size="28">
         <v-img :src="propsTargetInfo.user.image"></v-img>
       </v-avatar>
@@ -26,47 +26,39 @@
       }"
     >
       <SwiperSlide v-for="(target, i) in targets" :key="i">
-        <v-card max-width="600" class="mx-auto rounded-0">
-          <v-sheet class="d-flex flex-column">
-            <div class="layout">
-              <transition name="fade">
-                <v-icon
-                  v-show="target.targetStatus === 2"
-                  size="10rem"
-                  color="success"
-                  class="check"
-                  >mdi-check-circle</v-icon
-                >
-              </transition>
-              <v-img
-                :class="[
-                  i > 0 && target.targetStatus === 0 ? 'passive' : '',
-                  target.targetStatus === 2 ? 'clear' : '',
-                ]"
-                :src="target.image"
-                :style="{
-                  height: imageHeight,
-                  width: imageWidth,
-                }"
-              >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
-                  >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
-            </div>
-            <h3 class="mx-8 mt-3">{{ target.title }}</h3>
-            <small class="mx-8 mt-1">{{ target.comments }}</small>
-          </v-sheet>
-        </v-card>
+        <div class="layout">
+          <transition name="fade">
+            <v-icon
+              v-show="target.targetStatus === 2"
+              size="10rem"
+              color="success"
+              class="check"
+              >mdi-check-circle</v-icon
+            >
+          </transition>
+          <v-img
+            :class="[
+              i > 0 && target.targetStatus === 0 ? 'passive' : '',
+              target.targetStatus === 2 ? 'clear' : '',
+            ]"
+            :src="target.image"
+          >
+            <template v-slot:placeholder>
+              <v-row class="fill-height ma-0" align="center" justify="center">
+                <v-progress-circular
+                  indeterminate
+                  color="grey lighten-5"
+                ></v-progress-circular>
+              </v-row>
+            </template>
+          </v-img>
+        </div>
+        <div class="frame">
+          <h3 class="my-3">{{ target.title }}</h3>
+          <div class="comment">
+            {{ target.comments }}
+          </div>
+        </div>
       </SwiperSlide>
     </Swiper>
   </div>
@@ -102,8 +94,9 @@ const openMsgDialog = () => {
 <style scoped lang="scss">
 .layout {
   position: relative;
-  height: calc(100dvh - 14.2rem);
+  height: calc(100dvh - 100px);
   width: 100%;
+  background-color: #eee;
 }
 
 .layout .passive {
@@ -122,6 +115,21 @@ const openMsgDialog = () => {
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
+}
+
+.frame {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 160px;
+  margin: 0 1rem;
+}
+
+.frame .comment {
+  font-size: 0.9rem;
+  height: 100px;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .fade-enter-active,

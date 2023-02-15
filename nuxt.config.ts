@@ -32,7 +32,17 @@ export default {
         { name: "mobile-web-app-capable", content: "yes" },
       ],
       link: [
-        { rel: 'apple-touch-icon', type: 'image/png', href: '/apple-touch-icon-180x180.png' }
+        { rel: 'apple-touch-icon', type: 'image/png', href: '/apple-touch-icon-180x180.png' },
+        {
+          rel: 'stylesheet',
+          href:
+            'https://fonts.googleapis.com/css?family=M+PLUS+1p',
+        },
+        {
+          rel: 'stylesheet',
+          href:
+            'https://fonts.googleapis.com/css2?family=Montserrat&display=swap',
+        },
       ],
       style: [
         {
