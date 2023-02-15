@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+    <h2 class="title">Findit</h2>
     <div
       class="background-image"
       style="background-image: url('/images/bg.jpg')"
@@ -64,6 +65,16 @@ const adminLogin = async () => {
 </script>
 
 <style scoped lang="scss">
+.title {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  // font-family: "M PLUS 1p", sans-serif;
+  font-family: "Montserrat";
+  // font-size: 0.9rem;
+  opacity: 1;
+  z-index: 999;
+}
 .wrapper {
   display: flex;
   align-items: center;

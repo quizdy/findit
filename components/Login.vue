@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+    <h2 class="title">Findit</h2>
     <transition name="fade" v-for="(venue, i) in venues" :key="i">
       <div
         v-show="visibleVenues[i]"
@@ -131,7 +132,7 @@ onMounted(() => {
       pos++;
     }
     visibleVenues.value[pos] = true;
-  }, 5000);
+  }, 15000);
 });
 
 onBeforeUnmount(() => {
@@ -140,6 +141,17 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.title {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  // font-family: "M PLUS 1p", sans-serif;
+  font-family: "Montserrat";
+  // font-size: 0.9rem;
+  opacity: 1;
+  z-index: 999;
+}
+
 .wrapper {
   display: flex;
   align-items: center;

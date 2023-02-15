@@ -228,15 +228,15 @@ const nextTarget = async () => {
   checkedMp3.value.play();
   const target = userInfo.venue.targets[userInfo.venue.pos];
   target.targetStatus = 2;
+  broadMsg("「" + target.title + "」を発見しました。");
   updateStatus(target.no, 2);
   userInfo.venue.pos++;
-  if (userInfo.venue.pos < userInfo.venue.targets.length - 1) {
-    broadMsg("「" + target.title + "」を発見しました。");
-    target.targetStatus = 1;
+
+  if (userInfo.venue.pos < userInfo.venue.targets.length) {
+    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
   } else {
-    broadMsg("ゴールしました。");
-    userInfo.venue.pos = 0;
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    broadMsg("すべてのターゲットを発見しました。");
     changeComponent("finish");
   }
 };
