@@ -1,71 +1,66 @@
 <template>
-  <div>
-    <v-card max-width="600" class="mx-auto mt-2">
-      <v-sheet class="d-flex flex-column">
-        <v-container mt-0 pt-0>
-          <v-row no-gutters>
-            <v-col cols="12">
-              <div class="layout">
-                <v-progress-circular
-                  v-show="loading"
-                  indeterminate
-                  color="light-blue"
-                  :size="70"
-                  :width="7"
-                  style="margin: 50% calc(50% - 2rem)"
-                ></v-progress-circular>
-                <video
-                  id="webcam"
-                  class="d-none"
-                  autoplay
-                  muted
-                  playsinline
-                  :height="imageHeight"
-                  :width="imageWidth"
-                ></video>
-                <canvas
-                  v-show="!loading"
-                  id="webcamCanvas"
-                  class="webcamCanvas"
-                  :height="imageHeight"
-                  :width="imageWidth"
-                ></canvas>
-                <img
-                  class="targetImage"
-                  :src="
-                    propsTargetScan.venue.targets[propsTargetScan.venue.pos]
-                      .image
-                  "
-                  :style="{
-                    opacity: scan.opacity / 100,
-                    height: imageHeight,
-                    width: imageWidth,
-                  }"
-                />
-              </div>
-            </v-col>
-          </v-row>
-          <v-row dense>
-            <v-col cols="12">
-              <v-slider
-                class="mx-4"
-                max="100"
-                min="0"
-                color="blue"
-                v-model="scan.opacity"
-              ></v-slider>
-            </v-col>
-          </v-row>
-          <v-row dense>
-            <v-col cols="12" style="text-align: center">
-              <v-btn class="mx-4" min-width="300" @click="scanImage"
-                ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-sheet>
-    </v-card>
+  <div style="max-width: 600px; margin: 0 auto">
+    <v-row no-gutters>
+      <v-col cols="12">
+        <div class="layout">
+          <v-progress-circular
+            v-show="loading"
+            indeterminate
+            color="light-blue"
+            :size="70"
+            :width="7"
+            style="margin: 50% calc(50% - 2rem)"
+          ></v-progress-circular>
+          <video
+            id="webcam"
+            class="d-none"
+            autoplay
+            muted
+            playsinline
+            :height="imageHeight"
+            :width="imageWidth"
+          ></video>
+          <canvas
+            v-show="!loading"
+            id="webcamCanvas"
+            class="webcamCanvas"
+            :height="imageHeight"
+            :width="imageWidth"
+          ></canvas>
+          <img
+            class="targetImage"
+            :src="
+              propsTargetScan.venue.targets[propsTargetScan.venue.pos].image
+            "
+            :style="{
+              opacity: scan.opacity / 100,
+              height: imageHeight,
+              width: imageWidth,
+            }"
+          />
+        </div>
+      </v-col>
+    </v-row>
+    <v-row dense>
+      <v-col cols="12">
+        <v-slider
+          class="mx-4"
+          max="100"
+          min="0"
+          color="blue"
+          dense
+          hide-details="false"
+          v-model="scan.opacity"
+        ></v-slider>
+      </v-col>
+    </v-row>
+    <v-row dense>
+      <v-col cols="12" style="text-align: center">
+        <v-btn class="mx-4" min-width="300" @click="scanImage"
+          ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
+        >
+      </v-col>
+    </v-row>
     <v-overlay
       :model-value="overlay"
       class="align-center justify-center"
@@ -213,7 +208,7 @@ defineExpose({
 <style scoped lang="scss">
 .layout {
   position: relative;
-  height: calc(100dvh - 14.2rem);
+  height: calc(100dvh - 160px);
   width: 100%;
 }
 

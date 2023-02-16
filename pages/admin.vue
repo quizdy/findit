@@ -128,7 +128,6 @@ const targetInfo = reactive({
   gap: 0,
   icon: "",
   image: "",
-  mission: false,
   comments: "",
   targetStatus: 0,
 });
@@ -223,7 +222,6 @@ const setTargetInfo = (target: any) => {
   targetInfo.gap = target.gap;
   targetInfo.icon = target.icon;
   targetInfo.image = target.image;
-  targetInfo.mission = target.mission;
   targetInfo.comments = target.comments;
   targetInfo.targetStatus = target.targetStatus;
 };

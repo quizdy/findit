@@ -31,7 +31,6 @@ export default defineEventHandler(async (e) => {
       gap: body.target.gap,
       icon: body.target.icon,
       image: body.target.image,
-      mission: body.target.mission,
       comments: body.target.comments,
       targetStatus: 0,
     }
@@ -44,7 +43,6 @@ export default defineEventHandler(async (e) => {
     venueJson.targets[pos].gap = body.target.gap
     venueJson.targets[pos].icon = body.target.icon
     venueJson.targets[pos].image = body.target.image
-    venueJson.targets[pos].mission = body.target.mission
     venueJson.targets[pos].comments = body.target.comments
     venueJson.targets[pos].targetStatus = 0
   }

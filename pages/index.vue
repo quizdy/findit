@@ -128,7 +128,6 @@ const userInfo = reactive({
     comments: "",
     pos: 0,
     targets: <any[]>[],
-    missions: <any[]>[],
   },
 });
 const snackbar = reactive({
@@ -210,14 +209,6 @@ const setUserInfo = (user: any) => {
   userInfo.image = user.image;
   userInfo.comments = user.comments;
   userInfo.venue = user.venue;
-
-  userInfo.venue.missions = user.venue.targets.filter(
-    (_target: any) => _target.mission
-  );
-
-  userInfo.venue.targets = user.venue.targets.filter(
-    (_target: any) => !_target.mission
-  );
 
   changeComponent("targetInfo");
 };

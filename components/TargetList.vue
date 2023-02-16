@@ -105,7 +105,6 @@ const addTarget = () => {
     gap: 60,
     icon: $config.ICONS[0].value,
     image: "",
-    mission: false,
     comments: "",
     targetStatus: 0,
   };

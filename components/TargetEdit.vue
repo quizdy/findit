@@ -101,21 +101,7 @@
                     @change="onTargetFileChanged"
                   ></v-file-input>
                 </v-col>
-                <v-col cols="3">
-                  <v-tooltip
-                    :text="targetInfo.mission ? 'ミッション' : '通常'"
-                    location="bottom"
-                  >
-                    <template v-slot:activator="{ props }">
-                      <v-switch
-                        :="props"
-                        color="info"
-                        v-model="targetInfo.mission"
-                        hide-details="false"
-                      ></v-switch>
-                    </template>
-                  </v-tooltip>
-                </v-col>
+                <v-col cols="3"> </v-col>
               </v-row>
               <v-row no-gutters>
                 <v-col cols="12">
@@ -275,7 +261,6 @@ const targetInfo = reactive({
   gap: propsTargetEdit.target.gap,
   icon: propsTargetEdit.target.icon,
   image: propsTargetEdit.target.image,
-  mission: propsTargetEdit.target.mission,
   comments: propsTargetEdit.target.comments,
   targetStatus: propsTargetEdit.target.targetStatus,
 });

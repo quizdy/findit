@@ -6,14 +6,8 @@
       <v-btn class="ml-1" @click="venueList"
         ><v-icon>mdi-arrow-left-circle</v-icon></v-btn
       >
-      <v-btn class="ml-1" @click="msgDialog = true"
+      <v-btn class="ml-1" @click="openAdminMsgDialog"
         ><v-icon>mdi-email-fast-outline</v-icon></v-btn
-      >
-      <v-btn class="ml-1" @click="missionDialog = true"
-        ><v-icon>mdi-alert-box</v-icon></v-btn
-      >
-      <v-btn class="ml-1" @click="reset"
-        ><v-icon>mdi-rotate-left</v-icon></v-btn
       >
     </v-toolbar>
     <div id="map" v-show="!loading"></div>
@@ -27,60 +21,11 @@
     ></v-progress-circular>
   </v-card>
   <client-only>
-    <v-dialog v-model="msgDialog">
-      <v-card width="100%" max-width="800" class="mx-auto">
-        <v-card-title class="text-h6 justify-center mt-4">
-          メッセージ送信
-        </v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12">
-                <v-textarea
-                  solo
-                  v-model="adminMsg"
-                  label="メッセージ"
-                  variant="solo"
-                ></v-textarea>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <v-select
-                  label="参加者"
-                  :items="attendee"
-                  item-title="userName"
-                  item-value="userId"
-                  v-model="selectedUsers"
-                  variant="solo"
-                  multiple
-                ></v-select>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn
-            color="blue-darken-1"
-            variant="text"
-            @click="
-              closeMsgDialog();
-              sendMsg();
-            "
-          >
-            メッセージ送信
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="blue-darken-1" variant="text" @click="closeMsgDialog">
-            キャンセル
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="missionDialog">
-      <MissionDialog
+    <v-dialog v-model="adminMsgDialog">
+      <AdminMsgDialog
         :venue="propsAdminMap.venue"
-        @closeMissionDialog="closeMissionDialog"
+        @setSnackbar="setSnackbar"
+        @closeAdminMsgDialog="closeAdminMsgDialog"
       />
     </v-dialog>
   </client-only>
@@ -112,30 +57,27 @@ const pollingPosId = ref();
 const pollingMsgId = ref();
 const loading = ref(false);
 
-const msgDialog = ref(false);
-const missionDialog = ref(false);
-const attendee = ref();
-const selectedUsers = ref(<any[]>[]);
-const adminMsg = ref("");
-
 let targetMarkers = ref(<any[]>[]);
 let userMarkers = ref(<any[]>[]);
 
-const { data: resGetUsers } = await useFetch("/api/GetUsers", {
-  method: "GET",
-  params: {
-    venueName: propsAdminMap.venue.venueName,
-  },
-});
+const adminMsgDialog = ref(false);
 
-attendee.value = resGetUsers.value?.users;
-
-const closeMsgDialog = () => {
-  msgDialog.value = false;
+const setSnackbar = (
+  show: boolean,
+  timeout: number,
+  color: string,
+  location: string,
+  msg: string
+) => {
+  emitsAdminMap("setSnackbar", show, timeout, color, location, msg);
 };
 
-const closeMissionDialog = () => {
-  missionDialog.value = false;
+const openAdminMsgDialog = () => {
+  adminMsgDialog.value = true;
+};
+
+const closeAdminMsgDialog = () => {
+  adminMsgDialog.value = false;
 };
 
 onMounted(async () => {
@@ -277,62 +219,6 @@ const stopDrawMap = () => {
 
 const venueList = () => {
   emitsAdminMap("changeComponent", "venueList");
-};
-
-const reset = async () => {
-  await useFetch("/api/ClearPos", {
-    method: "POST",
-    params: {
-      userId: "",
-    },
-  });
-};
-
-const sendMsg = async () => {
-  if (!adminMsg.value) {
-    emitsAdminMap(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "bottom",
-      "メッセージを入力して下さい"
-    );
-    return;
-  }
-
-  if (Object.values(selectedUsers.value).length < 1) {
-    emitsAdminMap(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "bottom",
-      "参加者を指定してください"
-    );
-    return;
-  }
-
-  await useFetch("/api/SendMsg", {
-    method: "POST",
-    body: {
-      venueName: propsAdminMap.venue.venueName,
-      sender: "admin",
-      users: Object.values(selectedUsers.value),
-      msg: adminMsg.value,
-    },
-  });
-
-  emitsAdminMap(
-    "setSnackbar",
-    true,
-    2000,
-    "info",
-    "bottom",
-    "メッセージを送信しました"
-  );
-
-  adminMsg.value = "";
 };
 
 onMounted(() => {
