@@ -15,8 +15,9 @@
           >
             <template v-slot:append>
               <v-btn
-                color="grey-lighten-1"
-                icon="mdi-rotate-left"
+                v-if="target.targetStatus === 2"
+                color="green-lighten-1"
+                icon="mdi-check-bold"
                 variant="text"
                 @click.stop="clearStatus(target.no)"
               ></v-btn>
@@ -69,6 +70,12 @@ const clearStatus = async (targetNo: number) => {
     "bottom",
     "状態を初期化しました"
   );
+
+  const pos = targets.value.findIndex(
+    (_target: any) => _target.no === targetNo
+  );
+
+  targets.value[pos].targetStatus = 0;
 };
 </script>
 

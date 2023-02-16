@@ -158,6 +158,14 @@ const setUserMarker = (userPos: any) => {
 
   userMarker.setMap($gmap.value);
 
+  const infoWindow = new google.maps.InfoWindow({
+    content: "<div class='mx-2'><h3>" + userPos.userName + "</h3></div>",
+  });
+
+  userMarker.addListener("click", () => {
+    infoWindow.open($gmap.value, userMarker);
+  });
+
   userMarkers.value = [
     ...userMarkers.value,
     {
@@ -169,7 +177,7 @@ const setUserMarker = (userPos: any) => {
 
 const showTargetMarker = (no: number) => {
   targetMarkers.value.forEach((_marker) => {
-    if (_marker.no === no + 1) {
+    if (_marker.no <= no + 1) {
       _marker.targetMarker.setVisible(true);
     } else {
       _marker.targetMarker.setVisible(false);
@@ -201,6 +209,14 @@ const setTargetMarker = (target: any) => {
   });
 
   targetMarker.setMap($gmap.value);
+
+  const infoWindow = new google.maps.InfoWindow({
+    content: "<div class='mx-2'><h3>" + target.title + "</h3></div>",
+  });
+
+  targetMarker.addListener("click", () => {
+    infoWindow.open($gmap.value, targetMarker);
+  });
 
   targetMarkers.value = [
     ...targetMarkers.value,
