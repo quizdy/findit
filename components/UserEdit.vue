@@ -49,11 +49,11 @@
             <v-col cols="2">
               <v-btn
                 :disabled="!selectedVenueName"
-                class="mx-2 mt-1"
+                class="mx-3 mt-1"
                 rounded
                 icon
                 @click="openTargetDialog"
-                ><v-icon dense>mdi-sort</v-icon></v-btn
+                ><v-icon dense>mdi-list-box</v-icon></v-btn
               >
             </v-col>
           </v-row>

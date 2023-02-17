@@ -54,7 +54,7 @@
           </v-img>
         </div>
         <div class="frame">
-          <h3 class="my-3">{{ target.title }}</h3>
+          <h3 class="ma-3">{{ target.title }}</h3>
           <div class="comment">
             {{ target.comments }}
           </div>
@@ -99,6 +99,16 @@ const openMsgDialog = () => {
   background-color: #eee;
 }
 
+.layout::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(180deg, #000 0 70%, #fff 90%);
+}
+
 .layout .passive {
   filter: blur(20px);
 }
@@ -121,15 +131,19 @@ const openMsgDialog = () => {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 160px;
-  margin: 0 1rem;
+  height: 240px;
 }
 
 .frame .comment {
   font-size: 0.9rem;
-  height: 100px;
-  width: 100%;
+  height: 160px;
+  width: 90%;
   overflow-y: auto;
+  background: rgba(255, 255, 255, 0.6);
+  margin: 0 auto;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5);
 }
 
 .fade-enter-active,
