@@ -16,7 +16,7 @@
       </v-tabs>
       <v-form>
         <v-window v-model="tab">
-          <v-window-item key="tabInfo" value="tabInfo">
+          <v-window-item key="tabInfo" value="tabInfo" disabled>
             <v-container mt-0 pt-0 style="height: calc(100dvh - 3rem)">
               <v-row no-gutters>
                 <v-col cols="12">
@@ -43,15 +43,13 @@
               </v-row>
               <v-row dense>
                 <v-col cols="6" style="text-align: center">
-                  <v-text-field
-                    v-model.number="targetInfo.gap"
-                    label="誤差"
-                    required
-                    @focus="$event.target.select()"
+                  <v-select
+                    v-model="targetInfo.type"
+                    :items="targetTypes"
+                    variant="solo"
                     hide-details="auto"
-                    inputmode="numeric"
-                  ></v-text-field
-                ></v-col>
+                  ></v-select>
+                </v-col>
                 <v-col cols="6" style="text-align: center">
                   <v-select
                     v-model="targetInfo.icon"
@@ -123,75 +121,98 @@
               </v-row>
             </v-container>
           </v-window-item>
-          <v-window-item key="tabCamera" value="tabCamera">
-            <v-sheet class="d-flex flex-column">
-              <v-container mt-0 pt-0>
-                <v-row no-gutters>
-                  <v-col cols="12">
-                    <div class="layout">
-                      <v-progress-circular
-                        v-show="loading"
-                        indeterminate
-                        color="light-blue"
-                        :size="70"
-                        :width="7"
-                        style="margin: 50% calc(50% - 2rem)"
-                      ></v-progress-circular>
-                      <video
-                        id="webcam"
-                        class="d-none"
-                        autoplay
-                        muted
-                        playsinline
-                        :height="imageHeight"
-                        :width="imageWidth"
-                      ></video>
-                      <canvas
-                        v-show="!loading"
-                        id="webcamCanvas"
-                        class="webcamCanvas"
-                        :height="imageHeight"
-                        :width="imageWidth"
-                      ></canvas>
-                      <img
-                        class="targetImage"
-                        :src="targetInfo.image"
-                        :style="{
-                          opacity: scan.opacity / 100,
-                          height: imageHeight,
-                          width: imageWidth,
-                        }"
-                      />
-                      <v-slider
-                        :disabled="!targetInfo.image"
-                        class="mx-8 slider"
-                        direction="vertical"
-                        max="100"
-                        min="0"
-                        color="blue"
-                        dense
-                        v-model="scan.opacity"
-                      ></v-slider>
-                    </div>
-                  </v-col>
-                </v-row>
-                <v-row dense>
-                  <v-col cols="6">
-                    <v-btn
-                      v-if="targetInfo.image"
-                      class="ma-4"
-                      @click="scanImage"
-                      ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
+          <v-window-item key="tabCamera" value="tabCamera" disabled>
+            <v-container mt-0 pt-0 style="height: calc(100dvh - 3rem)">
+              <v-row no-gutters>
+                <v-col cols="12">
+                  <div class="layout">
+                    <v-progress-circular
+                      v-show="loading"
+                      indeterminate
+                      color="light-blue"
+                      :size="70"
+                      :width="7"
+                      style="margin: 50% calc(50% - 2rem)"
+                    ></v-progress-circular>
+                    <video
+                      id="webcam"
+                      class="d-none"
+                      autoplay
+                      muted
+                      playsinline
+                      :height="imageHeight"
+                      :width="imageWidth"
+                    ></video>
+                    <canvas
+                      v-show="!loading"
+                      id="webcamCanvas"
+                      class="webcamCanvas"
+                      :height="imageHeight"
+                      :width="imageWidth"
+                    ></canvas>
+                    <img
+                      class="targetImage"
+                      :src="targetInfo.image"
+                      :style="{
+                        opacity: scan.opacity / 100,
+                        height: imageHeight,
+                        width: imageWidth,
+                      }"
+                    />
+                    <v-slider
+                      :disabled="!targetInfo.image"
+                      class="mx-8 slider"
+                      direction="vertical"
+                      max="100"
+                      min="0"
+                      color="blue"
+                      dense
+                      v-model="scan.opacity"
+                    ></v-slider>
+                  </div>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col>
+                  <div class="d-flex align-center">
+                    <small>基準</small>
+                    <v-slider
+                      :disabled="!targetInfo.image"
+                      class="mx-8 slider"
+                      max="100"
+                      min="0"
+                      color="blue"
+                      dense
+                      hide-details="auto"
+                      v-model="targetInfo.gap"
+                      :step="1"
                     >
-                  </v-col>
-                  <v-col cols="6" style="text-align: right">
-                    <v-btn class="ma-4" @click="saveImage"
-                      ><v-icon>mdi-content-save</v-icon>保存する</v-btn
+                      <template v-slot:append>
+                        <small>{{ targetInfo.gap }}</small>
+                      </template>
+                    </v-slider>
+
+                    <v-btn icon :disabled="!targetInfo.image"
+                      ><v-icon size="x-small" @click="mask"
+                        >mdi-pen</v-icon
+                      ></v-btn
                     >
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-sheet>
+                  </div>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-btn v-if="targetInfo.image" class="ma-4" @click="scanImage"
+                    ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
+                  >
+                </v-col>
+                <v-col cols="6" style="text-align: right">
+                  <v-btn class="ma-4" @click="saveImage"
+                    ><v-icon>mdi-content-save</v-icon>保存する</v-btn
+                  >
+                </v-col>
+              </v-row>
+            </v-container>
           </v-window-item>
         </v-window>
       </v-form>
@@ -259,6 +280,7 @@ const targetInfo = reactive({
   lat: propsTargetEdit.target.lat,
   lng: propsTargetEdit.target.lng,
   gap: propsTargetEdit.target.gap,
+  type: propsTargetEdit.target.type,
   icon: propsTargetEdit.target.icon,
   image: propsTargetEdit.target.image,
   comments: propsTargetEdit.target.comments,
@@ -283,6 +305,25 @@ const loading = ref(false);
 
 const imageHeight = 800;
 const imageWidth = 600;
+
+const targetTypes = [
+  {
+    title: "通常",
+    value: "",
+  },
+  {
+    title: "追加",
+    value: "additional",
+  },
+  {
+    title: "パスコード",
+    value: "passcode",
+  },
+  {
+    title: "位置",
+    value: "position",
+  },
+];
 
 const showMap = () => {
   if (latLng.value === "" || latLng.value.indexOf(",") < 0) return;
@@ -554,6 +595,17 @@ const showProgress = () => {
   }, 100);
 };
 
+const mask = () => {
+  emitsTargetEdit(
+    "setSnackbar",
+    true,
+    -1,
+    "success",
+    "bottom",
+    "黒色でマスキングできるようにする（フリーハンド）。マスキングした箇所を写真とは別のイメージファイルとして保持して、比較するときにターゲット画像と写真画像のそれぞれにマスキング画像を合成して、比較することでマスキング箇所は同じ黒のため結果、マスキング以外が比較されることになるのでスキャンの精度が上がるはず。ただ実装が結構大変になる"
+  );
+};
+
 defineExpose({
   stopVideo,
 });
@@ -565,7 +617,6 @@ defineExpose({
   height: calc(100dvh - 13.6rem);
   width: 100%;
 }
-
 .layout .webcamCanvas,
 .layout .targetImage {
   position: absolute;
@@ -576,7 +627,6 @@ defineExpose({
   height: 100%;
   width: 100%;
 }
-
 .layout .slider {
   display: flex;
   position: absolute;
@@ -585,5 +635,6 @@ defineExpose({
   margin: 0;
   padding: 3rem 2rem;
   height: 100%;
+  box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
 }
 </style>

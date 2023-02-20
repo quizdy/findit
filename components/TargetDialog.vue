@@ -47,10 +47,20 @@ const propsTargetDialog = defineProps<{
   user: any;
 }>();
 
-const targets = ref(propsTargetDialog.user.venue.targets);
+const targets = ref(
+  propsTargetDialog.user.venue.targets.filter(
+    (_target: any) => _target.type === ""
+  )
+);
 
 const onEnd = () => {
-  emitsTargetDialog("setSortTargets", targets.value);
+  const mission = propsTargetDialog.user.venue.targets.filter(
+    (_target: any) => _target.type !== ""
+  );
+
+  const sortTargets = targets.value.concat(mission);
+
+  emitsTargetDialog("setSortTargets", sortTargets);
 };
 
 const clearStatus = async (targetNo: number) => {

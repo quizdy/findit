@@ -42,6 +42,7 @@ const emitsAdminLogin = defineEmits<{
   (e: "changeComponent", componentName: string): void;
 }>();
 
+const $config = useRuntimeConfig();
 const adminId = ref("");
 
 const validateCheck = () => {
@@ -53,10 +54,26 @@ const validateCheck = () => {
 
 const adminLogin = async () => {
   if (!adminId.value) {
+    emitsAdminLogin(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "top",
+      "パスワードを入力して下さい"
+    );
     return;
   }
 
-  if (adminId.value !== "admin") {
+  if (adminId.value !== $config.ADMIN_PASSWORD) {
+    emitsAdminLogin(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "top",
+      "パスワードが違います"
+    );
     return;
   }
 

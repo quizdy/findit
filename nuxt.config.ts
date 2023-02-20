@@ -3,6 +3,7 @@ export default {
   runtimeConfig: {
     public: {
       GMAP_API_KEY: process.env.GMAP_API_KEY || "AIzaSyCYsLDv3eHNGZ-HFcXUjoA5r442Aj10ND0",
+      ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || "admin",
       ICONS: [{
         title: "アイコン１",
         value: "/images/treasure1.png",

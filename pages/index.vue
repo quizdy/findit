@@ -60,7 +60,7 @@
         v-model="snackbar.show"
         :timeout="snackbar.timeout"
         :color="snackbar.color"
-        location="top"
+        :location="snackbar.location"
         @click="snackbar.show = false"
       >
         {{ snackbar.msg }}
@@ -223,7 +223,11 @@ const nextTarget = async () => {
   updateStatus(target.no, 2);
   userInfo.venue.pos++;
 
-  if (userInfo.venue.pos < userInfo.venue.targets.length) {
+  const normaltTarget = userInfo.venue.targets.filter(
+    (_target: any) => _target.type === ""
+  );
+
+  if (userInfo.venue.pos < normaltTarget.length) {
     userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
   } else {
     await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -380,8 +384,8 @@ const initGetMsg = () => {
     });
     const message = (res.value as any)?.message;
     if (message) {
-      if (message === "mission") {
-        alert("mission");
+      if (message.startsWith("#")) {
+        alert("mission" + message);
       } else {
         setSnackbar(true, -1, "info", "top", message);
       }

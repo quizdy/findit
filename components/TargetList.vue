@@ -103,6 +103,7 @@ const addTarget = () => {
     lat: 0,
     lng: 0,
     gap: 60,
+    type: "",
     icon: $config.ICONS[0].value,
     image: "",
     comments: "",

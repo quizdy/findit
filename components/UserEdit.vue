@@ -154,19 +154,31 @@ const getVenue = async () => {
 
   userInfo.venue = (resGetVenue.value as any).venue;
 
-  if (userInfo.venue.targets.length < 1) {
+  const targets = userInfo.venue.targets.filter(
+    (_target: any) => _target.type === ""
+  );
+
+  if (targets.length < 1) {
     emitsUserEdit(
       "setSnackbar",
       true,
       2000,
       "warning",
       "bottom",
-      "指定した会場にはターゲットの登録がありません"
+      "指定した会場には通常のターゲットの登録がありません"
     );
     selectedVenueName.value = "";
     userInfo.venue.venueName = "";
     return;
   }
+
+  const mission = userInfo.venue.targets.filter(
+    (_target: any) => _target.type !== ""
+  );
+
+  const sortTargets = targets.concat(mission);
+
+  userInfo.venue.targets = sortTargets;
 };
 
 const confirmUpdateUser = () => {

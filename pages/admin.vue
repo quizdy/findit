@@ -126,6 +126,7 @@ const targetInfo = reactive({
   lat: 0.0,
   lng: 0.0,
   gap: 0,
+  type: "",
   icon: "",
   image: "",
   comments: "",
@@ -220,6 +221,7 @@ const setTargetInfo = (target: any) => {
   targetInfo.lat = target.lat;
   targetInfo.lng = target.lng;
   targetInfo.gap = target.gap;
+  targetInfo.type = target.type;
   targetInfo.icon = target.icon;
   targetInfo.image = target.image;
   targetInfo.comments = target.comments;

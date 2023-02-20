@@ -69,10 +69,12 @@ onMounted(async () => {
   $gmap.value.setMapTypeId("noText");
 
   propsTargetMap.user.venue.targets.forEach((target: any) => {
-    setTargetMarker(target);
+    if (target.type === "") {
+      setTargetMarker(target);
+    }
   });
 
-  showTargetMarker(propsTargetMap.user.venue.pos);
+  showTargetMarker();
 
   google.maps.event.addListener($gmap.value, "zoom_changed", () => {
     zoom.value = $gmap.value?.getZoom();
@@ -175,9 +177,9 @@ const setUserMarker = (userPos: any) => {
   ];
 };
 
-const showTargetMarker = (no: number) => {
-  targetMarkers.value.forEach((_marker) => {
-    if (_marker.no <= no + 1) {
+const showTargetMarker = () => {
+  targetMarkers.value.forEach((_marker, index) => {
+    if (index === 0 || _marker.targetStatus !== 0) {
       _marker.targetMarker.setVisible(true);
     } else {
       _marker.targetMarker.setVisible(false);
@@ -222,6 +224,7 @@ const setTargetMarker = (target: any) => {
     ...targetMarkers.value,
     {
       no: target.no,
+      targetStatus: target.targetStatus,
       targetMarker: targetMarker,
     },
   ];

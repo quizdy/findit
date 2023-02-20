@@ -25,7 +25,11 @@
         },
       }"
     >
-      <SwiperSlide v-for="(target, i) in targets" :key="i">
+      <SwiperSlide
+        v-for="(target, i) in targets"
+        :key="i"
+        v-show="target.type === ''"
+      >
         <div class="layout">
           <transition name="fade">
             <v-icon
@@ -54,7 +58,7 @@
           </v-img>
         </div>
         <div class="frame">
-          <h3 class="ma-3">{{ target.title }}</h3>
+          <h3 class="pa-2">{{ target.title }}</h3>
           <div class="comment">
             {{ target.comments }}
           </div>
@@ -131,19 +135,20 @@ const openMsgDialog = () => {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 240px;
+  height: 180px;
+  width: calc(100% - 2.5rem);
+  background: rgba(255, 255, 255, 0.6);
+  margin: 0 0.75rem 0.5rem 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5);
 }
 
 .frame .comment {
   font-size: 0.9rem;
-  height: 160px;
-  width: 90%;
+  height: 130px;
+  width: 100%;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.6);
-  margin: 0 auto;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5);
 }
 
 .fade-enter-active,
