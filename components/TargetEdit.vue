@@ -562,6 +562,8 @@ const saveImage = () => {
     "bottom",
     "保存しました"
   );
+
+  scan.opacity = 100;
 };
 
 const scanImage = () => {
@@ -635,6 +637,5 @@ defineExpose({
   margin: 0;
   padding: 3rem 2rem;
   height: 100%;
-  box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
 }
 </style>

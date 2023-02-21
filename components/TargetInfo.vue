@@ -28,7 +28,7 @@
       <SwiperSlide
         v-for="(target, i) in targets"
         :key="i"
-        v-show="target.type === ''"
+        v-show="target.type === '' || target.targetStatus === 1"
       >
         <div class="layout">
           <transition name="fade">
@@ -38,6 +38,15 @@
               color="success"
               class="check"
               >mdi-check-circle</v-icon
+            >
+          </transition>
+          <transition name="fade">
+            <v-icon
+              v-show="target.targetStatus === 2"
+              size="10rem"
+              color="white"
+              class="circle"
+              >mdi-circle</v-icon
             >
           </transition>
           <v-img
@@ -122,13 +131,23 @@ const openMsgDialog = () => {
   filter: opacity(50%);
 }
 
-.layout .check {
+.layout .check,
+.layout .circle {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
+  opacity: 0.7;
+}
+
+.layout .circle {
+  z-index: 2;
+}
+
+.layout .check {
+  z-index: 3;
 }
 
 .frame {

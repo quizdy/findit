@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-const emitsTargetDialog = defineEmits<{
+const emitsTargetListDialog = defineEmits<{
   (
     e: "setSnackbar",
     show: boolean,
@@ -40,39 +40,39 @@ const emitsTargetDialog = defineEmits<{
     msg: string
   ): void;
   (e: "setSortTargets", targets: any[]): void;
-  (e: "closeTargetDialog"): void;
+  (e: "closeTargetListDialog"): void;
 }>();
 
-const propsTargetDialog = defineProps<{
+const propsTargetListDialog = defineProps<{
   user: any;
 }>();
 
 const targets = ref(
-  propsTargetDialog.user.venue.targets.filter(
+  propsTargetListDialog.user.venue.targets.filter(
     (_target: any) => _target.type === ""
   )
 );
 
 const onEnd = () => {
-  const mission = propsTargetDialog.user.venue.targets.filter(
+  const mission = propsTargetListDialog.user.venue.targets.filter(
     (_target: any) => _target.type !== ""
   );
 
   const sortTargets = targets.value.concat(mission);
 
-  emitsTargetDialog("setSortTargets", sortTargets);
+  emitsTargetListDialog("setSortTargets", sortTargets);
 };
 
 const clearStatus = async (targetNo: number) => {
   await useFetch("/api/UpdateStatus", {
     method: "POST",
     body: {
-      userId: propsTargetDialog.user.userId,
+      userId: propsTargetListDialog.user.userId,
       no: targetNo,
       targetStatus: 0,
     },
   });
-  emitsTargetDialog(
+  emitsTargetListDialog(
     "setSnackbar",
     true,
     2000,

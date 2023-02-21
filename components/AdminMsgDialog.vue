@@ -13,7 +13,7 @@
         <v-container>
           <v-row>
             <v-col>
-              <v-select
+              <v-autocomplete
                 label="参加者"
                 :items="attendee"
                 item-title="userName"
@@ -22,7 +22,26 @@
                 variant="solo"
                 multiple
                 hide-details="auto"
-              ></v-select>
+                chips
+                closable-chips
+                color="blue-grey-lighten-2"
+              >
+                <template v-slot:chip="{ props, item }">
+                  <v-chip
+                    v-bind="props"
+                    :prepend-avatar="item.raw.image"
+                    :text="item.raw.userName"
+                  ></v-chip>
+                </template>
+
+                <template v-slot:item="{ props, item }">
+                  <v-list-item
+                    v-bind="props"
+                    :prepend-avatar="item?.raw?.image"
+                    :title="item?.raw?.userName"
+                  ></v-list-item>
+                </template>
+              </v-autocomplete>
             </v-col>
           </v-row>
           <v-row>
@@ -55,9 +74,13 @@
         </v-container>
       </v-window-item>
       <v-window-item key="tabMission" value="tabMission">
-        <v-list lines="two">
+        <v-list lines="two" class="pa-0">
           <v-list-item
             v-for="(mission, i) in missions"
+            class="py-3"
+            :style="
+              i < missions.length - 1 ? 'border-bottom: 1px solid #eee;' : ''
+            "
             :key="i"
             :value="mission"
             :title="mission.title"

@@ -14,10 +14,13 @@
           ><v-icon>mdi-plus-circle</v-icon></v-btn
         >
       </v-toolbar>
-      <v-list>
-        <v-list-item v-if="targets.length === 0">No Target</v-list-item>
+      <v-list class="pa-0" style="height: calc(100dvh - 64px)">
         <v-list-item
           v-for="(target, i) in targets"
+          class="py-3"
+          :style="
+            i < targets.length - 1 ? 'border-bottom: 1px solid #eee;' : ''
+          "
           :key="i"
           :value="target"
           :title="target.title"

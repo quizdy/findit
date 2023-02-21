@@ -11,10 +11,11 @@
           ><v-icon>mdi-plus-circle</v-icon></v-btn
         >
       </v-toolbar>
-      <v-list>
-        <v-list-item v-if="venues.length === 0">No Venue</v-list-item>
+      <v-list class="pa-0" style="height: calc(100dvh - 64px)">
         <v-list-item
           v-for="(venue, i) in venues"
+          class="py-3"
+          :style="i < venues.length - 1 ? 'border-bottom: 1px solid #eee;' : ''"
           :key="i"
           :value="venue"
           :title="venue.venueName"

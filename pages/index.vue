@@ -50,7 +50,7 @@
         <v-icon>mdi-magnify-scan</v-icon>
         <span>Scan</span>
       </v-btn>
-      <v-btn @click="confirmDialog = true">
+      <v-btn @click="logoutDialog = true">
         <v-icon>mdi-door</v-icon>
         <span>Exit</span>
       </v-btn>
@@ -72,35 +72,20 @@
           @closeMsgDialog="closeMsgDialog"
         />
       </v-dialog>
-      <v-dialog v-model="confirmDialog" persistent>
-        <v-card max-width="600" class="mx-auto">
-          <v-card-title class="text-h5"> 終了 </v-card-title>
-          <v-card-text>終了します。よろしいですか？</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="green-darken-1"
-              variant="text"
-              @click="
-                closeConfirmDialog();
-                clearPos();
-                reload();
-              "
-            >
-              はい
-            </v-btn>
-            <v-btn
-              color="green-darken-1"
-              variant="text"
-              @click="
-                closeConfirmDialog();
-                changeComponent('targetInfo');
-              "
-            >
-              いいえ
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+      <v-dialog v-model="missionDialog" persistent>
+        <MissionDialog
+          :user="userInfo"
+          :mission="mission"
+          @setSnackbar="setSnackbar"
+          @closeMissionDialog="closeMissionDialog"
+        />
+      </v-dialog>
+      <v-dialog v-model="logoutDialog" persistent>
+        <LogoutDialog
+          @closeLogoutDialog="closeLogoutDialog"
+          @changeComponent="changeComponent"
+          @clearPos="clearPos"
+        />
       </v-dialog>
     </client-only>
     <!-- admin link -->
@@ -139,9 +124,11 @@ const snackbar = reactive({
 });
 
 const attendee = ref([]);
+const mission = ref();
 
 const msgDialog = ref(false);
-const confirmDialog = ref(false);
+const missionDialog = ref(false);
+const logoutDialog = ref(false);
 
 const refTargetMap = ref();
 const refTargetScan = ref();
@@ -195,12 +182,12 @@ const closeMsgDialog = () => {
   msgDialog.value = false;
 };
 
-const closeConfirmDialog = () => {
-  confirmDialog.value = false;
+const closeMissionDialog = () => {
+  missionDialog.value = false;
 };
 
-const reload = () => {
-  location.reload();
+const closeLogoutDialog = () => {
+  logoutDialog.value = false;
 };
 
 const setUserInfo = (user: any) => {
@@ -385,7 +372,12 @@ const initGetMsg = () => {
     const message = (res.value as any)?.message;
     if (message) {
       if (message.startsWith("#")) {
-        alert("mission" + message);
+        const no = message.substring(1);
+        const pos = userInfo.venue.targets.findIndex(
+          (_target: any) => _target.no === Number(no)
+        );
+        mission.value = userInfo.venue.targets[pos];
+        missionDialog.value = true;
       } else {
         setSnackbar(true, -1, "info", "top", message);
       }

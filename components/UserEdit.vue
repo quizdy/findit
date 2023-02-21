@@ -52,7 +52,7 @@
                 class="mx-3 mt-1"
                 rounded
                 icon
-                @click="openTargetDialog"
+                @click="openTargetListDialog"
                 ><v-icon dense>mdi-list-box</v-icon></v-btn
               >
             </v-col>
@@ -80,12 +80,12 @@
     </v-card>
   </div>
   <client-only>
-    <v-dialog v-model="targetSortDialog">
-      <TargetDialog
+    <v-dialog v-model="targetListDialog">
+      <TargetListDialog
         :user="userInfo"
         @setSnackbar="setSnackbar"
         @setSortTargets="setSortTargets"
-        @closeTargetDialog="targetSortDialog = false"
+        @closeTargetListDialog="targetListDialog = false"
       />
     </v-dialog>
   </client-only>
@@ -126,7 +126,7 @@ const userInfo = reactive({
 
 const venuesInfo = ref(<any[]>[]);
 const selectedVenueName = ref(propsUserList.user.venue.venueName);
-const targetSortDialog = ref(false);
+const targetListDialog = ref(false);
 
 const { data: resGetVenues } = await useFetch("/api/GetVenues", {
   method: "GET",
@@ -237,8 +237,8 @@ const cancelUser = () => {
   emitsUserEdit("changeComponent", "userList");
 };
 
-const openTargetDialog = () => {
-  targetSortDialog.value = true;
+const openTargetListDialog = () => {
+  targetListDialog.value = true;
 };
 
 const setSortTargets = (targets: any[]) => {
