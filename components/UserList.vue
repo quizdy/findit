@@ -19,6 +19,7 @@
           :key="i"
           :value="user"
           :title="user.userName"
+          :subtitle="user.venue.venueName"
           :prepend-avatar="user.image"
           @click="selectedUser(user)"
         >
