@@ -478,10 +478,6 @@ const startVideo = async () => {
     DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
   ).requestPermission;
 
-  const aaa = await navigator.mediaDevices.enumerateDevices()
-  for(let i = 0; i < aaa.length; i++) {
-    console.log("device:", aaa[i])
-  }
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
     (device) =>
       device.kind === "videoinput" &&
