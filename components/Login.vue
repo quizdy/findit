@@ -42,7 +42,7 @@ const emitsLogin = defineEmits<{
     location: string,
     msg: string
   ): void;
-  (e: "setUserInfo", user: any): void;
+  (e: "login", userId: string): void;
 }>();
 
 const userId = ref("");
@@ -74,51 +74,8 @@ const validateCheck = () => {
   }
 };
 
-const login = async () => {
-  if (!userId.value) {
-    emitsLogin(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "top",
-      "ユーザＩＤを入力して下さい"
-    );
-    return;
-  }
-
-  const { data: resGetUser } = await useFetch("/api/GetUser", {
-    method: "GET",
-    params: { userId: userId.value },
-  });
-
-  if (!resGetUser.value.userId) {
-    emitsLogin(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "top",
-      "ユーザが見つかりませんでした"
-    );
-    return;
-  }
-
-  const user = resGetUser.value;
-
-  if (user.venue.targets.length === 0) {
-    emitsLogin(
-      "setSnackbar",
-      true,
-      2000,
-      "warning",
-      "top",
-      "ターゲットが登録されていません"
-    );
-    return;
-  }
-
-  emitsLogin("setUserInfo", user);
+const login = () => {
+  emitsLogin("login", userId.value);
 };
 
 const sliderInterval = ref();

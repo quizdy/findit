@@ -24,9 +24,17 @@
       <Login
         v-if="currentComponent === 'login'"
         @setSnackbar="setSnackbar"
-        @setUserInfo="setUserInfo"
+        @login="login"
       />
       <Finish v-if="currentComponent === 'finish'" />
+      <v-progress-circular
+        v-show="loading"
+        class="loading"
+        indeterminate
+        color="light-blue"
+        :size="70"
+        :width="7"
+      ></v-progress-circular>
     </v-main>
     <v-bottom-navigation
       v-model="currentComponent"
@@ -123,6 +131,8 @@ const snackbar = reactive({
   msg: "",
 });
 
+const loading = ref(false);
+
 const attendee = ref([]);
 const mission = ref();
 
@@ -190,7 +200,31 @@ const closeLogoutDialog = () => {
   logoutDialog.value = false;
 };
 
-const setUserInfo = (user: any) => {
+const login = async (userId: string) => {
+  loading.value = true;
+
+  if (!userId) {
+    setSnackbar(true, 2000, "warning", "top", "ユーザＩＤを入力して下さい");
+    return;
+  }
+
+  const { data: resGetUser } = await useFetch("/api/GetUser", {
+    method: "GET",
+    params: { userId: userId },
+  });
+
+  if (!resGetUser.value.userId) {
+    setSnackbar(true, 2000, "warning", "top", "ユーザが見つかりませんでした");
+    return;
+  }
+
+  const user = resGetUser.value;
+
+  if (user.venue.targets.length === 0) {
+    setSnackbar(true, 2000, "warning", "top", "ターゲットが登録されていません");
+    return;
+  }
+
   userInfo.userId = user.userId;
   userInfo.userName = user.userName;
   userInfo.image = user.image;
@@ -198,6 +232,8 @@ const setUserInfo = (user: any) => {
   userInfo.venue = user.venue;
 
   changeComponent("targetInfo");
+
+  loading.value = false;
 };
 
 const nextTarget = async () => {
@@ -395,28 +431,34 @@ const initMedia = async () => {
     return;
   }
 
-  const constraints = {
-    audio: false,
-    video: { facingMode: { exact: "environment" } },
-  };
-
-  const requestPermission = (
-    DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
-  ).requestPermission;
-
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
-    (device) =>
-      device.kind === "videoinput" &&
-      (device.label.toLowerCase().includes("usb") ||
-        device.label.toLowerCase().includes("webcam"))
+    (device) => device.kind === "videoinput"
   );
 
-  if (0 < devices.length) {
-    (constraints.video as any) = true;
+  if (devices.length === 0) {
+    setSnackbar(
+      true,
+      2000,
+      "warning",
+      "bottom",
+      "カメラデバイスが見つかりませんでした"
+    );
+    return;
   }
 
-  if (typeof requestPermission === "function") {
-    (constraints.video as any) = { facingMode: { exact: "environment" } };
+  const constraints = {
+    audio: false,
+    video: {},
+  };
+
+  if (navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i) !== null) {
+    (constraints.video as any) = {
+      facingMode: {
+        exact: "environment",
+      },
+    };
+  } else {
+    (constraints.video as any) = true;
   }
 
   navigator.mediaDevices
@@ -454,6 +496,16 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  opacity: 0.8;
+  z-index: 999;
+}
 .admin-icon {
   position: fixed;
   bottom: 0.5rem;

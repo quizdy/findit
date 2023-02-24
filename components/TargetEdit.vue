@@ -462,47 +462,52 @@ const startVideo = async () => {
       true,
       2000,
       "warning",
-      "bottom",
+      "top",
       "カメラデバイスが無効です"
     );
     loading.value = false;
     return;
   }
 
-  const constraints = {
-    audio: false,
-    video: { facingMode: { exact: "environment" } },
-  };
-
-  const requestPermission = (
-    DeviceOrientationEvent as unknown as DeviceOrientationEventiOS
-  ).requestPermission;
-
   const devices = (await navigator.mediaDevices.enumerateDevices()).filter(
-    (device) =>
-      device.kind === "videoinput" &&
-      (device.label.toLowerCase().includes("usb") ||
-        device.label.toLowerCase().includes("webcam"))
+    (device) => device.kind === "videoinput"
   );
 
-  if (0 < devices.length) {
-    (constraints.video as any) = true;
-  } else {
+  if (devices.length === 0) {
     emitsTargetEdit(
       "setSnackbar",
       true,
       2000,
       "warning",
-      "bottom",
+      "top",
       "カメラデバイスが見つかりませんでした"
     );
+    return;
   }
 
-  if (typeof requestPermission === "function") {
-    (constraints.video as any) = { facingMode: { exact: "environment" } };
+  const constraints = {
+    audio: false,
+    video: {},
+  };
+
+  if (navigator.userAgent.match(/(iPhone|iPad|iPod|Android)/i) !== null) {
+    (constraints.video as any) = {
+      facingMode: {
+        exact: "environment",
+      },
+    };
+  } else {
+    (constraints.video as any) = true;
   }
 
-  stream.value = await navigator.mediaDevices.getUserMedia(constraints);
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then((st) => {
+      stream.value = st;
+    })
+    .catch((e) => {
+      emitsTargetEdit("setSnackbar", true, 2000, "warning", "top", e.name);
+    });
 
   const webcam = document.getElementById("webcam") as HTMLVideoElement;
   const webcamCanvas = document.getElementById(
