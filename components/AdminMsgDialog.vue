@@ -86,13 +86,21 @@
             :title="mission.title"
             :subtitle="mission.comments"
             :prepend-avatar="mission.image"
-            @click="selectedMission(mission)"
+            @click="
+              selectedMission = mission;
+              confirmDialog = true;
+            "
           >
           </v-list-item>
         </v-list>
       </v-window-item>
     </v-window>
   </v-card>
+  <client-only>
+    <v-dialog v-model="confirmDialog">
+      <ComfirmDialog title="ミッション発動" @ret="doMission" />
+    </v-dialog>
+  </client-only>
 </template>
 
 <script setup lang="ts">
@@ -117,6 +125,8 @@ const selectedUsers = ref(<any[]>[]);
 const adminMsg = ref("");
 const attendee = ref();
 const missions = ref();
+const selectedMission = ref();
+const confirmDialog = ref(false);
 
 const { data: resGetUsers } = await useFetch("/api/GetUsers", {
   method: "GET",
@@ -183,16 +193,19 @@ const sendAdminMsg = async () => {
   adminMsg.value = "";
 };
 
-const selectedMission = async (mission: any) => {
-  await useFetch("/api/SendMsg", {
-    method: "POST",
-    body: {
-      venueName: propsAdminMsgDialog.venue.venueName,
-      sender: "admin",
-      users: attendee.value.map((_user: any) => _user["userId"]),
-      msg: "#" + mission.no,
-    },
-  });
+const doMission = async (ret: boolean) => {
+  if (ret) {
+    await useFetch("/api/SendMsg", {
+      method: "POST",
+      body: {
+        venueName: propsAdminMsgDialog.venue.venueName,
+        sender: "admin",
+        users: attendee.value.map((_user: any) => _user["userId"]),
+        msg: "#" + selectedMission.value,
+      },
+    });
+  }
+  confirmDialog.value = false;
 };
 
 const closeAdminMsgDialog = () => {
