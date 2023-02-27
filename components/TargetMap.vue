@@ -68,9 +68,9 @@ onMounted(async () => {
   $gmap.value.mapTypes.set("noText", styledMapType);
   $gmap.value.setMapTypeId("noText");
 
-  propsTargetMap.user.venue.targets.forEach((target: any) => {
-    if (target.type === "") {
-      setTargetMarker(target);
+  propsTargetMap.user.venue.targets.forEach((_target: any) => {
+    if (_target.type === "" || _target.targetStatus === 1) {
+      setTargetMarker(_target);
     }
   });
 
@@ -83,10 +83,22 @@ onMounted(async () => {
   const usersPos = await getUsersPos();
   const myself = usersPos.filter(
     (_userPos) => _userPos.userId === propsTargetMap.user.userId
-  )[0];
-  setUserPos(myself);
-  const latLng = new google.maps.LatLng(myself.gps.lat, myself.gps.lng);
-  $gmap.value?.panTo(latLng);
+  );
+
+  if (myself.length === 1) {
+    setUserPos(myself[0]);
+    const latLng = new google.maps.LatLng(myself[0].gps.lat, myself[0].gps.lng);
+    $gmap.value?.panTo(latLng);
+  } else {
+    emitsTargetMap(
+      "setSnackbar",
+      true,
+      2000,
+      "warning",
+      "top",
+      "位置情報が取得できませんでした"
+    );
+  }
 
   // new google.maps.Circle({
   //   map: $gmap.value,
@@ -178,10 +190,24 @@ const setUserMarker = (userPos: any) => {
 };
 
 const showTargetMarker = () => {
-  targetMarkers.value.forEach((_marker, index) => {
-    if (index === 0 || _marker.targetStatus !== 0) {
+  targetMarkers.value.forEach((_marker) => {
+    if (_marker.targetStatus === 1) {
+      _marker.targetMarker.setVisible(true);
+    } else if (_marker.targetStatus === 2) {
       _marker.targetMarker.setVisible(true);
     } else {
+      const t =
+        propsTargetMap.user.venue.targets[propsTargetMap.user.venue.pos];
+      if (t.targetStatus === 0) {
+        emitsTargetMap(
+          "setSnackbar",
+          true,
+          2000,
+          "warning",
+          "top",
+          t.title + "の場所が特定できません"
+        );
+      }
       _marker.targetMarker.setVisible(false);
     }
   });

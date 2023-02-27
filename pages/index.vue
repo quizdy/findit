@@ -1,11 +1,16 @@
 <template>
   <v-app>
-    <v-main>
+    <v-main
+      ><v-btn @click="showMissionDialog('#2')" style="position: absolute"
+        >aaa</v-btn
+      >
       <TargetInfo
         v-if="currentComponent === 'targetInfo'"
         :user="userInfo"
         @setSnackbar="setSnackbar"
         @openMsgDialog="openMsgDialog"
+        @onSlideChange="onSlideChange"
+        ref="refTargetInfo"
       />
       <TargetMap
         v-if="currentComponent === 'targetMap'"
@@ -80,7 +85,11 @@
           @closeMsgDialog="closeMsgDialog"
         />
       </v-dialog>
-      <v-dialog v-model="missionDialog" persistent>
+      <v-dialog
+        v-model="missionDialog"
+        persistent
+        style="background: rgba(0, 0, 0, 0.5)"
+      >
         <MissionDialog
           :user="userInfo"
           :mission="mission"
@@ -140,6 +149,7 @@ const msgDialog = ref(false);
 const missionDialog = ref(false);
 const logoutDialog = ref(false);
 
+const refTargetInfo = ref();
 const refTargetMap = ref();
 const refTargetScan = ref();
 const pollingMsgId = ref();
@@ -231,9 +241,22 @@ const login = async (userId: string) => {
   userInfo.comments = user.comments;
   userInfo.venue = user.venue;
 
+  if (!userInfo.venue.targets.some((_target) => _target.targetStatus === 1)) {
+    userInfo.venue.targets[0].targetStatus = 1;
+  }
+
+  for (let i = 0; i < userInfo.venue.targets.length; i++) {
+    let aaa = userInfo.venue.targets[i];
+    console.log(aaa.title, aaa.targetStatus);
+  }
+
   changeComponent("targetInfo");
 
   loading.value = false;
+};
+
+const onSlideChange = (activeIndex: number) => {
+  userInfo.venue.pos = activeIndex;
 };
 
 const nextTarget = async () => {
@@ -244,18 +267,19 @@ const nextTarget = async () => {
   target.targetStatus = 2;
   broadMsg("「" + target.title + "」を発見しました。");
   updateStatus(target.no, 2);
-  userInfo.venue.pos++;
 
-  const normaltTarget = userInfo.venue.targets.filter(
-    (_target: any) => _target.type === ""
+  userInfo.venue.pos = userInfo.venue.targets.findIndex(
+    (_target: any) => _target.type === "" || _target.targetStatus === 0
   );
 
-  if (userInfo.venue.pos < normaltTarget.length) {
-    userInfo.venue.targets[userInfo.venue.pos].targetStatus = 1;
-  } else {
+  if (userInfo.venue.pos < 0) {
     await new Promise((resolve) => setTimeout(resolve, 3000));
     broadMsg("すべてのターゲットを発見しました。");
     changeComponent("finish");
+  } else {
+    const target = userInfo.venue.targets[userInfo.venue.pos];
+    target.targetStatus = 1;
+    updateStatus(target.no, 2);
   }
 };
 
@@ -408,12 +432,7 @@ const initGetMsg = () => {
     const message = (res.value as any)?.message;
     if (message) {
       if (message.startsWith("#")) {
-        const no = message.substring(1);
-        const pos = userInfo.venue.targets.findIndex(
-          (_target: any) => _target.no === Number(no)
-        );
-        mission.value = userInfo.venue.targets[pos];
-        missionDialog.value = true;
+        showMissionDialog(message);
       } else {
         setSnackbar(true, -1, "info", "top", message);
       }
@@ -478,6 +497,17 @@ const clearPos = async () => {
       userId: userInfo.userId,
     },
   });
+};
+
+const showMissionDialog = (message: string) => {
+  const no = message.substring(1).trim();
+  const pos = userInfo.venue.targets.findIndex(
+    (_target: any) => _target.no === Number(no)
+  );
+  userInfo.venue.targets[pos].targetStatus = 1;
+  mission.value = userInfo.venue.targets[pos];
+  missionDialog.value = true;
+  refTargetInfo.value.slideTo(pos);
 };
 
 onMounted(() => {

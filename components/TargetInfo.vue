@@ -12,7 +12,7 @@
     </v-toolbar>
     <Swiper
       :slides-per-view="1"
-      :initial-slide="propsTargetInfo.user.venue.pos"
+      :initial-slide="slidePos"
       :loop="false"
       :effect="'creative'"
       :creative-effect="{
@@ -24,6 +24,8 @@
           translate: ['100%', 0, 0],
         },
       }"
+      :key="refresh"
+      @slideChange="onSlideChange"
     >
       <SwiperSlide
         v-for="(target, i) in targets"
@@ -51,7 +53,7 @@
           </transition>
           <v-img
             :class="[
-              i > 0 && target.targetStatus === 0 ? 'passive' : '',
+              target.targetStatus === 0 ? 'passive' : '',
               target.targetStatus === 2 ? 'clear' : '',
             ]"
             :src="target.image"
@@ -88,12 +90,15 @@ const emitsTargetInfo = defineEmits<{
     msg: string
   ): void;
   (e: "openMsgDialog"): void;
+  (e: "onSlideChange", activeIndex: number): void;
 }>();
 
 const propsTargetInfo = defineProps<{
   user: any;
 }>();
 
+const slidePos = ref(propsTargetInfo.user.venue.pos);
+const refresh = ref(0);
 const imageHeight = 800;
 const imageWidth = 600;
 
@@ -102,6 +107,19 @@ const targets = ref(propsTargetInfo.user.venue.targets);
 const openMsgDialog = () => {
   emitsTargetInfo("openMsgDialog");
 };
+
+const onSlideChange = (e: any) => {
+  emitsTargetInfo("onSlideChange", e.activeIndex);
+};
+
+const slideTo = (pos: number) => {
+  slidePos.value = pos;
+  refresh.value++;
+};
+
+defineExpose({
+  slideTo,
+});
 </script>
 
 <style scoped lang="scss">
