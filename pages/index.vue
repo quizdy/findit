@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <v-main
-      ><v-btn @click="showMissionDialog('#2')" style="position: absolute"
+      ><v-btn
+        @click="showMissionDialog('#2')"
+        style="position: absolute; z-index: 999"
         >aaa</v-btn
       >
       <TargetInfo
@@ -156,28 +158,19 @@ const pollingMsgId = ref();
 
 const stream = ref();
 
-const changeComponent = async (componentName: string) => {
-  if (currentComponent.value === "login" && componentName === "targetInfo") {
-    await initAttendee();
-    await initGeolocation();
-    await initMedia();
-    initGetMsg();
+const changeComponent = (componentName: string) => {
+  if (currentComponent.value === "login") {
+    init();
   }
-  if (
-    currentComponent.value !== "targetMap" &&
-    typeof refTargetMap.value !== "undefined" &&
-    refTargetMap.value !== null
-  ) {
-    refTargetMap.value.stopDrawMap();
-  }
-  if (
-    currentComponent.value !== "targetScan" &&
-    typeof refTargetScan.value !== "undefined" &&
-    refTargetScan.value !== null
-  ) {
-    refTargetScan.value.stopVideo();
-  }
+
   currentComponent.value = componentName;
+};
+
+const init = async () => {
+  await initAttendee();
+  await initGeolocation();
+  await initMedia();
+  initGetMsg();
 };
 
 const setSnackbar = (
@@ -202,8 +195,13 @@ const closeMsgDialog = () => {
   msgDialog.value = false;
 };
 
-const closeMissionDialog = () => {
+const closeMissionDialog = (no: number) => {
   missionDialog.value = false;
+
+  const pos = userInfo.venue.targets.findIndex(
+    (_target: any) => _target.no === no
+  );
+  refTargetInfo.value.slideTo(pos);
 };
 
 const closeLogoutDialog = () => {
@@ -243,11 +241,6 @@ const login = async (userId: string) => {
 
   if (!userInfo.venue.targets.some((_target) => _target.targetStatus === 1)) {
     userInfo.venue.targets[0].targetStatus = 1;
-  }
-
-  for (let i = 0; i < userInfo.venue.targets.length; i++) {
-    let aaa = userInfo.venue.targets[i];
-    console.log(aaa.title, aaa.targetStatus);
   }
 
   changeComponent("targetInfo");
@@ -334,21 +327,6 @@ const initGeolocation = () => {
   }
 
   clearPos();
-
-  // navigator.geolocation.getCurrentPosition(
-  //   (position) => {
-  //     const userPos = getUserPos(position);
-  //     setUserPos(userPos);
-  //   },
-  //   (e: any) => {
-  //     setSnackbar(true, 2000, "warning", "top", e.message);
-  //     return;
-  //   },
-  //   {
-  //     enableHighAccuracy: true,
-  //     timeout: 2000,
-  //   }
-  // );
 
   navigator.geolocation.watchPosition(
     (position) => {
@@ -507,7 +485,7 @@ const showMissionDialog = (message: string) => {
   userInfo.venue.targets[pos].targetStatus = 1;
   mission.value = userInfo.venue.targets[pos];
   missionDialog.value = true;
-  refTargetInfo.value.slideTo(pos);
+  changeComponent("targetInfo");
 };
 
 onMounted(() => {

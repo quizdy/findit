@@ -1,66 +1,92 @@
 <template>
   <div style="max-width: 600px; margin: 0 auto">
-    <v-row no-gutters>
-      <v-col cols="12">
-        <div class="layout">
-          <v-progress-circular
-            v-show="loading"
-            indeterminate
-            color="light-blue"
-            :size="70"
-            :width="7"
-            style="margin: 50% calc(50% - 2rem)"
-          ></v-progress-circular>
-          <video
-            id="webcam"
-            class="d-none"
-            autoplay
-            muted
-            playsinline
-            :height="imageHeight"
-            :width="imageWidth"
-          ></video>
-          <canvas
-            v-show="!loading"
-            id="webcamCanvas"
-            class="webcamCanvas"
-            :height="imageHeight"
-            :width="imageWidth"
-          ></canvas>
-          <img
-            class="targetImage"
-            :src="
-              propsTargetScan.venue.targets[propsTargetScan.venue.pos].image
-            "
-            :style="{
-              opacity: scan.opacity / 100,
-              height: imageHeight,
-              width: imageWidth,
-            }"
-          />
-        </div>
-      </v-col>
-    </v-row>
-    <v-row dense>
-      <v-col cols="12">
-        <v-slider
-          class="mx-4"
-          max="100"
-          min="0"
-          color="blue"
-          dense
-          hide-details="false"
-          v-model="scan.opacity"
-        ></v-slider>
-      </v-col>
-    </v-row>
-    <v-row dense>
-      <v-col cols="12" style="text-align: center">
-        <v-btn class="mx-4" min-width="300" @click="scanImage"
-          ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
-        >
-      </v-col>
-    </v-row>
+    <v-container v-show="targetType === ''" class="ma-0 pa-0">
+      <v-row no-gutters>
+        <v-col cols="12">
+          <div class="layout">
+            <v-progress-circular
+              v-show="loading"
+              indeterminate
+              color="light-blue"
+              :size="70"
+              :width="7"
+              style="margin: 50% calc(50% - 2rem)"
+            ></v-progress-circular>
+            <video
+              id="webcam"
+              class="d-none"
+              autoplay
+              muted
+              playsinline
+              :height="imageHeight"
+              :width="imageWidth"
+            ></video>
+            <canvas
+              v-show="!loading"
+              id="webcamCanvas"
+              class="webcamCanvas"
+              :height="imageHeight"
+              :width="imageWidth"
+            ></canvas>
+            <img
+              class="targetImage"
+              :src="
+                propsTargetScan.venue.targets[propsTargetScan.venue.pos].image
+              "
+              :style="{
+                opacity: scan.opacity / 100,
+                height: imageHeight,
+                width: imageWidth,
+              }"
+            />
+          </div>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <v-col cols="12">
+          <v-slider
+            class="mx-4"
+            max="100"
+            min="0"
+            color="blue"
+            dense
+            hide-details="false"
+            v-model="scan.opacity"
+          ></v-slider>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <v-col cols="12" style="text-align: center">
+          <v-btn class="mx-4" min-width="300" @click="scanImage"
+            ><v-icon>mdi-line-scan</v-icon>スキャン</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-container v-show="targetType === 'passcode'" class="ma-0 pa-0">
+      <v-row no-gutters>
+        <v-col cols="12">
+          <div class="layout">
+            <div class="d-flex align-center justify-center">
+              <v-text-field
+                class="mx-4"
+                bg-color="#fff"
+                variant="outlined"
+                v-model="passcode"
+              ></v-text-field>
+            </div>
+          </div>
+          <div class="passcode"></div>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <v-col cols="12" style="text-align: center">
+          <v-btn class="mx-4" min-width="300" @click="sendPasscode"
+            ><v-icon>mdi-lock-open</v-icon> コード送信</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-container>
     <v-overlay
       :model-value="overlay"
       class="align-center justify-center"
@@ -107,6 +133,11 @@ const scan = reactive({
   opacity: 0,
 });
 
+const passcode = ref("");
+
+const targetType = ref(
+  propsTargetScan.venue.targets[propsTargetScan.venue.pos].type
+);
 const overlay = ref(false);
 const matchPercentageValue = ref(0);
 const progressInterval = ref();
@@ -117,6 +148,10 @@ const imageWidth = 600;
 
 onMounted(async () => {
   startVideo();
+});
+
+onUnmounted(() => {
+  stopVideo();
 });
 
 const startVideo = async () => {
@@ -198,6 +233,10 @@ const showProgress = () => {
     }
     matchPercentageValue.value += 1;
   }, 100);
+};
+
+const sendPasscode = () => {
+  alert(passcode.value);
 };
 
 defineExpose({

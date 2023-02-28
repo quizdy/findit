@@ -81,6 +81,7 @@ onMounted(async () => {
   });
 
   const usersPos = await getUsersPos();
+
   const myself = usersPos.filter(
     (_userPos) => _userPos.userId === propsTargetMap.user.userId
   );
@@ -122,6 +123,10 @@ onMounted(async () => {
   watchUsersPos();
 });
 
+onUnmounted(() => {
+  stopDrawMap();
+});
+
 const setUserPos = (userPos: any) => {
   setUserMarker(userPos);
 };
@@ -129,7 +134,7 @@ const setUserPos = (userPos: any) => {
 const watchUsersPos = () => {
   pollingPosId.value = setInterval(() => {
     setUsersPos();
-  }, 3000);
+  }, 2000);
 };
 
 const getUsersPos = async (): Promise<any[]> => {
@@ -148,7 +153,6 @@ const setUsersPos = async () => {
 
 const setUserMarker = (userPos: any) => {
   const latLng = new google.maps.LatLng(userPos.gps.lat, userPos.gps.lng);
-
   const markers = userMarkers.value.filter(
     (_marker) => _marker.userId === userPos.userId
   );

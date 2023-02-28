@@ -29,7 +29,7 @@ const emitsMissionDialog = defineEmits<{
     location: string,
     adminMsg: string
   ): void;
-  (e: "closeMissionDialog"): void;
+  (e: "closeMissionDialog", no: number): void;
 }>();
 
 const propsMissionDialog = defineProps<{
@@ -37,7 +37,7 @@ const propsMissionDialog = defineProps<{
 }>();
 
 const closeMissionDialog = () => {
-  emitsMissionDialog("closeMissionDialog");
+  emitsMissionDialog("closeMissionDialog", propsMissionDialog.mission.no);
 };
 </script>
 
