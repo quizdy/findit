@@ -65,25 +65,32 @@
     </v-container>
     <v-container v-show="targetType === 'passcode'" class="ma-0 pa-0">
       <v-row no-gutters>
-        <v-col cols="12">
-          <div class="layout">
-            <div class="d-flex align-center justify-center">
+        <v-col>
+          <div class="layout d-flex align-center justify-center">
+            <img
+              class="targetImage"
+              :src="
+                propsTargetScan.venue.targets[propsTargetScan.venue.pos].image
+              "
+              :style="{
+                height: imageHeight,
+                width: imageWidth,
+              }"
+            />
+            <div
+              class="d-flex flex-column rounded px-4 py-8"
+              style="background-color: #fff; opacity: 0.95"
+            >
               <v-text-field
-                class="mx-4"
                 bg-color="#fff"
                 variant="outlined"
                 v-model="passcode"
               ></v-text-field>
+              <v-btn height="48px" min-width="300" @click="sendPasscode"
+                ><v-icon>mdi-lock-open</v-icon> コード送信</v-btn
+              >
             </div>
           </div>
-          <div class="passcode"></div>
-        </v-col>
-      </v-row>
-      <v-row dense>
-        <v-col cols="12" style="text-align: center">
-          <v-btn class="mx-4" min-width="300" @click="sendPasscode"
-            ><v-icon>mdi-lock-open</v-icon> コード送信</v-btn
-          >
         </v-col>
       </v-row>
     </v-container>

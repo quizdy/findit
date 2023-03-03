@@ -27,15 +27,11 @@
       :key="refresh"
       @slideChange="onSlideChange"
     >
-      <SwiperSlide
-        v-for="(target, i) in targets"
-        :key="i"
-        v-show="target.type === '' || target.targetStatus === 1"
-      >
+      <SwiperSlide v-for="(slide, i) in slides" :key="i" :data-no="slide.no">
         <div class="layout">
           <transition name="fade">
             <v-icon
-              v-show="target.targetStatus === 2"
+              v-show="slide.targetStatus === 2"
               size="10rem"
               color="success"
               class="check"
@@ -44,7 +40,7 @@
           </transition>
           <transition name="fade">
             <v-icon
-              v-show="target.targetStatus === 2"
+              v-show="slide.targetStatus === 2"
               size="10rem"
               color="white"
               class="circle"
@@ -53,10 +49,10 @@
           </transition>
           <v-img
             :class="[
-              target.targetStatus === 0 ? 'passive' : '',
-              target.targetStatus === 2 ? 'clear' : '',
+              slide.targetStatus === 0 ? 'passive' : '',
+              slide.targetStatus === 2 ? 'clear' : '',
             ]"
-            :src="target.image"
+            :src="slide.image"
           >
             <template v-slot:placeholder>
               <v-row class="fill-height ma-0" align="center" justify="center">
@@ -69,9 +65,9 @@
           </v-img>
         </div>
         <div class="frame">
-          <h3 class="pa-2">{{ target.title }}</h3>
+          <h3 class="pa-2">{{ slide.title }}</h3>
           <div class="comment">
-            {{ target.comments }}
+            {{ slide.comments }}
           </div>
         </div>
       </SwiperSlide>
@@ -90,7 +86,7 @@ const emitsTargetInfo = defineEmits<{
     msg: string
   ): void;
   (e: "openMsgDialog"): void;
-  (e: "onSlideChange", activeIndex: number): void;
+  (e: "onSlideChange", pos: number): void;
 }>();
 
 const propsTargetInfo = defineProps<{
@@ -109,8 +105,18 @@ const openMsgDialog = () => {
 };
 
 const onSlideChange = (e: any) => {
-  emitsTargetInfo("onSlideChange", e.activeIndex);
+  const no = e.slides[e.activeIndex].getAttribute("data-no");
+  const pos = targets.value.findIndex(
+    (_target: any) => _target.no === Number(no)
+  );
+  emitsTargetInfo("onSlideChange", pos);
 };
+
+const slides = computed(() => {
+  return targets.value.filter(
+    (_target: any) => _target.type === "" || _target.targetStatus === 1
+  );
+});
 
 const slideTo = (pos: number) => {
   slidePos.value = pos;

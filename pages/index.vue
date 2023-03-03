@@ -2,7 +2,7 @@
   <v-app>
     <v-main
       ><v-btn
-        @click="showMissionDialog('#2')"
+        @click="showMissionDialog('#4')"
         style="position: absolute; z-index: 999"
         >aaa</v-btn
       >
@@ -34,14 +34,6 @@
         @login="login"
       />
       <Finish v-if="currentComponent === 'finish'" />
-      <v-progress-circular
-        v-show="loading"
-        class="loading"
-        indeterminate
-        color="light-blue"
-        :size="70"
-        :width="7"
-      ></v-progress-circular>
     </v-main>
     <v-bottom-navigation
       v-model="currentComponent"
@@ -106,6 +98,14 @@
           @clearPos="clearPos"
         />
       </v-dialog>
+      <v-overlay :model-value="loading" class="align-center justify-center">
+        <v-progress-circular
+          indeterminate
+          color="light-blue"
+          :size="70"
+          :width="7"
+        ></v-progress-circular>
+      </v-overlay>
     </client-only>
     <!-- admin link -->
     <div class="admin-icon" @click="openAdmin">
@@ -115,6 +115,8 @@
 </template>
 
 <script setup lang="ts">
+import { asArray } from "@unhead/vue";
+
 interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
   requestPermission?: () => Promise<"granted" | "denied">;
 }
@@ -159,10 +161,18 @@ const pollingMsgId = ref();
 const stream = ref();
 
 const changeComponent = (componentName: string) => {
-  if (currentComponent.value === "login") {
-    init();
+  const target = userInfo.venue.targets[userInfo.venue.pos];
+  if (componentName === "targetScan" && target.targetStatus === 0) {
+    setSnackbar(
+      true,
+      2000,
+      "warning",
+      "center",
+      "選択したターゲットは、まだスキャンできません"
+    );
+    currentComponent.value = "targetInfo";
+    return;
   }
-
   currentComponent.value = componentName;
 };
 
@@ -213,6 +223,7 @@ const login = async (userId: string) => {
 
   if (!userId) {
     setSnackbar(true, 2000, "warning", "top", "ユーザＩＤを入力して下さい");
+    loading.value = false;
     return;
   }
 
@@ -223,6 +234,7 @@ const login = async (userId: string) => {
 
   if (!resGetUser.value.userId) {
     setSnackbar(true, 2000, "warning", "top", "ユーザが見つかりませんでした");
+    loading.value = false;
     return;
   }
 
@@ -230,6 +242,7 @@ const login = async (userId: string) => {
 
   if (user.venue.targets.length === 0) {
     setSnackbar(true, 2000, "warning", "top", "ターゲットが登録されていません");
+    loading.value = false;
     return;
   }
 
@@ -243,13 +256,15 @@ const login = async (userId: string) => {
     userInfo.venue.targets[0].targetStatus = 1;
   }
 
+  await init();
+
   changeComponent("targetInfo");
 
   loading.value = false;
 };
 
-const onSlideChange = (activeIndex: number) => {
-  userInfo.venue.pos = activeIndex;
+const onSlideChange = (pos: number) => {
+  userInfo.venue.pos = pos;
 };
 
 const nextTarget = async () => {
@@ -458,14 +473,7 @@ const initMedia = async () => {
     (constraints.video as any) = true;
   }
 
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((st) => {
-      stream.value = st;
-    })
-    .catch((e) => {
-      setSnackbar(true, 2000, "warning", "top", e.name);
-    });
+  stream.value = await navigator.mediaDevices.getUserMedia(constraints);
 };
 
 const clearPos = async () => {
@@ -495,25 +503,15 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(pollingMsgId.value);
   clearPos();
-  // if (stream.value) {
-  //   stream.value.getTracks().forEach((track: any) => {
-  //     track.stop();
-  //   });
-  // }
+  if (stream.value) {
+    stream.value.getTracks().forEach((track: any) => {
+      track.stop();
+    });
+  }
 });
 </script>
 
 <style scoped lang="scss">
-.loading {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  opacity: 0.8;
-  z-index: 999;
-}
 .admin-icon {
   position: fixed;
   bottom: 0.5rem;
