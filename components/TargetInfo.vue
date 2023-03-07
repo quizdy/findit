@@ -114,7 +114,10 @@ const onSlideChange = (e: any) => {
 
 const slides = computed(() => {
   return targets.value.filter(
-    (_target: any) => _target.type === "" || _target.targetStatus === 1
+    (_target: any) =>
+      _target.type === "" ||
+      _target.targetStatus === 2 ||
+      (_target.type !== "" && _target.targetStatus === 1)
   );
 });
 

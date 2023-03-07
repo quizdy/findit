@@ -2,7 +2,7 @@
   <v-app>
     <v-main
       ><v-btn
-        @click="showMissionDialog('#4')"
+        @click="showMissionDialog('#2')"
         style="position: absolute; z-index: 999"
         >aaa</v-btn
       >
@@ -25,7 +25,7 @@
         :venue="userInfo.venue"
         :stream="stream"
         @setSnackbar="setSnackbar"
-        @nextTarget="nextTarget"
+        @foundTarget="foundTarget"
         ref="refTargetScan"
       />
       <Login
@@ -115,8 +115,6 @@
 </template>
 
 <script setup lang="ts">
-import { asArray } from "@unhead/vue";
-
 interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
   requestPermission?: () => Promise<"granted" | "denied">;
 }
@@ -267,7 +265,7 @@ const onSlideChange = (pos: number) => {
   userInfo.venue.pos = pos;
 };
 
-const nextTarget = async () => {
+const foundTarget = async () => {
   changeComponent("targetInfo");
   await new Promise((resolve) => setTimeout(resolve, 1000));
   checkedMp3.value.play();
@@ -277,7 +275,7 @@ const nextTarget = async () => {
   updateStatus(target.no, 2);
 
   userInfo.venue.pos = userInfo.venue.targets.findIndex(
-    (_target: any) => _target.type === "" || _target.targetStatus === 0
+    (_target: any) => _target.type === "" && _target.targetStatus === 0
   );
 
   if (userInfo.venue.pos < 0) {
@@ -287,7 +285,7 @@ const nextTarget = async () => {
   } else {
     const target = userInfo.venue.targets[userInfo.venue.pos];
     target.targetStatus = 1;
-    updateStatus(target.no, 2);
+    updateStatus(target.no, 1);
   }
 };
 

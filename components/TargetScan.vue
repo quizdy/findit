@@ -1,6 +1,9 @@
 <template>
   <div style="max-width: 600px; margin: 0 auto">
-    <v-container v-show="targetType === ''" class="ma-0 pa-0">
+    <v-container
+      v-show="targetType === '' || targetType === 'additional'"
+      class="ma-0 pa-0"
+    >
       <v-row no-gutters>
         <v-col cols="12">
           <div class="layout">
@@ -126,7 +129,7 @@ const emitsTargetScan = defineEmits<{
     msg: string
   ): void;
   (e: "changeComponent", componentName: string): void;
-  (e: "nextTarget"): void;
+  (e: "foundTarget"): void;
 }>();
 
 const propsTargetScan = defineProps<{
@@ -233,7 +236,7 @@ const showProgress = () => {
         propsTargetScan.venue.targets[propsTargetScan.venue.pos].gap
       ) {
         stopVideo();
-        emitsTargetScan("nextTarget");
+        emitsTargetScan("foundTarget");
       }
       webcam.play();
       return;
